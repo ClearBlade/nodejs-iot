@@ -26,9 +26,11 @@ import type {
   PaginationCallback,
   GaxCall,
 } from 'google-gax';
-import {Transform} from 'stream';
+import { Transform } from 'stream';
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
+import * as https from "https"
+
 /**
  * Client JSON configuration object, loaded from
  * `src/v1/device_manager_client_config.json`.
@@ -36,6 +38,19 @@ import jsonProtos = require('../../protos/protos.json');
  */
 import * as gapicConfig from './device_manager_client_config.json';
 const version = require('../../../package.json').version;
+
+/**
+ * ClearBlade Constants
+ */
+const adminSystemKey = '84abb9b30ca4ece486d4bcf7ad71';
+const adminSystemUserToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Y2YxZGViMzBjYjBkMmNjODk4Njk3OWNkZGZmMDEiLCJzaWQiOiIxMWQxMzljMy1iNmQzLTQ2Y2QtODg4OC0xOTE1ZDQyZjY5M2YiLCJ1dCI6MiwidHQiOjEsImV4cCI6MTY2NTg1ODE1OSwiaWF0IjoxNjY1NDI2MTU5fQ.aoQRw_NBm7FY1Zhy5tJGf_vPVCA-QA8Wal5MMluZo4c';
+/**
+ * User Constants (Needs to fetch from service account auth JSON)
+ */
+const constRegion = 'us-central1';
+const constRegistry = 'ingressRegistry';
+const constProject = 'ingressdevelopmentenv';
+
 
 /**
  *  Internet of Things (IoT) service. Securely connect and manage IoT devices.
@@ -49,7 +64,7 @@ export class DeviceManagerClient {
   private _gaxModule: typeof gax | typeof gax.fallback;
   private _gaxGrpc: gax.GrpcClient | gax.fallback.GrpcClient;
   private _protos: {};
-  private _defaults: {[method: string]: gax.CallSettings};
+  private _defaults: { [method: string]: gax.CallSettings };
   auth: gax.GoogleAuth;
   descriptors: Descriptors = {
     page: {},
@@ -58,9 +73,9 @@ export class DeviceManagerClient {
     batching: {},
   };
   warn: (code: string, message: string, warnType?: string) => void;
-  innerApiCalls: {[name: string]: Function};
-  pathTemplates: {[name: string]: gax.PathTemplate};
-  deviceManagerStub?: Promise<{[name: string]: Function}>;
+  innerApiCalls: { [name: string]: Function };
+  pathTemplates: { [name: string]: gax.PathTemplate };
+  deviceManagerStub?: Promise<{ [name: string]: Function }>;
 
   /**
    * Construct an instance of DeviceManagerClient.
@@ -118,7 +133,7 @@ export class DeviceManagerClient {
     const fallback =
       opts?.fallback ??
       (typeof window !== 'undefined' && typeof window?.fetch === 'function');
-    opts = Object.assign({servicePath, port, clientConfig, fallback}, opts);
+    opts = Object.assign({ servicePath, port, clientConfig, fallback }, opts);
 
     // If scopes are unset in options and we're connecting to a non-default endpoint, set scopes just in case.
     if (servicePath !== staticMembers.servicePath && !('scopes' in opts)) {
@@ -207,7 +222,7 @@ export class DeviceManagerClient {
       'google.cloud.iot.v1.DeviceManager',
       gapicConfig as gax.ClientConfig,
       opts.clientConfig || {},
-      {'x-goog-api-client': clientHeader.join(' ')}
+      { 'x-goog-api-client': clientHeader.join(' ') }
     );
 
     // Set up a dictionary of "inner API calls"; the core implementation
@@ -234,20 +249,21 @@ export class DeviceManagerClient {
     // If the client stub promise is already initialized, return immediately.
     if (this.deviceManagerStub) {
       return this.deviceManagerStub;
-    }
+    }    
+
 
     // Put together the "service stub" for
     // google.cloud.iot.v1.DeviceManager.
     this.deviceManagerStub = this._gaxGrpc.createStub(
       this._opts.fallback
         ? (this._protos as protobuf.Root).lookupService(
-            'google.cloud.iot.v1.DeviceManager'
-          )
+          'google.cloud.iot.v1.DeviceManager'
+        )
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (this._protos as any).google.cloud.iot.v1.DeviceManager,
+        (this._protos as any).google.cloud.iot.v1.DeviceManager,
       this._opts,
       this._providedCustomServicePath
-    ) as Promise<{[method: string]: Function}>;
+    ) as Promise<{ [method: string]: Function }>;
 
     // Iterate over each of the methods that the service provides
     // and create an API call method for each.
@@ -294,10 +310,8 @@ export class DeviceManagerClient {
         descriptor,
         this._opts.fallback
       );
-
       this.innerApiCalls[methodName] = apiCall;
     }
-
     return this.deviceManagerStub;
   }
 
@@ -415,12 +429,12 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.cloud.iot.v1.IDeviceRegistry,
-          | protos.google.cloud.iot.v1.ICreateDeviceRegistryRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
+        protos.google.cloud.iot.v1.IDeviceRegistry,
+        | protos.google.cloud.iot.v1.ICreateDeviceRegistryRequest
+        | null
+        | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.cloud.iot.v1.IDeviceRegistry,
       | protos.google.cloud.iot.v1.ICreateDeviceRegistryRequest
@@ -503,12 +517,12 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.cloud.iot.v1.IDeviceRegistry,
-          | protos.google.cloud.iot.v1.IGetDeviceRegistryRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
+        protos.google.cloud.iot.v1.IDeviceRegistry,
+        | protos.google.cloud.iot.v1.IGetDeviceRegistryRequest
+        | null
+        | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.cloud.iot.v1.IDeviceRegistry,
       protos.google.cloud.iot.v1.IGetDeviceRegistryRequest | null | undefined,
@@ -600,12 +614,12 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.cloud.iot.v1.IDeviceRegistry,
-          | protos.google.cloud.iot.v1.IUpdateDeviceRegistryRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
+        protos.google.cloud.iot.v1.IDeviceRegistry,
+        | protos.google.cloud.iot.v1.IUpdateDeviceRegistryRequest
+        | null
+        | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.cloud.iot.v1.IDeviceRegistry,
       | protos.google.cloud.iot.v1.IUpdateDeviceRegistryRequest
@@ -692,12 +706,12 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.protobuf.IEmpty,
-          | protos.google.cloud.iot.v1.IDeleteDeviceRegistryRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
+        protos.google.protobuf.IEmpty,
+        | protos.google.cloud.iot.v1.IDeleteDeviceRegistryRequest
+        | null
+        | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.protobuf.IEmpty,
       | protos.google.cloud.iot.v1.IDeleteDeviceRegistryRequest
@@ -785,10 +799,10 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.cloud.iot.v1.IDevice,
-          protos.google.cloud.iot.v1.ICreateDeviceRequest | null | undefined,
-          {} | null | undefined
-        >,
+        protos.google.cloud.iot.v1.IDevice,
+        protos.google.cloud.iot.v1.ICreateDeviceRequest | null | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.cloud.iot.v1.IDevice,
       protos.google.cloud.iot.v1.ICreateDeviceRequest | null | undefined,
@@ -874,10 +888,10 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.cloud.iot.v1.IDevice,
-          protos.google.cloud.iot.v1.IGetDeviceRequest | null | undefined,
-          {} | null | undefined
-        >,
+        protos.google.cloud.iot.v1.IDevice,
+        protos.google.cloud.iot.v1.IGetDeviceRequest | null | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.cloud.iot.v1.IDevice,
       protos.google.cloud.iot.v1.IGetDeviceRequest | null | undefined,
@@ -965,10 +979,10 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.cloud.iot.v1.IDevice,
-          protos.google.cloud.iot.v1.IUpdateDeviceRequest | null | undefined,
-          {} | null | undefined
-        >,
+        protos.google.cloud.iot.v1.IDevice,
+        protos.google.cloud.iot.v1.IUpdateDeviceRequest | null | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.cloud.iot.v1.IDevice,
       protos.google.cloud.iot.v1.IUpdateDeviceRequest | null | undefined,
@@ -1050,10 +1064,10 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.protobuf.IEmpty,
-          protos.google.cloud.iot.v1.IDeleteDeviceRequest | null | undefined,
-          {} | null | undefined
-        >,
+        protos.google.protobuf.IEmpty,
+        protos.google.cloud.iot.v1.IDeleteDeviceRequest | null | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.protobuf.IEmpty,
       protos.google.cloud.iot.v1.IDeleteDeviceRequest | null | undefined,
@@ -1149,12 +1163,12 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.cloud.iot.v1.IDeviceConfig,
-          | protos.google.cloud.iot.v1.IModifyCloudToDeviceConfigRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
+        protos.google.cloud.iot.v1.IDeviceConfig,
+        | protos.google.cloud.iot.v1.IModifyCloudToDeviceConfigRequest
+        | null
+        | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.cloud.iot.v1.IDeviceConfig,
       | protos.google.cloud.iot.v1.IModifyCloudToDeviceConfigRequest
@@ -1251,12 +1265,12 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse,
-          | protos.google.cloud.iot.v1.IListDeviceConfigVersionsRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
+        protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse,
+        | protos.google.cloud.iot.v1.IListDeviceConfigVersionsRequest
+        | null
+        | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse,
       | protos.google.cloud.iot.v1.IListDeviceConfigVersionsRequest
@@ -1349,12 +1363,12 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.cloud.iot.v1.IListDeviceStatesResponse,
-          | protos.google.cloud.iot.v1.IListDeviceStatesRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
+        protos.google.cloud.iot.v1.IListDeviceStatesResponse,
+        | protos.google.cloud.iot.v1.IListDeviceStatesRequest
+        | null
+        | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.cloud.iot.v1.IListDeviceStatesResponse,
       protos.google.cloud.iot.v1.IListDeviceStatesRequest | null | undefined,
@@ -1447,10 +1461,10 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.iam.v1.IPolicy,
-          protos.google.iam.v1.ISetIamPolicyRequest | null | undefined,
-          {} | null | undefined
-        >,
+        protos.google.iam.v1.IPolicy,
+        protos.google.iam.v1.ISetIamPolicyRequest | null | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.iam.v1.IPolicy,
       protos.google.iam.v1.ISetIamPolicyRequest | null | undefined,
@@ -1536,10 +1550,10 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.iam.v1.IPolicy,
-          protos.google.iam.v1.IGetIamPolicyRequest | null | undefined,
-          {} | null | undefined
-        >,
+        protos.google.iam.v1.IPolicy,
+        protos.google.iam.v1.IGetIamPolicyRequest | null | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.iam.v1.IPolicy,
       protos.google.iam.v1.IGetIamPolicyRequest | null | undefined,
@@ -1627,10 +1641,10 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.iam.v1.ITestIamPermissionsResponse,
-          protos.google.iam.v1.ITestIamPermissionsRequest | null | undefined,
-          {} | null | undefined
-        >,
+        protos.google.iam.v1.ITestIamPermissionsResponse,
+        protos.google.iam.v1.ITestIamPermissionsRequest | null | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.iam.v1.ITestIamPermissionsResponse,
       protos.google.iam.v1.ITestIamPermissionsRequest | null | undefined,
@@ -1732,12 +1746,12 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.cloud.iot.v1.ISendCommandToDeviceResponse,
-          | protos.google.cloud.iot.v1.ISendCommandToDeviceRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
+        protos.google.cloud.iot.v1.ISendCommandToDeviceResponse,
+        | protos.google.cloud.iot.v1.ISendCommandToDeviceRequest
+        | null
+        | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.cloud.iot.v1.ISendCommandToDeviceResponse,
       protos.google.cloud.iot.v1.ISendCommandToDeviceRequest | null | undefined,
@@ -1750,23 +1764,50 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        name: request.name || '',
+
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const payload = JSON.stringify({
+        binaryData: request?.binaryData,
+        subfolder: request?.subfolder
+      })
+      var options = {
+        host: 'iot-sandbox.clearblade.com',
+        port: '443',
+        path: `/api/v/4/webhook/execute/` + token.systemKey + `/devices?method=sendCommandToDevice&name=` + request?.name,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': token.serviceAccountToken,
+          'Content-Length': payload.length
+        }
+      };      
+      
+      const req = https.request({
+        ...options,
+      }, res => {
+        let data = '';
+        const chunks: any[] = [];
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          let array: [protos.google.cloud.iot.v1.ISendCommandToDeviceResponse, protos.google.cloud.iot.v1.ISendCommandToDeviceRequest | undefined, {} | undefined];
+
+          const isendcommandtodevicerequest: protos.google.cloud.iot.v1.ISendCommandToDeviceRequest | undefined = {};
+          const isendcommandtodeviceresponse: protos.google.cloud.iot.v1.ISendCommandToDeviceResponse = {};
+          array = [isendcommandtodevicerequest, isendcommandtodeviceresponse, {}];
+          resolve(array);
+        })
+      })
+      req.on('error', (e) => {
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.sendCommandToDevice(request, options, callback);
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    })
+
   }
   /**
    * Associates the device with the gateway.
@@ -1825,12 +1866,12 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.cloud.iot.v1.IBindDeviceToGatewayResponse,
-          | protos.google.cloud.iot.v1.IBindDeviceToGatewayRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
+        protos.google.cloud.iot.v1.IBindDeviceToGatewayResponse,
+        | protos.google.cloud.iot.v1.IBindDeviceToGatewayRequest
+        | null
+        | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.cloud.iot.v1.IBindDeviceToGatewayResponse,
       protos.google.cloud.iot.v1.IBindDeviceToGatewayRequest | null | undefined,
@@ -1922,12 +1963,12 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | Callback<
-          protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayResponse,
-          | protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
+        protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayResponse,
+        | protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayRequest
+        | null
+        | undefined,
+        {} | null | undefined
+      >,
     callback?: Callback<
       protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayResponse,
       | protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayRequest
@@ -2031,12 +2072,12 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | PaginationCallback<
-          protos.google.cloud.iot.v1.IListDeviceRegistriesRequest,
-          | protos.google.cloud.iot.v1.IListDeviceRegistriesResponse
-          | null
-          | undefined,
-          protos.google.cloud.iot.v1.IDeviceRegistry
-        >,
+        protos.google.cloud.iot.v1.IListDeviceRegistriesRequest,
+        | protos.google.cloud.iot.v1.IListDeviceRegistriesResponse
+        | null
+        | undefined,
+        protos.google.cloud.iot.v1.IDeviceRegistry
+      >,
     callback?: PaginationCallback<
       protos.google.cloud.iot.v1.IListDeviceRegistriesRequest,
       | protos.google.cloud.iot.v1.IListDeviceRegistriesResponse
@@ -2051,24 +2092,96 @@ export class DeviceManagerClient {
       protos.google.cloud.iot.v1.IListDeviceRegistriesResponse
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        parent: request.parent || '',
+    return new Promise(async (resolve, reject) => {
+      const payload = JSON.stringify({
+        parent: request?.parent
+      })
+      var options = {
+        host: 'iot-sandbox.clearblade.com',
+        path: `/api/v/1/code/`+ adminSystemKey +`/registriesList`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': adminSystemUserToken          
+        }
+      };
+      
+      const req = https.request({        
+        ...options,
+      }, res => {
+        let data = '';
+        const chunks: any[] = [];
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          
+          let array: [protos.google.cloud.iot.v1.IDeviceRegistry[], protos.google.cloud.iot.v1.IListDeviceRegistriesRequest | null, protos.google.cloud.iot.v1.IListDeviceRegistriesResponse];
+
+          const ideviceregistry: protos.google.cloud.iot.v1.IDeviceRegistry[] = [];
+
+          //for loop fetching JSON
+          const registry: protos.google.cloud.iot.v1.IDeviceRegistry = {};
+          
+          const registriesList = JSON.parse(data);
+          for (let index in registriesList.deviceRegistries) {
+            registry.name = registriesList.deviceRegistries[index].name;
+            registry.id = registriesList.deviceRegistries[index].id;
+            ideviceregistry.push(registry);
+          }
+
+          const ilistDeviceregistriesrequest: protos.google.cloud.iot.v1.IListDeviceRegistriesRequest = {};
+          const ilistdeviceregistriesresponse: protos.google.cloud.iot.v1.IListDeviceRegistriesResponse = {};
+          ilistdeviceregistriesresponse.deviceRegistries = ideviceregistry;
+          array = [ideviceregistry, ilistDeviceregistriesrequest, ilistdeviceregistriesresponse];
+          resolve(array);
+        })
+      })
+      req.on('error', (e) => {
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.listDeviceRegistries(request, options, callback);
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    })
   }
+  
+
+  async getRegistryToken() {
+    const payload = JSON.stringify({
+      region: constRegion,
+      registry: constRegistry,
+      project: constProject
+    })
+    return new Promise<string>(async (resolve, reject) => {
+
+      const options = {
+        host: 'iot-sandbox.clearblade.com',
+        path: `/api/v/1/code/`+adminSystemKey+`/getRegistryCredentials`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': adminSystemUserToken,
+          'Content-Length': payload.length
+        }
+      };
+      
+      const req = https.request(options, res => {
+        let data = '';
+        const chunks: any[] = [];
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          resolve(data);
+        });
+      });
+      req.on('error', e => {
+        reject(e);
+      });
+      req.write(payload);
+      req.end();      
+    });
+
+  }
+
 
   /**
    * Equivalent to `method.name.toCamelCase()`, but returns a NodeJS Stream object.
@@ -2247,10 +2360,10 @@ export class DeviceManagerClient {
     optionsOrCallback?:
       | CallOptions
       | PaginationCallback<
-          protos.google.cloud.iot.v1.IListDevicesRequest,
-          protos.google.cloud.iot.v1.IListDevicesResponse | null | undefined,
-          protos.google.cloud.iot.v1.IDevice
-        >,
+        protos.google.cloud.iot.v1.IListDevicesRequest,
+        protos.google.cloud.iot.v1.IListDevicesResponse | null | undefined,
+        protos.google.cloud.iot.v1.IDevice
+      >,
     callback?: PaginationCallback<
       protos.google.cloud.iot.v1.IListDevicesRequest,
       protos.google.cloud.iot.v1.IListDevicesResponse | null | undefined,
