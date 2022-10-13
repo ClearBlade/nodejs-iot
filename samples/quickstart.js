@@ -33,16 +33,49 @@ async function main() {
     /**
      * Send Command to Device
      */
-    const binaryData = Buffer.from("c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl");
+    // const binaryData = Buffer.from("c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl");
 
+    // const request = {
+    //   subfolder : 'sub',
+    //   name: 'device_ingress',
+    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    // };
+
+    // const [response] = await client.sendCommandToDevice(request);
+    // console.log('Sent command: ', response);
+    /**
+     * Device config modify
+     */
+    // const request = {
+    //   versionToUpdate : '6',
+    //   name: 'device_ingress',
+    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    // };
+
+    // const [response] = await client.modifyCloudToDeviceConfig(request);
+    // console.log('Sent command: ', response);
+    /**
+     * Create Device
+     */
+    const regPath = 'ingressRegistry';
+    const device = {
+      id: 'ingress_device_node',
+      credentials: [
+        // {
+        //   publicKey: {
+        //     format: 'ES256_PEM',
+        //     key: readFileSync(esCertificateFile).toString(),
+        //   },
+        // },
+      ],
+    };
     const request = {
-      subfolder : 'sub',
-      name: 'device_ingress',
-      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+      parent: regPath,
+      device,
     };
 
-    const [response] = await client.sendCommandToDevice(request);
-    console.log('Sent command: ', response);
+    const [response] = await client.createDevice(request);
+    console.log('Created device', response);
   }
   quickstart();
   // [END iot_quickstart]
