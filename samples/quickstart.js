@@ -33,16 +33,24 @@ async function main() {
     /**
      * Send Command to Device
      */
-    const binaryData = Buffer.from("c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl");
+    // const binaryData = Buffer.from("c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl");
+
+    // const request = {
+    //   subfolder : 'prst-sub',
+    //   name: 'prashant-device',
+    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    // };
+
+    // const [response] = await client.sendCommandToDevice(request);
+    // console.log('Sent command: ', response);
 
     const request = {
-      subfolder : 'sub',
-      name: 'device_ingress',
-      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+      name : "projects/ingressdevelopmentenv/locations/us-central1/registries/prashant-registry/devices/prashant-device"
     };
-
-    const [response] = await client.sendCommandToDevice(request);
-    console.log('Sent command: ', response);
+    const [response] = await client.getDevice(request);
+    console.log('Device Information');
+    console.log(response);
+    console.log("Device Information End");
   }
   quickstart();
   // [END iot_quickstart]

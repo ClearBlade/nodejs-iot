@@ -42,13 +42,17 @@ const version = require('../../../package.json').version;
 /**
  * ClearBlade Constants
  */
-const adminSystemKey = '84abb9b30ca4ece486d4bcf7ad71';
-const adminSystemUserToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Y2YxZGViMzBjYjBkMmNjODk4Njk3OWNkZGZmMDEiLCJzaWQiOiIxMWQxMzljMy1iNmQzLTQ2Y2QtODg4OC0xOTE1ZDQyZjY5M2YiLCJ1dCI6MiwidHQiOjEsImV4cCI6MTY2NTg1ODE1OSwiaWF0IjoxNjY1NDI2MTU5fQ.aoQRw_NBm7FY1Zhy5tJGf_vPVCA-QA8Wal5MMluZo4c';
+
+//  const adminSystemKey = '84abb9b30ca4ece486d4bcf7ad71';
+//  const adminSystemUserToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Y2YxZGViMzBjYjBkMmNjODk4Njk3OWNkZGZmMDEiLCJzaWQiOiIxMWQxMzljMy1iNmQzLTQ2Y2QtODg4OC0xOTE1ZDQyZjY5M2YiLCJ1dCI6MiwidHQiOjEsImV4cCI6MTY2NTg1ODE1OSwiaWF0IjoxNjY1NDI2MTU5fQ.aoQRw_NBm7FY1Zhy5tJGf_vPVCA-QA8Wal5MMluZo4c';
+ 
+const adminSystemKey = 'e88bb3b40c929baec1bceacfc8c801';
+const adminSystemUserToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlZThiYjNiNDBjYzhmNzgxOGVkMWY4OTBmYzk0MDEiLCJzaWQiOiI4YzEzYjVhYi0wNGJkLTQ5NGQtYTBmMi04MDAyZTUwNWZkZjMiLCJ1dCI6MiwidHQiOjEsImV4cCI6LTEsImlhdCI6MTY2NTU1NzIzOX0.R0QBtzuoND11OwgI6dKV7ltYpvX5V8-BqC6RnJ6STT0';
 /**
  * User Constants (Needs to fetch from service account auth JSON)
  */
 const constRegion = 'us-central1';
-const constRegistry = 'ingressRegistry';
+const constRegistry = 'prashant-registry';
 const constProject = 'ingressdevelopmentenv';
 
 
@@ -904,23 +908,45 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        name: request.name || '',
+
+    return new Promise(async (resolve, reject) => {
+      
+
+      var options = {
+        host: 'iot-sandbox.clearblade.com',
+        path: `/api/v/4/webhook/execute/`+ adminSystemKey +`/devices?name=`+request?.name,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': adminSystemUserToken          
+        }
+      };
+      
+      //console.log(options);
+      const req = https.request({        
+        ...options,
+      }, res => {
+        let data = '';
+        const chunks: any[] = [];
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          
+          const device: protos.google.cloud.iot.v1.IDevice = JSON.parse(data);
+          var testData = protos.google.cloud.iot.v1.Device.fromObject([data]);
+          console.log('mydata')
+          console.log(testData);
+        
+          resolve([device, {}, {}]);
+        })
+      })
+      req.on('error', (e) => {
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.getDevice(request, options, callback);
+      // if (payload) {
+      //   req.write(payload);
+      // }
+      req.end();
+    });
   }
   /**
    * Updates a device.
@@ -1783,7 +1809,7 @@ export class DeviceManagerClient {
           'Content-Length': payload.length
         }
       };      
-      
+      console.log(options);
       const req = https.request({
         ...options,
       }, res => {
@@ -2105,7 +2131,7 @@ export class DeviceManagerClient {
           'ClearBlade-UserToken': adminSystemUserToken          
         }
       };
-      
+      console.log('test');
       const req = https.request({        
         ...options,
       }, res => {
