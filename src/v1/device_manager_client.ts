@@ -820,7 +820,7 @@ export class DeviceManagerClient {
       const token = JSON.parse(token_response);
       const payload = JSON.stringify({
         id: request?.device?.id,
-        credentials: request?.device?.credentials        
+        credentials: request?.device?.credentials
       })
       var options = {
         host: 'iot-sandbox.clearblade.com',
@@ -865,7 +865,7 @@ export class DeviceManagerClient {
           device.logLevel = deviceResponse.logLevel;
           device.metadata = deviceResponse.metadata;
           device.gatewayConfig = deviceResponse.gatewayConfig;
-          
+
           array = [device, icreatedevicerequest, {}];
           resolve(array);
         })
@@ -879,23 +879,6 @@ export class DeviceManagerClient {
       }
       req.end();
     })
-    // request = request || {};
-    // let options: CallOptions;
-    // if (typeof optionsOrCallback === 'function' && callback === undefined) {
-    //   callback = optionsOrCallback;
-    //   options = {};
-    // } else {
-    //   options = optionsOrCallback as CallOptions;
-    // }
-    // options = options || {};
-    // options.otherArgs = options.otherArgs || {};
-    // options.otherArgs.headers = options.otherArgs.headers || {};
-    // options.otherArgs.headers['x-goog-request-params'] =
-    //   this._gaxModule.routingHeader.fromParams({
-    //     parent: request.parent || '',
-    //   });
-    // this.initialize();
-    // return this.innerApiCalls.createDevice(request, options, callback);
   }
   /**
    * Gets details about a device.
@@ -1144,23 +1127,46 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        name: request.name || '',
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const payload = JSON.stringify({
+        name: request?.name
+      })
+      var options = {
+        host: 'iot-sandbox.clearblade.com',
+        path: `/api/v/1/code/` + token.systemKey + `/devicesDelete`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': token.serviceAccountToken,
+          'Content-Length': payload.length
+        }
+      };
+
+      const req = https.request({
+        ...options,
+      }, res => {
+        let data = '';
+        const chunks: any[] = [];
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          let array: [protos.google.protobuf.IEmpty, protos.google.cloud.iot.v1.IDeleteDeviceRequest | undefined, {} | undefined];
+
+          const ideletedevicerequest: protos.google.cloud.iot.v1.IDeleteDeviceRequest | undefined = {};
+          const iempty: protos.google.protobuf.IEmpty = {};
+          array = [ideletedevicerequest, iempty, {}];
+          resolve(array);
+        })
+      })
+      req.on('error', (e) => {
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.deleteDevice(request, options, callback);
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    })    
   }
   /**
    * Modifies the configuration for the device, which is eventually sent from
@@ -1388,27 +1394,69 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        name: request.name || '',
+
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const payload = JSON.stringify({
+        name: request?.name,
+        numVersions: request?.numVersions
+      })
+      var options = {
+        host: 'iot-sandbox.clearblade.com',
+        path: `/api/v/1/code/` + token.systemKey + `/devicesConfigVersionsList`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': token.serviceAccountToken,
+          'Content-Length': payload.length
+        }
+      };
+
+      const req = https.request({
+        ...options,
+      }, res => {
+        let data = '';
+        const chunks: any[] = [];
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          if (!this.isJsonString(data)) {
+            reject(data);
+            return;
+          }
+          let array: [protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse, protos.google.cloud.iot.v1.IListDeviceConfigVersionsRequest | undefined, {} | undefined];
+
+          const ilistdeviceconfigversionsresponse: protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse = {};
+
+          const ideviceconfigarray: protos.google.cloud.iot.v1.IDeviceConfig[] | null = [];
+
+          const configList = JSON.parse(data);
+          //for loop fetching JSON
+          for (let index in configList.deviceConfigs) {
+            const config: protos.google.cloud.iot.v1.IDeviceConfig = {};
+            config.version = configList.deviceConfigs[index].version;
+            config.deviceAckTime = configList.deviceConfigs[index].deviceAckTime;
+            config.binaryData = configList.deviceConfigs[index].binaryData;
+            config.cloudUpdateTime = configList.deviceConfigs[index].cloudUpdateTime;
+            ideviceconfigarray.push(config);
+          }
+
+          const ilistDeviceconfigversionsrequest: protos.google.cloud.iot.v1.IListDeviceConfigVersionsRequest = {};
+
+          ilistdeviceconfigversionsresponse.deviceConfigs = ideviceconfigarray;
+
+          array = [ilistdeviceconfigversionsresponse, ilistDeviceconfigversionsrequest, {}];
+          resolve(array);
+        })
+      })
+      req.on('error', (e) => {
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.listDeviceConfigVersions(
-      request,
-      options,
-      callback
-    );
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    })    
   }
   /**
    * Lists the last few versions of the device state in descending order (i.e.:
