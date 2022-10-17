@@ -1042,6 +1042,7 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
+    console.log('test');
     request = request || {};
     let options: CallOptions;
     if (typeof optionsOrCallback === 'function' && callback === undefined) {
