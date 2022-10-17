@@ -87,6 +87,15 @@ async function main() {
     // const [version] = await client.listDeviceConfigVersions(request);
     // console.log(`RES : `, version);
 
+    //Get Device Information
+    // const request = {
+    //   name : "projects/ingressdevelopmentenv/locations/us-central1/registries/prashant-registry/devices/prashant-device"
+    // };
+    // const [response] = await client.getDevice(request);
+    // console.log('Device Information');
+    // console.log(response);
+    // console.log("Device Information End");
+
     /**
      * delete device
      */
