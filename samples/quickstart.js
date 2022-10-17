@@ -19,7 +19,7 @@ const { auth } = require('google-auth-library');
 async function main() {
   // [START iot_quickstart]
   const iot = require('@google-cloud/iot');
-  const client = new iot.v1.DeviceManagerClient({"fallback":"rest"});
+  const client = new iot.v1.DeviceManagerClient({ "fallback": "rest" });
 
   async function quickstart() {
     /**
@@ -43,11 +43,70 @@ async function main() {
     //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
     // };
 
-    const projectId = await client.getProjectId();
-    const parent = client.locationPath(projectId, 'us-central1');
+    // const [response] = await client.sendCommandToDevice(request);
+    // console.log('Sent command: ', response);
+    /**
+     * Device config modify
+     */
+    // const request = {
+    //   versionToUpdate : '6',
+    //   name: 'device_ingress',
+    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    // };
 
-    const [response] = await client.listDevices({parent});
-    console.log('Device list: ', response);
+    // const [response] = await client.modifyCloudToDeviceConfig(request);
+    // console.log('Sent command: ', response);
+    /**
+     * Create Device
+     */
+    // const regPath = 'ingressRegistry';
+    // const device = {
+    //   id: 'ingress_device_node',
+    //   credentials: [
+    //     // {
+    //     //   publicKey: {
+    //     //     format: 'ES256_PEM',
+    //     //     key: readFileSync(esCertificateFile).toString(),
+    //     //   },
+    //     // },
+    //   ],
+    // };
+    // const requestCreateDevice = {
+    //   parent: regPath,
+    //   device,
+    // };
+
+    // const [response] = await client.createDevice(requestCreateDevice);
+    // console.log('Created device', response);
+
+    // /**
+    //  * Get list config version device
+    //  */
+    // const request = {
+    //   name: 'device_ingress',
+    //   numVersions : 2
+    // };
+    // const [version] = await client.listDeviceConfigVersions(request);
+    // console.log(`RES : `, version);
+
+    //
+    // get List of device
+    //
+    
+    // const projectId = await client.getProjectId();
+    // const parent = client.locationPath(projectId, 'us-central1');
+
+    // const [response] = await client.listDevices({parent});
+    // console.log('Device list: ', response);
+
+    /**
+     * delete device
+     */
+    const request = {
+      name: 'device_ingress'
+    };
+    const [res] = await client.deleteDevice(request);
+    console.log(`RES : `, res);
   }
   quickstart();
   // [END iot_quickstart]
