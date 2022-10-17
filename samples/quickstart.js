@@ -17,7 +17,7 @@
 async function main() {
   // [START iot_quickstart]
   const iot = require('@google-cloud/iot');
-  const client = new iot.v1.DeviceManagerClient({"fallback":"rest"});
+  const client = new iot.v1.DeviceManagerClient({ "fallback": "rest" });
 
   async function quickstart() {
     /**
@@ -33,16 +33,68 @@ async function main() {
     /**
      * Send Command to Device
      */
-    const binaryData = Buffer.from("c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl");
+    // const binaryData = Buffer.from("c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl");
 
+    // const request = {
+    //   subfolder : 'sub',
+    //   name: 'device_ingress',
+    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    // };
+
+    // const [response] = await client.sendCommandToDevice(request);
+    // console.log('Sent command: ', response);
+    /**
+     * Device config modify
+     */
+    // const request = {
+    //   versionToUpdate : '6',
+    //   name: 'device_ingress',
+    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    // };
+
+    // const [response] = await client.modifyCloudToDeviceConfig(request);
+    // console.log('Sent command: ', response);
+    /**
+     * Create Device
+     */
+    // const regPath = 'ingressRegistry';
+    // const device = {
+    //   id: 'ingress_device_node',
+    //   credentials: [
+    //     // {
+    //     //   publicKey: {
+    //     //     format: 'ES256_PEM',
+    //     //     key: readFileSync(esCertificateFile).toString(),
+    //     //   },
+    //     // },
+    //   ],
+    // };
+    // const requestCreateDevice = {
+    //   parent: regPath,
+    //   device,
+    // };
+
+    // const [response] = await client.createDevice(requestCreateDevice);
+    // console.log('Created device', response);
+
+    // /**
+    //  * Get list config version device
+    //  */
+    // const request = {
+    //   name: 'device_ingress',
+    //   numVersions : 2
+    // };
+    // const [version] = await client.listDeviceConfigVersions(request);
+    // console.log(`RES : `, version);
+
+    /**
+     * delete device
+     */
     const request = {
-      subfolder : 'sub',
-      name: 'device_ingress',
-      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+      name: 'device_ingress'
     };
-
-    const [response] = await client.sendCommandToDevice(request);
-    console.log('Sent command: ', response);
+    const [res] = await client.deleteDevice(request);
+    console.log(`RES : `, res);
   }
   quickstart();
   // [END iot_quickstart]

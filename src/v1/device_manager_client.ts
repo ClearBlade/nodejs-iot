@@ -253,7 +253,7 @@ export class DeviceManagerClient {
     // If the client stub promise is already initialized, return immediately.
     if (this.deviceManagerStub) {
       return this.deviceManagerStub;
-    }    
+    }
 
 
     // Put together the "service stub" for
@@ -819,23 +819,70 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        parent: request.parent || '',
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const payload = JSON.stringify({
+        id: request?.device?.id,
+        credentials: request?.device?.credentials
+      })
+      var options = {
+        host: 'iot-sandbox.clearblade.com',
+        path: `/api/v/1/code/` + token.systemKey + `/devicesCreate`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': token.serviceAccountToken,
+          'Content-Length': payload.length
+        }
+      };
+
+      const req = https.request({
+        ...options,
+      }, res => {
+        let data = '';
+        const chunks: any[] = [];
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          if (!this.isJsonString(data)) {
+            reject(data);
+            return;
+          }
+          let array: [protos.google.cloud.iot.v1.IDevice, protos.google.cloud.iot.v1.ICreateDeviceRequest | undefined, {} | undefined];
+          const deviceResponse = JSON.parse(data);
+          const icreatedevicerequest: protos.google.cloud.iot.v1.ICreateDeviceRequest | undefined = {};
+          const device: protos.google.cloud.iot.v1.IDevice = {};
+          device.id = deviceResponse.id;
+          device.name = deviceResponse.name;
+          device.numId = deviceResponse.numId;
+          device.credentials = deviceResponse.credentials;
+          device.lastHeartbeatTime = deviceResponse.lastHeartbeatTime;
+          device.lastEventTime = deviceResponse.lastEventTime;
+          device.lastStateTime = deviceResponse.lastStateTime;
+          device.lastConfigAckTime = deviceResponse.lastConfigAckTime;
+          device.lastConfigSendTime = deviceResponse.lastConfigSendTime;
+          device.blocked = deviceResponse.blocked;
+          device.lastErrorTime = deviceResponse.lastErrorTime;
+          device.lastErrorStatus = deviceResponse.lastErrorStatus;
+          device.config = deviceResponse.config;
+          device.state = deviceResponse.state;
+          device.logLevel = deviceResponse.logLevel;
+          device.metadata = deviceResponse.metadata;
+          device.gatewayConfig = deviceResponse.gatewayConfig;
+
+          array = [device, icreatedevicerequest, {}];
+          resolve(array);
+        })
+      })
+      req.on('error', (e) => {
+        console.log("error: ", e);
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.createDevice(request, options, callback);
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    })
   }
   /**
    * Gets details about a device.
@@ -1106,23 +1153,46 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        name: request.name || '',
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const payload = JSON.stringify({
+        name: request?.name
+      })
+      var options = {
+        host: 'iot-sandbox.clearblade.com',
+        path: `/api/v/1/code/` + token.systemKey + `/devicesDelete`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': token.serviceAccountToken,
+          'Content-Length': payload.length
+        }
+      };
+
+      const req = https.request({
+        ...options,
+      }, res => {
+        let data = '';
+        const chunks: any[] = [];
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          let array: [protos.google.protobuf.IEmpty, protos.google.cloud.iot.v1.IDeleteDeviceRequest | undefined, {} | undefined];
+
+          const ideletedevicerequest: protos.google.cloud.iot.v1.IDeleteDeviceRequest | undefined = {};
+          const iempty: protos.google.protobuf.IEmpty = {};
+          array = [ideletedevicerequest, iempty, {}];
+          resolve(array);
+        })
+      })
+      req.on('error', (e) => {
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.deleteDevice(request, options, callback);
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    })    
   }
   /**
    * Modifies the configuration for the device, which is eventually sent from
@@ -1209,27 +1279,66 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        name: request.name || '',
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const payload = JSON.stringify({
+        binaryData: request?.binaryData,
+        versionToUpdate: request?.versionToUpdate,
+        deviceId: request?.name
+      })
+      var options = {
+        host: 'iot-sandbox.clearblade.com',
+        path: `/api/v/1/code/` + token.systemKey + `/devicesModifyCloudToDeviceConfig`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': token.serviceAccountToken,
+          'Content-Length': payload.length
+        }
+      };
+
+      const req = https.request({
+        ...options,
+      }, res => {
+        let data = '';
+        const chunks: any[] = [];
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          if (!this.isJsonString(data)) {
+            reject(data);
+            return;
+          }
+          let array: [protos.google.cloud.iot.v1.IDeviceConfig, protos.google.cloud.iot.v1.IModifyCloudToDeviceConfigRequest | undefined, {} | undefined];
+          const deviceConfig = JSON.parse(data);
+          const imodifycloudtodeviceconfigrequest: protos.google.cloud.iot.v1.IModifyCloudToDeviceConfigRequest | undefined = {};
+          const ideviceconfig: protos.google.cloud.iot.v1.IDeviceConfig = {};
+          ideviceconfig.binaryData = deviceConfig.binaryData;
+          ideviceconfig.version = deviceConfig.version;
+          ideviceconfig.cloudUpdateTime = deviceConfig.cloudUpdateTime;
+          ideviceconfig.deviceAckTime = deviceConfig.deviceAckTime;
+          array = [ideviceconfig, imodifycloudtodeviceconfigrequest, {}];
+          resolve(array);
+        })
+      })
+      req.on('error', (e) => {
+        console.log("error: ", e);
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.modifyCloudToDeviceConfig(
-      request,
-      options,
-      callback
-    );
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    })
+  }
+
+  isJsonString(str: string) {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
   }
   /**
    * Lists the last few versions of the device configuration in descending
@@ -1311,27 +1420,69 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        name: request.name || '',
+
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const payload = JSON.stringify({
+        name: request?.name,
+        numVersions: request?.numVersions
+      })
+      var options = {
+        host: 'iot-sandbox.clearblade.com',
+        path: `/api/v/1/code/` + token.systemKey + `/devicesConfigVersionsList`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': token.serviceAccountToken,
+          'Content-Length': payload.length
+        }
+      };
+
+      const req = https.request({
+        ...options,
+      }, res => {
+        let data = '';
+        const chunks: any[] = [];
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          if (!this.isJsonString(data)) {
+            reject(data);
+            return;
+          }
+          let array: [protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse, protos.google.cloud.iot.v1.IListDeviceConfigVersionsRequest | undefined, {} | undefined];
+
+          const ilistdeviceconfigversionsresponse: protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse = {};
+
+          const ideviceconfigarray: protos.google.cloud.iot.v1.IDeviceConfig[] | null = [];
+
+          const configList = JSON.parse(data);
+          //for loop fetching JSON
+          for (let index in configList.deviceConfigs) {
+            const config: protos.google.cloud.iot.v1.IDeviceConfig = {};
+            config.version = configList.deviceConfigs[index].version;
+            config.deviceAckTime = configList.deviceConfigs[index].deviceAckTime;
+            config.binaryData = configList.deviceConfigs[index].binaryData;
+            config.cloudUpdateTime = configList.deviceConfigs[index].cloudUpdateTime;
+            ideviceconfigarray.push(config);
+          }
+
+          const ilistDeviceconfigversionsrequest: protos.google.cloud.iot.v1.IListDeviceConfigVersionsRequest = {};
+
+          ilistdeviceconfigversionsresponse.deviceConfigs = ideviceconfigarray;
+
+          array = [ilistdeviceconfigversionsresponse, ilistDeviceconfigversionsrequest, {}];
+          resolve(array);
+        })
+      })
+      req.on('error', (e) => {
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.listDeviceConfigVersions(
-      request,
-      options,
-      callback
-    );
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    })    
   }
   /**
    * Lists the last few versions of the device state in descending order (i.e.:
@@ -1808,8 +1959,8 @@ export class DeviceManagerClient {
           'ClearBlade-UserToken': token.serviceAccountToken,
           'Content-Length': payload.length
         }
-      };      
-      console.log(options);
+      };
+
       const req = https.request({
         ...options,
       }, res => {
@@ -2124,29 +2275,29 @@ export class DeviceManagerClient {
       })
       var options = {
         host: 'iot-sandbox.clearblade.com',
-        path: `/api/v/1/code/`+ adminSystemKey +`/registriesList`,
+        path: `/api/v/1/code/` + adminSystemKey + `/registriesList`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': adminSystemUserToken          
+          'ClearBlade-UserToken': adminSystemUserToken
         }
       };
-      console.log('test');
-      const req = https.request({        
+
+      const req = https.request({
         ...options,
       }, res => {
         let data = '';
         const chunks: any[] = [];
         res.on('data', chunk => data += chunk)
         res.on('end', () => {
-          
+
           let array: [protos.google.cloud.iot.v1.IDeviceRegistry[], protos.google.cloud.iot.v1.IListDeviceRegistriesRequest | null, protos.google.cloud.iot.v1.IListDeviceRegistriesResponse];
 
           const ideviceregistry: protos.google.cloud.iot.v1.IDeviceRegistry[] = [];
 
           //for loop fetching JSON
           const registry: protos.google.cloud.iot.v1.IDeviceRegistry = {};
-          
+
           const registriesList = JSON.parse(data);
           for (let index in registriesList.deviceRegistries) {
             registry.name = registriesList.deviceRegistries[index].name;
@@ -2170,7 +2321,7 @@ export class DeviceManagerClient {
       req.end();
     })
   }
-  
+
 
   async getRegistryToken() {
     const payload = JSON.stringify({
@@ -2182,7 +2333,7 @@ export class DeviceManagerClient {
 
       const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: `/api/v/1/code/`+adminSystemKey+`/getRegistryCredentials`,
+        path: `/api/v/1/code/` + adminSystemKey + `/getRegistryCredentials`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -2190,7 +2341,7 @@ export class DeviceManagerClient {
           'Content-Length': payload.length
         }
       };
-      
+
       const req = https.request(options, res => {
         let data = '';
         const chunks: any[] = [];
@@ -2203,7 +2354,7 @@ export class DeviceManagerClient {
         reject(e);
       });
       req.write(payload);
-      req.end();      
+      req.end();
     });
 
   }
