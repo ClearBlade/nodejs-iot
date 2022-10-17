@@ -14,6 +14,8 @@
 
 'use strict';
 
+const { auth } = require('google-auth-library');
+
 async function main() {
   // [START iot_quickstart]
   const iot = require('@google-cloud/iot');
@@ -33,16 +35,19 @@ async function main() {
     /**
      * Send Command to Device
      */
-    const binaryData = Buffer.from("c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl");
+    // const binaryData = Buffer.from("c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl");
 
-    const request = {
-      subfolder : 'sub',
-      name: 'device_ingress',
-      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
-    };
+    // const request = {
+    //   subfolder : 'sub',
+    //   name: 'device_ingress',
+    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    // };
 
-    const [response] = await client.sendCommandToDevice(request);
-    console.log('Sent command: ', response);
+    const projectId = await client.getProjectId();
+    const parent = client.locationPath(projectId, 'us-central1');
+
+    const [response] = await client.listDevices({parent});
+    console.log('Device list: ', response);
   }
   quickstart();
   // [END iot_quickstart]
