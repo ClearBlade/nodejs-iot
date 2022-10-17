@@ -43,16 +43,13 @@ const version = require('../../../package.json').version;
  * ClearBlade Constants
  */
 
-//  const adminSystemKey = '84abb9b30ca4ece486d4bcf7ad71';
-//  const adminSystemUserToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Y2YxZGViMzBjYjBkMmNjODk4Njk3OWNkZGZmMDEiLCJzaWQiOiIxMWQxMzljMy1iNmQzLTQ2Y2QtODg4OC0xOTE1ZDQyZjY5M2YiLCJ1dCI6MiwidHQiOjEsImV4cCI6MTY2NTg1ODE1OSwiaWF0IjoxNjY1NDI2MTU5fQ.aoQRw_NBm7FY1Zhy5tJGf_vPVCA-QA8Wal5MMluZo4c';
- 
-const adminSystemKey = 'e88bb3b40c929baec1bceacfc8c801';
-const adminSystemUserToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlZThiYjNiNDBjYzhmNzgxOGVkMWY4OTBmYzk0MDEiLCJzaWQiOiI4YzEzYjVhYi0wNGJkLTQ5NGQtYTBmMi04MDAyZTUwNWZkZjMiLCJ1dCI6MiwidHQiOjEsImV4cCI6LTEsImlhdCI6MTY2NTU1NzIzOX0.R0QBtzuoND11OwgI6dKV7ltYpvX5V8-BqC6RnJ6STT0';
-/**
+ const adminSystemKey = '84abb9b30ca4ece486d4bcf7ad71';
+ const adminSystemUserToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Y2YxZGViMzBjYjBkMmNjODk4Njk3OWNkZGZmMDEiLCJzaWQiOiIxMWQxMzljMy1iNmQzLTQ2Y2QtODg4OC0xOTE1ZDQyZjY5M2YiLCJ1dCI6MiwidHQiOjEsImV4cCI6MTY2NTg1ODE1OSwiaWF0IjoxNjY1NDI2MTU5fQ.aoQRw_NBm7FY1Zhy5tJGf_vPVCA-QA8Wal5MMluZo4c';
+ /**
  * User Constants (Needs to fetch from service account auth JSON)
  */
 const constRegion = 'us-central1';
-const constRegistry = 'prashant-registry';
+const constRegistry = 'ingressRegistry';
 const constProject = 'ingressdevelopmentenv';
 
 
