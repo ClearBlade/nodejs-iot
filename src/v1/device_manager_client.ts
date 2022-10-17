@@ -976,10 +976,6 @@ export class DeviceManagerClient {
         res.on('end', () => {
           
           const device: protos.google.cloud.iot.v1.IDevice = JSON.parse(data);
-          var testData = protos.google.cloud.iot.v1.Device.fromObject([data]);
-          console.log('mydata')
-          console.log(testData);
-        
           resolve([device, {}, {}]);
         })
       })
