@@ -952,36 +952,41 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       const token_response = await this.getRegistryToken();
       const token = JSON.parse(token_response);
-      var options = {
+      const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: `/api/v/4/webhook/execute/`+ token?.systemKey +`/cloudiot_devices?name=`+request?.name,
+        path:
+          '/api/v/4/webhook/execute/' +
+          token?.systemKey +
+          '/cloudiot_devices?name=' +
+          request?.name,
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token.serviceAccountToken          
-        }
+          'ClearBlade-UserToken': token.serviceAccountToken,
+        },
       };
-      
-      const req = https.request({        
-        ...options,
-      }, res => {
-        let data = '';
-        const chunks: any[] = [];
-        res.on('data', chunk => data += chunk)
-        res.on('end', () => {
-          
-          const device: protos.google.cloud.iot.v1.IDevice = JSON.parse(data);
-          resolve([device, {}, {}]);
-        })
-      })
-      req.on('error', (e) => {
+
+      const req = https.request(
+        {
+          ...options,
+        },
+        res => {
+          let data = '';
+          res.on('data', chunk => (data += chunk));
+          res.on('end', () => {
+            const device: protos.google.cloud.iot.v1.IDevice = JSON.parse(data);
+            resolve([device, {}, {}]);
+          });
+        }
+      );
+      req.on('error', e => {
         reject(e);
       });
-     
+
       req.end();
     });
   }
