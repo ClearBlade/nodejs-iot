@@ -90,11 +90,27 @@ async function main() {
     /**
      * delete device
      */
+    // const request = {
+    //   name: 'device_ingress'
+    // };
+    // const [res] = await client.deleteDevice(request);
+    // console.log(`RES : `, res);
+
+    /*
+    Device Update
+    */
     const request = {
-      name: 'device_ingress'
+      device:{
+        id: "prashant-device",
+        name: "prashant-device",
+        numId: "2735869279028923"
+      }
     };
-    const [res] = await client.deleteDevice(request);
-    console.log(`RES : `, res);
+    const [response] = await client.updateDevice(request);
+    console.log('Update Start');
+    console.log(response);
+    console.log('Update End');
+
   }
   quickstart();
   // [END iot_quickstart]
