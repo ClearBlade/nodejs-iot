@@ -954,19 +954,18 @@ export class DeviceManagerClient {
   > | void {
 
     return new Promise(async (resolve, reject) => {
-      
-
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
       var options = {
         host: 'iot-sandbox.clearblade.com',
-        path: `/api/v/4/webhook/execute/`+ adminSystemKey +`/devices?name=`+request?.name,
+        path: `/api/v/4/webhook/execute/`+ token?.systemKey +`/cloudiot_devices?name=`+request?.name,
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': adminSystemUserToken          
+          'ClearBlade-UserToken': token.serviceAccountToken          
         }
       };
       
-      //console.log(options);
       const req = https.request({        
         ...options,
       }, res => {
@@ -982,9 +981,7 @@ export class DeviceManagerClient {
       req.on('error', (e) => {
         reject(e);
       });
-      // if (payload) {
-      //   req.write(payload);
-      // }
+     
       req.end();
     });
   }
