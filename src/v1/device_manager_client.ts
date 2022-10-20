@@ -1042,41 +1042,43 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       const token_response = await this.getRegistryToken();
       const token = JSON.parse(token_response);
-      var payload = JSON.stringify({
-        device: request?.device
-      });
+      const payload = JSON.stringify(request?.device);
 
-      var options = {
+      const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: 
-          '/api/v/1/code/'
-          + token.systemKey +
-          '/devicesPatch',
-          // + request?.device?.name,
-        method: 'POST',
+        path:
+          '/api/v/4/webhook/execute/' +
+          token.systemKey +
+          '/cloudiot_devices?name=' +
+          request?.device?.name +
+          '&updateMask=' +
+          request?.updateMask,
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'ClearBlade-UserToken': token.serviceAccountToken,
           'Content-Length': payload.length,
-        }
+        },
       };
-      
-      console.log(options);
-      console.log(payload);
-      const req = https.request({        
-        ...options,
-      }, res => {
-        let data = '';
-        res.on('data', chunk => data += chunk)
-        res.on('end', () => {
-          const device: protos.google.cloud.iot.v1.IDevice = JSON.parse(data);
-          resolve([device, {}, {}]);
-        })
-      })
-      req.on('error', (e) => {
+
+      const req = https.request(
+        {
+          ...options,
+        },
+        res => {
+          let data = '';
+          res.on('data', chunk => (data += chunk));
+          res.on('end', () => {
+            const device: protos.google.cloud.iot.v1.IDevice = JSON.parse(data);
+            resolve([device, {}, {}]);
+          });
+        }
+      );
+      req.on('error', e => {
         reject(e);
       });
       if (payload) {
