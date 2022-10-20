@@ -42,10 +42,9 @@ const version = require('../../../package.json').version;
 /**
  * ClearBlade Constants
  */
-
- const adminSystemKey = '84abb9b30ca4ece486d4bcf7ad71';
- const adminSystemUserToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Y2YxZGViMzBjYjBkMmNjODk4Njk3OWNkZGZmMDEiLCJzaWQiOiIxMWQxMzljMy1iNmQzLTQ2Y2QtODg4OC0xOTE1ZDQyZjY5M2YiLCJ1dCI6MiwidHQiOjEsImV4cCI6MTY2NTg1ODE1OSwiaWF0IjoxNjY1NDI2MTU5fQ.aoQRw_NBm7FY1Zhy5tJGf_vPVCA-QA8Wal5MMluZo4c';
- /**
+const adminSystemKey = '84abb9b30ca4ece486d4bcf7ad71';
+const adminSystemUserToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5NGFiYjliMzBjOTRjMGE1ZGNhOGE4ODRiYzU5Iiwic2lkIjoiMmQ5ZTAzZjUtZmQ2OC00MWM4LTg5OGYtYWQzMWE4ZjMzMmIwIiwidXQiOjIsInR0IjoxLCJleHAiOi0xLCJpYXQiOjE2NjQ1NTk5NDR9.0RrKIrs9vBY1fcp_nei3mTRhYxcZU5mdar9ribHlso0';
+/**
  * User Constants (Needs to fetch from service account auth JSON)
  */
 const constRegion = 'us-central1';
@@ -2056,23 +2055,53 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        parent: request.parent || '',
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const payload = JSON.stringify({
+        gatewayId: request?.gatewayId,
+        deviceId: request?.deviceId
+      })
+      var options = {
+        host: 'iot-sandbox.clearblade.com',
+        path: `/api/v/1/code/` + token.systemKey + `/bindDeviceToGateway`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': token.serviceAccountToken,
+          'Content-Length': payload.length
+        }
+      };
+
+      const req = https.request({
+        ...options,
+      }, res => {
+        let data = '';
+        const chunks: any[] = [];
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          if (data  !=  '' && !this.isJsonString(data)) {
+            reject(data);
+            return;
+          }
+          let array: [protos.google.cloud.iot.v1.IBindDeviceToGatewayResponse,
+            protos.google.cloud.iot.v1.IBindDeviceToGatewayRequest | undefined,
+            {} | undefined];
+          const imodifycloudtodeviceconfigrequest: protos.google.cloud.iot.v1.IBindDeviceToGatewayRequest | undefined = {};
+          const ibinddevicetogatewayresponse: protos.google.cloud.iot.v1.IBindDeviceToGatewayResponse = {};
+          array = [ibinddevicetogatewayresponse, imodifycloudtodeviceconfigrequest, {}];
+          resolve(array);
+        })
+      })
+      req.on('error', (e) => {
+        console.log("error: ", e);
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.bindDeviceToGateway(request, options, callback);
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    })    
   }
   /**
    * Deletes the association between the device and the gateway.
@@ -2155,27 +2184,53 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        parent: request.parent || '',
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const payload = JSON.stringify({
+        gatewayId: request?.gatewayId,
+        deviceId: request?.deviceId
+      })
+      var options = {
+        host: 'iot-sandbox.clearblade.com',
+        path: `/api/v/1/code/` + adminSystemKey + `/unbindDeviceFromGateway`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': adminSystemUserToken,
+          'Content-Length': payload.length
+        }
+      };
+
+      const req = https.request({
+        ...options,
+      }, res => {
+        let data = '';
+        const chunks: any[] = [];
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          if (!this.isJsonString(data)) {
+            reject(data);
+            return;
+          }
+          let array: [protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayResponse,
+            protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayRequest | undefined,
+            {} | undefined];
+          const request: protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayRequest | undefined = {};
+          const response: protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayResponse = {};
+          array = [response, request, {}];
+          resolve(array);
+        })
+      })
+      req.on('error', (e) => {
+        console.log("error: ", e);
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.unbindDeviceFromGateway(
-      request,
-      options,
-      callback
-    );
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    })
   }
 
   /**
@@ -2270,7 +2325,7 @@ export class DeviceManagerClient {
       })
       var options = {
         host: 'iot-sandbox.clearblade.com',
-        path: `/api/v/1/code/` + adminSystemKey + `/registriesList`,
+        path: `/api/v/1/code/`+ adminSystemKey +`/registriesList`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
