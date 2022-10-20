@@ -44,44 +44,67 @@ async function main() {
     // const [response] = await client.sendCommandToDevice(request);
     // console.log('Sent command: ', response);
 
-    /**
-     * Un bind gateway to device
-     */
-    //  const requestUnBindGateway = {
-    //   deviceId : 'myOldDevice',
-    //   gatewayId: 'ingress_registry_second'
+    // get List of device
+    //
+
+    // const projectId = await client.getProjectId();
+    // const parent = client.locationPath(projectId, 'us-central1');
+
+    // const [response] = await client.listDevices({parent});
+    // console.log('Device list: ', response);
+
+    //Get Device Information
+    // const request = {
+    //   name : "projects/ingressdevelopmentenv/locations/us-central1/registries/prashant-registry/devices/prashant-device"
     // };
+    // const [response] = await client.getDevice(request);
+    // console.log('Device Information');
+    // console.log(response);
+    // console.log("Device Information End");
 
-    // const [responseUnBindGateway] = await client.unbindDeviceFromGateway(requestUnBindGateway);
-    // console.log('RES: ', responseUnBindGateway);
-    // /**
-    //  * bind gateway to device
-    //  */
-    //  const requestBindGateway = {
-    //    deviceId : 'myOldDevice',
-    //    gatewayId: 'ingress_registry_second'
-    //  };
-
-    //  const [responseBindGateway] = await client.bindDeviceToGateway(requestBindGateway);
-    //  console.log('RES: ', responseBindGateway);
     /*
     Device Update
     */
-    const request = {
-      device: {
-        id: 'prashant-device',
-        name: 'prashant-device',
-        logLevel: 'NONE',
-        metadata: {
-          Test1: 13,
-        },
-      },
-      updateMask: 'logLevel,metadata',
+    // const request = {
+    //   device: {
+    //     id: 'prashant-device',
+    //     name: 'prashant-device',
+    //     logLevel: 'NONE',
+    //     metadata: {
+    //       Test1: 13,
+    //     },
+    //   },
+    //   updateMask: 'logLevel,metadata',
+    // };
+    // const [response] = await client.updateDevice(request);
+    // console.log('Update Start');
+    // console.log(response);
+    // console.log('Update End');
+
+    /**
+     * Un bind gateway to device
+     */
+    const requestUnBindGateway = {
+      deviceId: 'myOldDevice',
+      gatewayId: 'ingress_registry_second',
     };
-    const [response] = await client.updateDevice(request);
-    console.log('Update Start');
-    console.log(response);
-    console.log('Update End');
+
+    const [responseUnBindGateway] = await client.unbindDeviceFromGateway(
+      requestUnBindGateway
+    );
+    console.log('RES: ', responseUnBindGateway);
+    /**
+     * bind gateway to device
+     */
+    const requestBindGateway = {
+      deviceId: 'myOldDevice',
+      gatewayId: 'ingress_registry_second',
+    };
+
+    const [responseBindGateway] = await client.bindDeviceToGateway(
+      requestBindGateway
+    );
+    console.log('RES: ', responseBindGateway);
   }
   quickstart();
   // [END iot_quickstart]
