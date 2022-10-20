@@ -103,7 +103,6 @@ async function main() {
       device:{
         id: "prashant-device",
         name: "prashant-device",
-        numId: "2735869279028923"
       }
     };
     const [response] = await client.updateDevice(request);

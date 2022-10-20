@@ -42,13 +42,13 @@ const version = require('../../../package.json').version;
 /**
  * ClearBlade Constants
  */
-const adminSystemKey = 'e88bb3b40c929baec1bceacfc8c801';
-const adminSystemUserToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlZThiYjNiNDBjYzhmNzgxOGVkMWY4OTBmYzk0MDEiLCJzaWQiOiI4YzEzYjVhYi0wNGJkLTQ5NGQtYTBmMi04MDAyZTUwNWZkZjMiLCJ1dCI6MiwidHQiOjEsImV4cCI6LTEsImlhdCI6MTY2NTU1NzIzOX0.R0QBtzuoND11OwgI6dKV7ltYpvX5V8-BqC6RnJ6STT0';
+const adminSystemKey = '84abb9b30ca4ece486d4bcf7ad71';
+const adminSystemUserToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJmMGE2ODBiNDBjZjhmM2Y4OGY5NThiYThlY2EyMDEiLCJzaWQiOiI4NTAwNTVmZC00M2VlLTQ3YWMtYjZmNi1kYzZiMDU0NGY5ZGYiLCJ1dCI6MiwidHQiOjEsImV4cCI6MTY2NjU4MTg5OSwiaWF0IjoxNjY2MTQ5ODk5fQ.qr8iRHkjHO80CGw9ITf3RIf4q4aEgdJ9pPXglyYcqTY';
 /**
  * User Constants (Needs to fetch from service account auth JSON)
  */
 const constRegion = 'us-central1';
-const constRegistry = 'ingressRegistry';
+const constRegistry = 'prashant-registry';
 const constProject = 'ingressdevelopmentenv';
 
 
@@ -1043,25 +1043,33 @@ export class DeviceManagerClient {
     ]
   > | void {
     return new Promise(async (resolve, reject) => {
-    
-      var payload = JSON.stringify(request?.device);
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      var payload = JSON.stringify({
+        device: request?.device
+      });
 
       var options = {
         host: 'iot-sandbox.clearblade.com',
-        path: `/api/v/4/webhook/execute/`+ adminSystemKey +`/devices?name=` + request?.device?.name,
-        method: 'PATCH',
+        path: 
+          '/api/v/1/code/'
+          + token.systemKey +
+          '/devicesPatch',
+          // + request?.device?.name,
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': adminSystemUserToken          
+          'ClearBlade-UserToken': token.serviceAccountToken,
+          'Content-Length': payload.length,
         }
       };
       
       console.log(options);
+      console.log(payload);
       const req = https.request({        
         ...options,
       }, res => {
         let data = '';
-        const chunks: any[] = [];
         res.on('data', chunk => data += chunk)
         res.on('end', () => {
           const device: protos.google.cloud.iot.v1.IDevice = JSON.parse(data);
