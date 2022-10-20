@@ -49,7 +49,7 @@ const adminSystemUserToken =
  * User Constants (Needs to fetch from service account auth JSON)
  */
 const constRegion = 'us-central1';
-const constRegistry = 'ingressRegistry';
+const constRegistry = 'prashant-registry';
 const constProject = 'ingressdevelopmentenv';
 
 /**
@@ -1071,23 +1071,50 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        'device.name': request.device!.name || '',
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const payload = JSON.stringify(request?.device);
+
+      const options = {
+        host: 'iot-sandbox.clearblade.com',
+        path:
+          '/api/v/4/webhook/execute/' +
+          token.systemKey +
+          '/cloudiot_devices?name=' +
+          request?.device?.name +
+          '&updateMask=' +
+          request?.updateMask,
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': token.serviceAccountToken,
+          'Content-Length': payload.length,
+        },
+      };
+
+      const req = https.request(
+        {
+          ...options,
+        },
+        res => {
+          let data = '';
+          res.on('data', chunk => (data += chunk));
+          res.on('end', () => {
+            const device: protos.google.cloud.iot.v1.IDevice = JSON.parse(data);
+            resolve([device, {}, {}]);
+          });
+        }
+      );
+      req.on('error', e => {
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.updateDevice(request, options, callback);
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    });
   }
   /**
    * Deletes a device.
@@ -2289,9 +2316,9 @@ export class DeviceManagerClient {
         gatewayId: request?.gatewayId,
         deviceId: request?.deviceId,
       });
-      var options = {
+      const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: `/api/v/1/code/` + adminSystemKey + `/unbindDeviceFromGateway`,
+        path: '/api/v/1/code/' + adminSystemKey + '/unbindDeviceFromGateway',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

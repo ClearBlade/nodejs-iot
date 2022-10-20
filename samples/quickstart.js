@@ -62,6 +62,25 @@ async function main() {
     // console.log(response);
     // console.log("Device Information End");
 
+    /*
+    Device Update
+    */
+    // const request = {
+    //   device: {
+    //     id: 'prashant-device',
+    //     name: 'prashant-device',
+    //     logLevel: 'NONE',
+    //     metadata: {
+    //       Test1: 13,
+    //     },
+    //   },
+    //   updateMask: 'logLevel,metadata',
+    // };
+    // const [response] = await client.updateDevice(request);
+    // console.log('Update Start');
+    // console.log(response);
+    // console.log('Update End');
+
     /**
      * Un bind gateway to device
      */
