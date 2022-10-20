@@ -17,7 +17,7 @@
 async function main() {
   // [START iot_quickstart]
   const iot = require('@google-cloud/iot');
-  const client = new iot.v1.DeviceManagerClient({"fallback":"rest"});
+  const client = new iot.v1.DeviceManagerClient({fallback: 'rest'});
 
   async function quickstart() {
     /**
@@ -46,13 +46,12 @@ async function main() {
 
     // get List of device
     //
-    
+
     // const projectId = await client.getProjectId();
     // const parent = client.locationPath(projectId, 'us-central1');
 
     // const [response] = await client.listDevices({parent});
     // console.log('Device list: ', response);
-    
 
     //Get Device Information
     // const request = {
@@ -66,26 +65,28 @@ async function main() {
     /**
      * Un bind gateway to device
      */
-     const requestUnBindGateway = {
-      deviceId : 'myOldDevice',
-      gatewayId: 'ingress_registry_second'       
+    const requestUnBindGateway = {
+      deviceId: 'myOldDevice',
+      gatewayId: 'ingress_registry_second',
     };
 
-    const [responseUnBindGateway] = await client.unbindDeviceFromGateway(requestUnBindGateway);
+    const [responseUnBindGateway] = await client.unbindDeviceFromGateway(
+      requestUnBindGateway
+    );
     console.log('RES: ', responseUnBindGateway);
     /**
      * bind gateway to device
      */
-     const requestBindGateway = {
-       deviceId : 'myOldDevice',
-       gatewayId: 'ingress_registry_second'       
-     };
- 
-     const [responseBindGateway] = await client.bindDeviceToGateway(requestBindGateway);
-     console.log('RES: ', responseBindGateway);
-    
-    
-   }
+    const requestBindGateway = {
+      deviceId: 'myOldDevice',
+      gatewayId: 'ingress_registry_second',
+    };
+
+    const [responseBindGateway] = await client.bindDeviceToGateway(
+      requestBindGateway
+    );
+    console.log('RES: ', responseBindGateway);
+  }
   quickstart();
   // [END iot_quickstart]
 }
