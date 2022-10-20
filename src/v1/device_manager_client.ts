@@ -2316,9 +2316,9 @@ export class DeviceManagerClient {
         gatewayId: request?.gatewayId,
         deviceId: request?.deviceId,
       });
-      var options = {
+      const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: `/api/v/1/code/` + adminSystemKey + `/unbindDeviceFromGateway`,
+        path: '/api/v/1/code/' + adminSystemKey + '/unbindDeviceFromGateway',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
