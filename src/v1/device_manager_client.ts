@@ -951,23 +951,43 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        name: request.name || '',
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const options = {
+        host: 'iot-sandbox.clearblade.com',
+        path:
+          '/api/v/4/webhook/execute/' +
+          token?.systemKey +
+          '/cloudiot_devices?name=' +
+          request?.name,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': token.serviceAccountToken,
+        },
+      };
+
+      const req = https.request(
+        {
+          ...options,
+        },
+        res => {
+          let data = '';
+          res.on('data', chunk => (data += chunk));
+          res.on('end', () => {
+            const device: protos.google.cloud.iot.v1.IDevice = JSON.parse(data);
+            resolve([device, {}, {}]);
+          });
+        }
+      );
+      req.on('error', e => {
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.getDevice(request, options, callback);
+
+      req.end();
+    });
   }
   /**
    * Updates a device.
