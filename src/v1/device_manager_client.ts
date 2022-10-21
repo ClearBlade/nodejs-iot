@@ -49,7 +49,7 @@ const adminSystemUserToken =
  * User Constants (Needs to fetch from service account auth JSON)
  */
 const constRegion = 'us-central1';
-const constRegistry = 'prashant-registry';
+const constRegistry = 'ingressRegistry';
 const constProject = 'ingressdevelopmentenv';
 
 /**
@@ -1640,17 +1640,20 @@ export class DeviceManagerClient {
     return new Promise(async (resolve, reject) => {
       const token_response = await this.getRegistryToken();
       const token = JSON.parse(token_response);
-      const payload = JSON.stringify({
-        name: request?.name,
-      });
-      var options = {
+      const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: `/api/v/1/code/` + token.systemKey + `/devicesStatesList`,
-        method: 'POST',
+        port: '443',
+        path:
+          `/api/v/4/webhook/execute/` +
+          token.systemKey +
+          `/cloudiot_devices_states?name=` +
+          request?.name +
+          `&numStates=` +
+          request?.numStates,
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'ClearBlade-UserToken': token.serviceAccountToken,
-          'Content-Length': payload.length,
         },
       };
 
@@ -1699,9 +1702,6 @@ export class DeviceManagerClient {
         console.log('error: ', e);
         reject(e);
       });
-      if (payload) {
-        req.write(payload);
-      }
       req.end();
     });
   }
