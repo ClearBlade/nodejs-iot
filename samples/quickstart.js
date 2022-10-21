@@ -17,7 +17,7 @@
 async function main() {
   // [START iot_quickstart]
   const iot = require('@google-cloud/iot');
-  const client = new iot.v1.DeviceManagerClient({"fallback":"rest"});
+  const client = new iot.v1.DeviceManagerClient({fallback: 'rest'});
 
   async function quickstart() {
     /**
@@ -43,39 +43,69 @@ async function main() {
 
     // const [response] = await client.sendCommandToDevice(request);
     // console.log('Sent command: ', response);
-    
+
+    // get List of device
+    //
+
+    // const projectId = await client.getProjectId();
+    // const parent = client.locationPath(projectId, 'us-central1');
+
+    // const [response] = await client.listDevices({parent});
+    // console.log('Device list: ', response);
+
+    //Get Device Information
+    // const request = {
+    //   name : "projects/ingressdevelopmentenv/locations/us-central1/registries/prashant-registry/devices/prashant-device"
+    // };
+    // const [response] = await client.getDevice(request);
+    // console.log('Device Information');
+    // console.log(response);
+    // console.log("Device Information End");
+
+    /*
+    Device Update
+    */
+    // const request = {
+    //   device: {
+    //     id: 'prashant-device',
+    //     name: 'prashant-device',
+    //     logLevel: 'NONE',
+    //     metadata: {
+    //       Test1: 13,
+    //     },
+    //   },
+    //   updateMask: 'logLevel,metadata',
+    // };
+    // const [response] = await client.updateDevice(request);
+    // console.log('Update Start');
+    // console.log(response);
+    // console.log('Update End');
+
     /**
      * Un bind gateway to device
      */
-    //  const requestUnBindGateway = {
-    //   deviceId : 'myOldDevice',
-    //   gatewayId: 'ingress_registry_second'       
-    // };
+    const requestUnBindGateway = {
+      deviceId: 'myOldDevice',
+      gatewayId: 'ingress_registry_second',
+    };
 
-    // const [responseUnBindGateway] = await client.unbindDeviceFromGateway(requestUnBindGateway);
+    // const [responseUnBindGateway] = await client.unbindDeviceFromGateway(
+      requestUnBindGateway
+    );
     // console.log('RES: ', responseUnBindGateway);
     /**
      * bind gateway to device
      */
-    //  const requestBindGateway = {
-    //    deviceId : 'myOldDevice',
-    //    gatewayId: 'ingress_registry_second'       
-    //  };
- 
-    //  const [responseBindGateway] = await client.bindDeviceToGateway(requestBindGateway);
-    //  console.log('RES: ', responseBindGateway);
-    /**
-     * Get device state list
-     */
-    const requestGetDeviceState = {
-       name : 'device_ingress'      
-     };
- 
-     const [responseDeviceStateList] = await client.listDeviceStates(requestGetDeviceState);
-     console.log('RES: ', responseDeviceStateList);
-    
-    
-   }
+    const requestBindGateway = {
+      deviceId: 'myOldDevice',
+      gatewayId: 'ingress_registry_second',
+    };
+
+    const [responseBindGateway] = await client.bindDeviceToGateway(
+      requestBindGateway
+    );
+    console.log('RES: ', responseBindGateway);
+  }
   quickstart();
   // [END iot_quickstart]
 }
