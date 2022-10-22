@@ -45,12 +45,6 @@ const version = require('../../../package.json').version;
 const adminSystemKey = '84abb9b30ca4ece486d4bcf7ad71';
 const adminSystemUserToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5NGFiYjliMzBjOTRjMGE1ZGNhOGE4ODRiYzU5Iiwic2lkIjoiMmQ5ZTAzZjUtZmQ2OC00MWM4LTg5OGYtYWQzMWE4ZjMzMmIwIiwidXQiOjIsInR0IjoxLCJleHAiOi0xLCJpYXQiOjE2NjQ1NTk5NDR9.0RrKIrs9vBY1fcp_nei3mTRhYxcZU5mdar9ribHlso0';
-/**
- * User Constants (Needs to fetch from service account auth JSON)
- */
-const constRegion = 'us-central1';
-const constRegistry = 'prashant-registry';
-const constProject = 'ingressdevelopmentenv';
 
 /**
  *  Internet of Things (IoT) service. Securely connect and manage IoT devices.
@@ -58,6 +52,9 @@ const constProject = 'ingressdevelopmentenv';
  * @memberof v1
  */
 export class DeviceManagerClient {
+  private region?: string;
+  private registry?: string;
+  private projectId?: string;
   private _terminated = false;
   private _opts: ClientOptions;
   private _providedCustomServicePath: boolean;
@@ -119,9 +116,25 @@ export class DeviceManagerClient {
    */
   constructor(
     opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback
+    gaxInstance?: typeof gax | typeof gax.fallback,
+    region?: string,
+    registry?: string,
+    projectId?: string
   ) {
     // Ensure that options include all the required fields.
+    //constRegion = region;
+    this.region = region;
+    this.registry = registry;
+    this.projectId = projectId;
+    if (region == null || region == '') {
+      throw 'region can not be empty';
+    }
+    if (registry == null || registry == '') {
+      throw 'registry can not be empty';
+    }
+    if (projectId == null || projectId == '') {
+      throw 'projectId can not be empty';
+    }
     const staticMembers = this.constructor as typeof DeviceManagerClient;
     const servicePath =
       opts?.servicePath || opts?.apiEndpoint || staticMembers.servicePath;
@@ -2526,9 +2539,9 @@ export class DeviceManagerClient {
 
   async getRegistryToken() {
     const payload = JSON.stringify({
-      region: constRegion,
-      registry: constRegistry,
-      project: constProject,
+      region: this.region,
+      registry: this.registry,
+      project: this.projectId,
     });
     // eslint-disable-next-line no-async-promise-executor
     return new Promise<string>(async (resolve, reject) => {
@@ -2542,7 +2555,6 @@ export class DeviceManagerClient {
           'Content-Length': payload.length,
         },
       };
-
       const req = https.request(options, res => {
         let data = '';
         const chunks: any[] = [];
