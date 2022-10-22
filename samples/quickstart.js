@@ -114,6 +114,18 @@ async function main() {
     //   requestBindGateway
     // );
     // console.log('RES: ', responseBindGateway);
+     /**
+     * Get device state list
+     */
+    const requestGetDeviceState = {
+       name : 'device_ingress',
+       numStates : -1  
+     };
+ 
+     const [responseDeviceStateList] = await client.listDeviceStates(requestGetDeviceState);
+     console.log('RES: ', responseDeviceStateList);
+    
+
   }
   quickstart();
   // [END iot_quickstart]
