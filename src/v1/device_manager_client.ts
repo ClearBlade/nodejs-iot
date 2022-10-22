@@ -49,7 +49,7 @@ const adminSystemUserToken =
  * User Constants (Needs to fetch from service account auth JSON)
  */
 const constRegion = 'us-central1';
-const constRegistry = 'prashant-registry';
+const constRegistry = 'ingressRegistry';
 const constProject = 'ingressdevelopmentenv';
 
 /**
@@ -910,7 +910,7 @@ export class DeviceManagerClient {
    *   [documentation](https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods)
    *   for more details and examples.
    * @example <caption>include:samples/generated/v1/device_manager.get_device.js</caption>
-   * region_tag:cloudiot_v1_generated_DeviceManager_GetDevice_async
+   * region_tag:cloudiot_v1_generated_DeviceManager_GetDevice                                                                                                                     _async
    */
   getDevice(
     request?: protos.google.cloud.iot.v1.IGetDeviceRequest,
@@ -1637,23 +1637,73 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        name: request.name || '',
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const options = {
+        host: 'iot-sandbox.clearblade.com',
+        port: '443',
+        path:
+          `/api/v/4/webhook/execute/` +
+          token.systemKey +
+          `/cloudiot_devices_states?name=` +
+          request?.name +
+          `&numStates=` +
+          request?.numStates,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': token.serviceAccountToken,
+        },
+      };
+
+      const req = https.request(
+        {
+          ...options,
+        },
+        res => {
+          let data = '';
+          const chunks: any[] = [];
+          res.on('data', chunk => (data += chunk));
+          res.on('end', () => {
+            if (!this.isJsonString(data)) {
+              reject(data);
+              return;
+            }
+            let array: [
+              protos.google.cloud.iot.v1.IListDeviceStatesResponse,
+              protos.google.cloud.iot.v1.IListDeviceStatesRequest | undefined,
+              {} | undefined
+            ];
+            const request:
+              | protos.google.cloud.iot.v1.IListDeviceStatesRequest
+              | undefined = {};
+            const deviceStatesRes = JSON.parse(data);
+            const deviceStateObj: protos.google.cloud.iot.v1.IDeviceState = {};
+            const deviceStateArray:
+              | protos.google.cloud.iot.v1.IDeviceState[]
+              | null = [];
+            const response: protos.google.cloud.iot.v1.IListDeviceStatesResponse =
+              {};
+            for (let index in deviceStatesRes.deviceStates) {
+              deviceStateObj.updateTime =
+                deviceStatesRes.deviceStates[index].updateTime;
+              deviceStateObj.binaryData =
+                deviceStatesRes.deviceStates[index].binaryData;
+              deviceStateArray.push(deviceStateObj);
+            }
+            response.deviceStates = deviceStateArray;
+            array = [response, request, {}];
+            resolve(array);
+          });
+        }
+      );
+      req.on('error', e => {
+        console.log('error: ', e);
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.listDeviceStates(request, options, callback);
+      req.end();
+    });
   }
   /**
    * Sets the access control policy on the specified resource. Replaces any
