@@ -30,6 +30,7 @@ import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
 import * as https from 'https';
+import {ADMIN_SYSTEM_KEY, ADMIN_USER_TOKEN} from './util/secrets';
 
 /**
  * Client JSON configuration object, loaded from
@@ -38,14 +39,6 @@ import * as https from 'https';
  */
 import * as gapicConfig from './device_manager_client_config.json';
 const version = require('../../../package.json').version;
-
-/**
- * ClearBlade Constants
- */
-const adminSystemKey = '84abb9b30ca4ece486d4bcf7ad71';
-const adminSystemUserToken =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5NGFiYjliMzBjOTRjMGE1ZGNhOGE4ODRiYzU5Iiwic2lkIjoiMmQ5ZTAzZjUtZmQ2OC00MWM4LTg5OGYtYWQzMWE4ZjMzMmIwIiwidXQiOjIsInR0IjoxLCJleHAiOi0xLCJpYXQiOjE2NjQ1NTk5NDR9.0RrKIrs9vBY1fcp_nei3mTRhYxcZU5mdar9ribHlso0';
-
 
 /**
  *  Internet of Things (IoT) service. Securely connect and manage IoT devices.
@@ -123,7 +116,6 @@ export class DeviceManagerClient {
     projectId?: string
   ) {
     // Ensure that options include all the required fields.
-    //constRegion = region;
     this.region = region;
     this.registry = registry;
     this.projectId = projectId;
@@ -2382,11 +2374,11 @@ export class DeviceManagerClient {
       });
       const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: '/api/v/1/code/' + adminSystemKey + '/unbindDeviceFromGateway',
+        path: '/api/v/1/code/' + ADMIN_SYSTEM_KEY + '/unbindDeviceFromGateway',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': adminSystemUserToken,
+          'ClearBlade-UserToken': ADMIN_USER_TOKEN,
           'Content-Length': payload.length,
         },
       };
@@ -2527,11 +2519,11 @@ export class DeviceManagerClient {
       });
       const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: '/api/v/1/code/' + adminSystemKey + '/registriesList',
+        path: '/api/v/1/code/' + ADMIN_SYSTEM_KEY + '/registriesList',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': adminSystemUserToken,
+          'ClearBlade-UserToken': ADMIN_USER_TOKEN,
         },
       };
 
@@ -2598,11 +2590,11 @@ export class DeviceManagerClient {
     return new Promise<string>(async (resolve, reject) => {
       const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: `/api/v/1/code/` + adminSystemKey + `/getRegistryCredentials`,
+        path: `/api/v/1/code/` + ADMIN_SYSTEM_KEY + `/getRegistryCredentials`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': adminSystemUserToken,
+          'ClearBlade-UserToken': ADMIN_USER_TOKEN,
           'Content-Length': payload.length,
         },
       };

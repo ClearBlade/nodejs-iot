@@ -43,6 +43,7 @@
     "precompile": "gts clean"
   },
   "dependencies": {
+    "dotenv": "^16.0.3",
     "google-gax": "^3.3.0"
   },
   "devDependencies": {
