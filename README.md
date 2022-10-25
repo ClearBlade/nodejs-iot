@@ -1,22 +1,17 @@
 [//]: # "This README.md file is auto-generated, all changes to this file will be lost."
 [//]: # "To regenerate it, use `python -m synthtool`."
-<img src="https://avatars2.githubusercontent.com/u/2810941?v=3&s=96" alt="Google Cloud Platform logo" title="Google Cloud Platform" align="right" height="96" width="96"/>
 
-# [Google Cloud Internet of Things (IoT) Core: Node.js Client](https://github.com/googleapis/nodejs-iot)
+# [ClearBlade Internet of Things (IoT) Core: Node.js Client](https://github.com/clearblade/nodejs-iot)
 
 [![release level](https://img.shields.io/badge/release%20level-stable-brightgreen.svg?style=flat)](https://cloud.google.com/terms/launch-stages)
 [![npm version](https://img.shields.io/npm/v/@google-cloud/iot.svg)](https://www.npmjs.org/package/@google-cloud/iot)
 
 
+> Node.js idiomatic client for [ClearBlade IoT Core][product-docs].
+
+[ClearBlade Internet of Things (IoT) Core](https://clearblade.atlassian.net/wiki/spaces/IC/overview?homepageId=2170716228) is a fully managed service for securely connecting and managing IoT devices, from a few to millions. Ingest data from connected devices and build rich applications that integrate with the other big data services of Google Cloud Platform.
 
 
-> Node.js idiomatic client for [Cloud IoT Core][product-docs].
-
-[Google Cloud Internet of Things (IoT) Core](https://cloud.google.com/iot/docs) is a fully managed service for securely connecting and managing IoT devices, from a few to millions. Ingest data from connected devices and build rich applications that integrate with the other big data services of Google Cloud Platform.
-
-
-A comprehensive list of changes in each version may be found in
-[the CHANGELOG](https://github.com/googleapis/nodejs-iot/blob/main/CHANGELOG.md).
 
 * [Google Cloud Internet of Things (IoT) Core Node.js Client API Reference][client-docs]
 * [Google Cloud Internet of Things (IoT) Core Documentation][product-docs]
