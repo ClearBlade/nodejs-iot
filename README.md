@@ -1,10 +1,6 @@
-[//]: # "This README.md file is auto-generated, all changes to this file will be lost."
-[//]: # "To regenerate it, use `python -m synthtool`."
-
 # [ClearBlade Internet of Things (IoT) Core: Node.js Client](https://github.com/clearblade/nodejs-iot)
 
-[![release level](https://img.shields.io/badge/release%20level-stable-brightgreen.svg?style=flat)](https://cloud.google.com/terms/launch-stages)
-[![npm version](https://img.shields.io/npm/v/@google-cloud/iot.svg)](https://www.npmjs.org/package/@google-cloud/iot)
+[![npm version](https://img.shields.io/npm/v/@clearblade/iot.svg)](https://www.npmjs.org/package/@clearblade/iot)
 
 
 > Node.js idiomatic client for [ClearBlade IoT Core][product-docs].
@@ -13,14 +9,11 @@
 
 
 
-* [Google Cloud Internet of Things (IoT) Core Node.js Client API Reference][client-docs]
-* [Google Cloud Internet of Things (IoT) Core Documentation][product-docs]
-* [github.com/googleapis/nodejs-iot](https://github.com/googleapis/nodejs-iot)
+* [ClearBlade Internet of Things (IoT) Core Node.js Client API Reference][client-docs]
+* [Clearblade Internet of Things (IoT) Core Documentation][product-docs]
+* [github.com/clearblade/nodejs-iot](https://github.com/clearblade/nodejs-iot)
 
-Read more about the client libraries for Cloud APIs, including the older
-Google APIs Client Libraries, in [Client Libraries Explained][explained].
 
-[explained]: https://cloud.google.com/apis/docs/client-libraries-explained
 
 **Table of contents:**
 
@@ -40,21 +33,22 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 
 1.  [Select or create a Cloud Platform project][projects].
 1.  [Enable billing for your project][billing].
-1.  [Enable the Google Cloud Internet of Things (IoT) Core API][enable_api].
+1.  [Enable the ClearBlade Internet of Things (IoT) Core API][enable_api].
 1.  [Set up authentication with a service account][auth] so you can access the
     API from your local workstation.
 
 ### Installing the client library
 
 ```bash
-npm install @google-cloud/iot
+npm install @clearblade/iot
 ```
 
 
 ### Using the client library
 
+
 ```javascript
-const iot = require('@google-cloud/iot');
+const iot = require('@clearblade/iot');
 const client = new iot.v1.DeviceManagerClient();
 
 async function quickstart() {
@@ -74,15 +68,15 @@ quickstart();
 
 ## Samples
 
-Samples are in the [`samples/`](https://github.com/googleapis/nodejs-iot/tree/main/samples) directory. Each sample's `README.md` has instructions for running its sample.
+Samples are in the [`samples/`](https://github.com/clearblade/nodejs-iot/tree/main/samples) directory. Each sample's `README.md` has instructions for running its sample.
 
 | Sample                      | Source Code                       | Try it |
 | --------------------------- | --------------------------------- | ------ |
-| Quickstart | [source code](https://github.com/googleapis/nodejs-iot/blob/main/samples/quickstart.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-iot&page=editor&open_in_editor=samples/quickstart.js,samples/README.md) |
+| Quickstart | [source code](https://github.com/clearblade/nodejs-iot/blob/main/samples/quickstart.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/clearblade/nodejs-iot&page=editor&open_in_editor=samples/quickstart.js,samples/README.md) |
 
 
 
-The [Google Cloud Internet of Things (IoT) Core Node.js Client API Reference][client-docs] documentation
+The [ClearBlade Internet of Things (IoT) Core Node.js Client API Reference][client-docs] documentation
 also contains samples.
 
 ## Supported Node.js Versions
@@ -93,7 +87,7 @@ Node.js.
 If you are using an end-of-life version of Node.js, we recommend that you update
 as soon as possible to an actively supported LTS version.
 
-Google's client libraries support legacy versions of Node.js runtimes on a
+ClearBlade's client libraries support legacy versions of Node.js runtimes on a
 best-efforts basis with the following warnings:
 
 * Legacy versions are not tested in continuous integration.
@@ -120,21 +114,10 @@ are addressed with the highest priority.
 
 
 
-
-
-More Information: [Google Cloud Platform Launch Stages][launch_stages]
-
-[launch_stages]: https://cloud.google.com/terms/launch-stages
-
 ## Contributing
 
-Contributions welcome! See the [Contributing Guide](https://github.com/googleapis/nodejs-iot/blob/main/CONTRIBUTING.md).
+Contributions welcome! See the [Contributing Guide](https://github.com/clearblade/nodejs-iot/blob/main/CONTRIBUTING.md).
 
-Please note that this `README.md`, the `samples/README.md`,
-and a variety of configuration files in this repository (including `.nycrc` and `tsconfig.json`)
-are generated from a central template. To edit one of these files, make an edit
-to its templates in
-[directory](https://github.com/googleapis/synthtool).
 
 ## License
 
@@ -143,9 +126,9 @@ Apache Version 2.0
 See [LICENSE](https://github.com/googleapis/nodejs-iot/blob/main/LICENSE)
 
 [client-docs]: https://cloud.google.com/nodejs/docs/reference/iot/latest
-[product-docs]: https://cloud.google.com/iot
+[product-docs]: https://clearblade.atlassian.net/wiki/spaces/IC/pages/2200895497/All+concepts
 [shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
 [projects]: https://console.cloud.google.com/project
 [billing]: https://support.google.com/cloud/answer/6293499#enable-billing
-[enable_api]: https://console.cloud.google.com/flows/enableapi?apiid=cloudiot.googleapis.com
+[enable_api]: https://clearblade.atlassian.net/wiki/spaces/IC/pages/2230976570/Google+Cloud+Marketplace+Activation
 [auth]: https://cloud.google.com/docs/authentication/getting-started
