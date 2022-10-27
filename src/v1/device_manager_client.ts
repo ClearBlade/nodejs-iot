@@ -49,7 +49,7 @@ const adminSystemUserToken =
  * User Constants (Needs to fetch from service account auth JSON)
  */
 const constRegion = 'us-central1';
-const constRegistry = 'prashant-registry';
+const constRegistry = 'ingressRegistry';
 const constProject = 'ingressdevelopmentenv';
 
 /**
