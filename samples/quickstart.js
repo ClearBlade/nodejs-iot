@@ -37,34 +37,27 @@ async function main() {
     //  * Send Command to Device
     //  */
     // const binaryData = Buffer.from("c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl");
-
     // const request = {
     //   subfolder : 'sub',
     //   name: 'device_ingress',
     //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
     // };
-
     // const [response] = await client.sendCommandToDevice(request);
     // console.log('Sent command: ', response);
+    //Get List of device
 
-    // get List of device
-    //
-
-    // const projectId = await client.getProjectId();
-    // const parent = client.locationPath(projectId, 'us-central1');
-
-    // const [response] = await client.listDevices({parent});
-    // console.log('Device list: ', response);
-
+    const projectId = await client.getProjectId();
+    const parent = client.locationPath(projectId, 'us-central1');
+    const [response] = await client.listDevices({parent});
+    console.log('Device list: ', response[0]);
     //Get Device Information
-    const request = {
-      name: 'projects/ingressdevelopmentenv/locations/us-central1/registries/ingressRegistry/devices/device_ingress',
-    };
-    const [response] = await client.getDevice(request);
-    console.log('Device Information');
-    console.log(response);
-    console.log('Device Information End');
-
+    // const request = {
+    //   name: 'projects/ingressdevelopmentenv/locations/us-central1/registries/ingressRegistry/devices/device_ingress',
+    // };
+    // const [response] = await client.getDevice(request);
+    // console.log('Device Information');
+    // console.log(response);
+    // console.log('Device Information End');
     /*
     Device Update
     */
@@ -83,7 +76,6 @@ async function main() {
     // console.log('Update Start');
     // console.log(response);
     // console.log('Update End');
-
     /**
      * Un bind gateway to device
      */
@@ -91,7 +83,6 @@ async function main() {
     //   deviceId: 'myOldDevice',
     //   gatewayId: 'ingress_registry_second',
     // };
-
     // const [responseUnBindGateway] = await client.unbindDeviceFromGateway(
     //   requestUnBindGateway
     // );
@@ -103,7 +94,6 @@ async function main() {
     //   deviceId: 'myOldDevice',
     //   gatewayId: 'ingress_registry_second',
     // };
-
     // const [responseBindGateway] = await client.bindDeviceToGateway(
     //   requestBindGateway
     // );

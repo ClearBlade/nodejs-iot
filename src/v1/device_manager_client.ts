@@ -17,7 +17,7 @@
 // ** All changes to this file may be overwritten. **
 
 /* global window */
-//import type * as gax from 'google-gax';
+import type * as gax from 'google-gax';
 import type {
   Callback,
   CallOptions,
@@ -28,7 +28,7 @@ import type {
 } from 'google-gax';
 //import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
-//import jsonProtos = require('../../protos/protos.json');
+import jsonProtos = require('../../protos/protos.json');
 import * as https from 'https';
 import {ADMIN_SYSTEM_KEY, ADMIN_USER_TOKEN} from './util/secrets';
 
@@ -37,8 +37,8 @@ import {ADMIN_SYSTEM_KEY, ADMIN_USER_TOKEN} from './util/secrets';
  * `src/v1/device_manager_client_config.json`.
  * This file defines retry strategy and timeouts for all API methods in this library.
  */
-//import * as gapicConfig from './device_manager_client_config.json';
-//const version = require('../../../package.json').version;
+import * as gapicConfig from './device_manager_client_config.json';
+const version = require('../../../package.json').version;
 
 /**
  *  Internet of Things (IoT) service. Securely connect and manage IoT devices.
@@ -52,9 +52,9 @@ export class DeviceManagerClient {
   //private _terminated = false;
   // private _opts: ClientOptions;
   // private _providedCustomServicePath: boolean;
-  // private _gaxModule: typeof gax | typeof gax.fallback;
-  //private _gaxGrpc: gax.GrpcClient | gax.fallback.GrpcClient;
-  // private _protos: {};
+  private _gaxModule: typeof gax | typeof gax.fallback;
+  private _gaxGrpc: gax.GrpcClient | gax.fallback.GrpcClient;
+  private _protos: {};
   // private _defaults: {[method: string]: gax.CallSettings};
   // auth: gax.GoogleAuth;
   // descriptors: Descriptors = {
@@ -110,8 +110,9 @@ export class DeviceManagerClient {
    */
   constructor(region?: string, registry?: string, projectId?: string) {
     // Ensure that options include all the required fields.
-    //var opts: ClientOptions | null = null;
+    var opts: ClientOptions = {};
     //var gaxInstance: typeof gax | typeof gax.fallback | null = null;
+    const gaxInstance = require('google-gax/build/src/fallback'); // avoids loading google-gax with gRPC
     this.region = region;
     this.registry = registry;
     this.projectId = projectId;
@@ -148,7 +149,8 @@ export class DeviceManagerClient {
     // }
 
     // // Choose either gRPC or proto-over-HTTP implementation of google-gax.
-    // this._gaxModule = opts.fallback ? gaxInstance.fallback : gaxInstance;
+    this._gaxModule = opts.fallback ? gaxInstance.fallback : gaxInstance;
+    this._gaxGrpc = new this._gaxModule.GrpcClient(opts);
 
     // // Create a `gaxGrpc` object, with any grpc-specific options sent to the client.
 
@@ -185,7 +187,7 @@ export class DeviceManagerClient {
     //   clientHeader.push(`${opts.libName}/${opts.libVersion}`);
     // }
     // // Load the applicable protos.
-    // this._protos = this._gaxGrpc.loadProtoJSON(jsonProtos);
+    this._protos = this._gaxGrpc.loadProtoJSON(jsonProtos);
 
     // // This API contains "path templates"; forward-slash-separated
     // // identifiers to uniquely identify resources within the API.
@@ -2867,9 +2869,39 @@ export class DeviceManagerClient {
           let data = '';
           res.on('data', chunk => (data += chunk));
           res.on('end', () => {
-            const devices: protos.google.cloud.iot.v1.IDevice[] =
-              JSON.parse(data);
-            resolve([devices, {}, {}]);
+            const response: protos.google.cloud.iot.v1.IListDevicesResponse =
+              {};
+            const request: protos.google.cloud.iot.v1.ListDevicesRequest | null =
+              null;
+            const deviceListResponse = JSON.parse(data);
+            const devicesArray: protos.google.cloud.iot.v1.IDevice[] = [];
+
+            for (const index in deviceListResponse.devices) {
+              const device: protos.google.cloud.iot.v1.IDevice = {};
+              device.id = deviceListResponse.devices[index].id;
+              device.name = deviceListResponse.devices[index].name;
+              device.numId = deviceListResponse.devices[index].numId;
+              device.credentials =
+                deviceListResponse.devices[index].credentials;
+              device.lastHeartbeatTime =
+                deviceListResponse.devices[index].lastHeartbeatTime;
+              device.lastEventTime =
+                deviceListResponse.devices[index].lastEventTime;
+              device.lastStateTime =
+                deviceListResponse.devices[index].lastStateTime;
+              device.lastConfigAckTime =
+                deviceListResponse.devices[index].lastConfigAckTime;
+              device.lastConfigSendTime =
+                deviceListResponse.devices[index].lastConfigSendTime;
+              device.blocked = deviceListResponse.devices[index].blocked;
+              device.lastErrorTime =
+                deviceListResponse.devices[index].lastErrorTime;
+              device.lastErrorStatus =
+                deviceListResponse.devices[index].lastErrorStatus;
+              devicesArray.push(device);
+            }
+            response.devices = devicesArray;
+            resolve([devicesArray, request, response]);
           });
         }
       );
