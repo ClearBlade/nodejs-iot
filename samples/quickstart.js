@@ -106,17 +106,35 @@ async function main() {
     // );
     // console.log('RES: ', responseBindGateway);
 
-     /**
+    /**
      * Get device state list
      */
-    const requestGetDeviceState = {
-       name : 'device_ingress',
-       numStates : -1  
-     };
- 
-     const [responseDeviceStateList] = await client.listDeviceStates(requestGetDeviceState);
-     console.log('RES: ', responseDeviceStateList);
-    
+    // const requestGetDeviceState = {
+    //   name: 'device_ingress',
+    //   numStates: -1,
+    // };
+    // const [responseDeviceStateList] = await client.listDeviceStates(
+    //   requestGetDeviceState
+    // );
+    // console.log('RES: ', responseDeviceStateList);
+    /*
+    Device Registry Update
+    */
+    const request = {
+      deviceRegistry: {
+        id: 'prashant-registry',
+        name: 'projects/ingressdevelopmentenv/locations/us-central1/registries/prashant-registry',
+        logLevel: '',
+        httpConfig: {
+          httpEnabledState: 'HTTP_ENABLED',
+        },
+      },
+      updateMask: 'httpConfig.http_enabled_state',
+    };
+    const [response] = await client.updateDeviceRegistry(request);
+    console.log('Update Start');
+    console.log(response);
+    console.log('Update End');
   }
   quickstart();
   // [END iot_quickstart]
