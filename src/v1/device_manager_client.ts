@@ -457,24 +457,46 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // request = request || {};
-    // let options: CallOptions;
-    // if (typeof optionsOrCallback === 'function' && callback === undefined) {
-    //   callback = optionsOrCallback;
-    //   options = {};
-    // } else {
-    //   options = optionsOrCallback as CallOptions;
-    // }
-    // options = options || {};
-    // options.otherArgs = options.otherArgs || {};
-    // options.otherArgs.headers = options.otherArgs.headers || {};
-    // options.otherArgs.headers['x-goog-request-params'] =
-    //   this._gaxModule.routingHeader.fromParams({
-    //     parent: request.parent || '',
-    //   });
-    // this.initialize();
-    // return this.innerApiCalls.createDeviceRegistry(request, options, callback);
-    return undefined;
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve, reject) => {
+      const payload = JSON.stringify(request?.deviceRegistry);
+      const options = {
+        host: 'iot-sandbox.clearblade.com',
+        path:
+          '/api/v/4/webhook/execute/' +
+          this.ADMIN_SYSTEM_KEY +
+          '/cloudiot?parent=' +
+          request?.parent,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
+          'Content-Length': payload.length,
+        },
+      };
+
+      const req = https.request(
+        {
+          ...options,
+        },
+        res => {
+          let data = '';
+          res.on('data', chunk => (data += chunk));
+          res.on('end', () => {
+            const deviceRegistry: protos.google.cloud.iot.v1.IDeviceRegistry =
+              JSON.parse(data);
+            resolve([deviceRegistry, {}, {}]);
+          });
+        }
+      );
+      req.on('error', e => {
+        reject(e);
+      });
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    });
   }
   /**
    * Gets a device registry configuration.
