@@ -938,7 +938,7 @@ export class DeviceManagerClient {
    *   [documentation](https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods)
    *   for more details and examples.
    * @example <caption>include:samples/generated/v1/device_manager.get_device.js</caption>
-   * region_tag:cloudiot_v1_generated_DeviceManager_GetDevice_async
+   * region_tag:cloudiot_v1_generated_DeviceManager_GetDevice
    */
   getDevice(
     request?: protos.google.cloud.iot.v1.IGetDeviceRequest,
