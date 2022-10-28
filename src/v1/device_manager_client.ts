@@ -1264,7 +1264,7 @@ export class DeviceManagerClient {
           token.systemKey +
           '/cloudiot_devices?name=' +
           request?.name,
-        method: 'POST',
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'ClearBlade-UserToken': token.serviceAccountToken,
