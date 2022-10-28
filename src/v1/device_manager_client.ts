@@ -30,7 +30,6 @@ import type {
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
 import * as https from 'https';
-import {ADMIN_SYSTEM_KEY, ADMIN_USER_TOKEN} from './util/secrets';
 
 /**
  * Client JSON configuration object, loaded from
@@ -38,6 +37,7 @@ import {ADMIN_SYSTEM_KEY, ADMIN_USER_TOKEN} from './util/secrets';
  * This file defines retry strategy and timeouts for all API methods in this library.
  */
 import * as gapicConfig from './device_manager_client_config.json';
+import {assert} from 'console';
 const version = require('../../../package.json').version;
 
 /**
@@ -49,6 +49,8 @@ export class DeviceManagerClient {
   private region?: string;
   private registry?: string;
   private projectId?: string;
+  private ADMIN_SYSTEM_KEY?: string;
+  private ADMIN_USER_TOKEN?: string;
   //private _terminated = false;
   // private _opts: ClientOptions;
   // private _providedCustomServicePath: boolean;
@@ -111,6 +113,13 @@ export class DeviceManagerClient {
   constructor(region?: string, registry?: string, projectId?: string) {
     // Ensure that options include all the required fields.
     var opts: ClientOptions = {};
+    const clerabladeConfigFile = process.env.CLEARBLADE_CONFIGURATION;
+    if (!clerabladeConfigFile) {
+      throw '[ERROR] : The "CLEARBLADE_CONFIGURATION" environment variable is required.!';
+    }
+    let json = require('' + clerabladeConfigFile);
+    this.ADMIN_SYSTEM_KEY = json.systemKey;
+    this.ADMIN_USER_TOKEN = json.token;
     //var gaxInstance: typeof gax | typeof gax.fallback | null = null;
     const gaxInstance = require('google-gax/build/src/fallback'); // avoids loading google-gax with gRPC
     this.region = region;
@@ -2404,11 +2413,12 @@ export class DeviceManagerClient {
       });
       const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: '/api/v/1/code/' + ADMIN_SYSTEM_KEY + '/unbindDeviceFromGateway',
+        path:
+          '/api/v/1/code/' + this.ADMIN_SYSTEM_KEY + '/unbindDeviceFromGateway',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': ADMIN_USER_TOKEN,
+          'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
           'Content-Length': payload.length,
         },
       };
@@ -2549,11 +2559,11 @@ export class DeviceManagerClient {
       });
       const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: '/api/v/1/code/' + ADMIN_SYSTEM_KEY + '/registriesList',
+        path: '/api/v/1/code/' + this.ADMIN_SYSTEM_KEY + '/registriesList',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': ADMIN_USER_TOKEN,
+          'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
         },
       };
 
@@ -2620,11 +2630,12 @@ export class DeviceManagerClient {
     return new Promise<string>(async (resolve, reject) => {
       const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: `/api/v/1/code/` + ADMIN_SYSTEM_KEY + `/getRegistryCredentials`,
+        path:
+          `/api/v/1/code/` + this.ADMIN_SYSTEM_KEY + `/getRegistryCredentials`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': ADMIN_USER_TOKEN,
+          'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
           'Content-Length': payload.length,
         },
       };
