@@ -639,23 +639,51 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        'device_registry.name': request.deviceRegistry!.name || '',
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve, reject) => {
+      const token_response = await this.getRegistryToken();
+      const token = JSON.parse(token_response);
+      const payload = JSON.stringify(request?.deviceRegistry);
+
+      const options = {
+        host: 'iot-sandbox.clearblade.com',
+        path:
+          '/api/v/4/webhook/execute/' +
+          token.systemKey +
+          '/cloudiot?name=' +
+          request?.deviceRegistry?.name +
+          '&updateMask=' +
+          request?.updateMask,
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': token.serviceAccountToken,
+          'Content-Length': payload.length,
+        },
+      };
+
+      const req = https.request(
+        {
+          ...options,
+        },
+        res => {
+          let data = '';
+          res.on('data', chunk => (data += chunk));
+          res.on('end', () => {
+            const deviceRegistry: protos.google.cloud.iot.v1.IDeviceRegistry =
+              JSON.parse(data);
+            resolve([deviceRegistry, {}, {}]);
+          });
+        }
+      );
+      req.on('error', e => {
+        reject(e);
       });
-    this.initialize();
-    return this.innerApiCalls.updateDeviceRegistry(request, options, callback);
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    });
   }
   /**
    * Deletes a device registry configuration.
@@ -916,7 +944,7 @@ export class DeviceManagerClient {
    *   [documentation](https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods)
    *   for more details and examples.
    * @example <caption>include:samples/generated/v1/device_manager.get_device.js</caption>
-   * region_tag:cloudiot_v1_generated_DeviceManager_GetDevice                                                                                                                     _async
+   * region_tag:cloudiot_v1_generated_DeviceManager_GetDevice
    */
   getDevice(
     request?: protos.google.cloud.iot.v1.IGetDeviceRequest,
@@ -1643,6 +1671,7 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       const token_response = await this.getRegistryToken();
       const token = JSON.parse(token_response);
@@ -1691,7 +1720,7 @@ export class DeviceManagerClient {
               | null = [];
             const response: protos.google.cloud.iot.v1.IListDeviceStatesResponse =
               {};
-            for (let index in deviceStatesRes.deviceStates) {
+            for (const index in deviceStatesRes.deviceStates) {
               deviceStateObj.updateTime =
                 deviceStatesRes.deviceStates[index].updateTime;
               deviceStateObj.binaryData =
@@ -1699,6 +1728,7 @@ export class DeviceManagerClient {
               deviceStateArray.push(deviceStateObj);
             }
             response.deviceStates = deviceStateArray;
+            // eslint-disable-next-line prefer-const
             array = [response, request, {}];
             resolve(array);
           });

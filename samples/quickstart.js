@@ -63,13 +63,13 @@ async function main() {
     // console.log('Device list: ', response);
 
     //Get Device Information
-    const request = {
-      name: 'projects/ingressdevelopmentenv/locations/us-central1/registries/ingressRegistry/devices/device_ingress',
-    };
-    const [response] = await client.getDevice(request);
-    console.log('Device Information');
-    console.log(response);
-    console.log('Device Information End');
+    // const request = {
+    //   name: 'projects/ingressdevelopmentenv/locations/us-central1/registries/ingressRegistry/devices/device_ingress',
+    // };
+    // const [response] = await client.getDevice(request);
+    // console.log('Device Information');
+    // console.log(response);
+    // console.log('Device Information End');
 
     /*
     Device Update
@@ -121,11 +121,28 @@ async function main() {
     //   name: 'device_ingress',
     //   numStates: -1,
     // };
-
     // const [responseDeviceStateList] = await client.listDeviceStates(
     //   requestGetDeviceState
     // );
     // console.log('RES: ', responseDeviceStateList);
+    /*
+    Device Registry Update
+    */
+    const request = {
+      deviceRegistry: {
+        id: 'prashant-registry',
+        name: 'projects/ingressdevelopmentenv/locations/us-central1/registries/prashant-registry',
+        logLevel: '',
+        httpConfig: {
+          httpEnabledState: 'HTTP_ENABLED',
+        },
+      },
+      updateMask: 'httpConfig.http_enabled_state',
+    };
+    const [response] = await client.updateDeviceRegistry(request);
+    console.log('Update Start');
+    console.log(response);
+    console.log('Update End');
   }
   quickstart();
   // [END iot_quickstart]
