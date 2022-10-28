@@ -17,7 +17,7 @@
 // ** All changes to this file may be overwritten. **
 
 /* global window */
-import type * as gax from 'google-gax';
+//import type * as gax from 'google-gax';
 import type {
   Callback,
   CallOptions,
@@ -26,9 +26,9 @@ import type {
   PaginationCallback,
   GaxCall,
 } from 'google-gax';
-import {Transform} from 'stream';
+//import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
-import jsonProtos = require('../../protos/protos.json');
+//import jsonProtos = require('../../protos/protos.json');
 import * as https from 'https';
 import {ADMIN_SYSTEM_KEY, ADMIN_USER_TOKEN} from './util/secrets';
 
@@ -37,8 +37,8 @@ import {ADMIN_SYSTEM_KEY, ADMIN_USER_TOKEN} from './util/secrets';
  * `src/v1/device_manager_client_config.json`.
  * This file defines retry strategy and timeouts for all API methods in this library.
  */
-import * as gapicConfig from './device_manager_client_config.json';
-const version = require('../../../package.json').version;
+//import * as gapicConfig from './device_manager_client_config.json';
+//const version = require('../../../package.json').version;
 
 /**
  *  Internet of Things (IoT) service. Securely connect and manage IoT devices.
@@ -49,24 +49,24 @@ export class DeviceManagerClient {
   private region?: string;
   private registry?: string;
   private projectId?: string;
-  private _terminated = false;
-  private _opts: ClientOptions;
-  private _providedCustomServicePath: boolean;
-  private _gaxModule: typeof gax | typeof gax.fallback;
-  private _gaxGrpc: gax.GrpcClient | gax.fallback.GrpcClient;
-  private _protos: {};
-  private _defaults: {[method: string]: gax.CallSettings};
-  auth: gax.GoogleAuth;
-  descriptors: Descriptors = {
-    page: {},
-    stream: {},
-    longrunning: {},
-    batching: {},
-  };
-  warn: (code: string, message: string, warnType?: string) => void;
-  innerApiCalls: {[name: string]: Function};
-  pathTemplates: {[name: string]: gax.PathTemplate};
-  deviceManagerStub?: Promise<{[name: string]: Function}>;
+  //private _terminated = false;
+  // private _opts: ClientOptions;
+  // private _providedCustomServicePath: boolean;
+  // private _gaxModule: typeof gax | typeof gax.fallback;
+  //private _gaxGrpc: gax.GrpcClient | gax.fallback.GrpcClient;
+  // private _protos: {};
+  // private _defaults: {[method: string]: gax.CallSettings};
+  // auth: gax.GoogleAuth;
+  // descriptors: Descriptors = {
+  //   page: {},
+  //   stream: {},
+  //   longrunning: {},
+  //   batching: {},
+  // };
+  // warn: (code: string, message: string, warnType?: string) => void;
+  // innerApiCalls: {[name: string]: Function};
+  //pathTemplates: {[name: string]: gax.PathTemplate};
+  // deviceManagerStub?: Promise<{[name: string]: Function}>;
 
   /**
    * Construct an instance of DeviceManagerClient.
@@ -108,136 +108,131 @@ export class DeviceManagerClient {
    *     const client = new DeviceManagerClient({fallback: 'rest'}, gax);
    *     ```
    */
-  constructor(
-    opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback,
-    region?: string,
-    registry?: string,
-    projectId?: string
-  ) {
+  constructor(region?: string, registry?: string, projectId?: string) {
     // Ensure that options include all the required fields.
+    //var opts: ClientOptions | null = null;
+    //var gaxInstance: typeof gax | typeof gax.fallback | null = null;
     this.region = region;
     this.registry = registry;
     this.projectId = projectId;
-    if (region == null || region == '') {
+    if (region === null || region === '') {
       throw 'region can not be empty';
     }
-    if (registry == null || registry == '') {
+    if (registry === null || registry === '') {
       throw 'registry can not be empty';
     }
-    if (projectId == null || projectId == '') {
+    if (projectId === null || projectId === '') {
       throw 'projectId can not be empty';
     }
-    const staticMembers = this.constructor as typeof DeviceManagerClient;
-    const servicePath =
-      opts?.servicePath || opts?.apiEndpoint || staticMembers.servicePath;
-    this._providedCustomServicePath = !!(
-      opts?.servicePath || opts?.apiEndpoint
-    );
-    const port = opts?.port || staticMembers.port;
-    const clientConfig = opts?.clientConfig ?? {};
-    const fallback =
-      opts?.fallback ??
-      (typeof window !== 'undefined' && typeof window?.fetch === 'function');
-    opts = Object.assign({servicePath, port, clientConfig, fallback}, opts);
+    // const staticMembers = this.constructor as typeof DeviceManagerClient;
+    // const servicePath =
+    //   opts?.servicePath || opts?.apiEndpoint || staticMembers.servicePath;
+    // this._providedCustomServicePath = !!(
+    //   opts?.servicePath || opts?.apiEndpoint
+    // );
+    // const port = opts?.port || staticMembers.port;
+    // const clientConfig = opts?.clientConfig ?? {};
+    // const fallback =
+    //   opts?.fallback ??
+    //   (typeof window !== 'undefined' && typeof window?.fetch === 'function');
+    // opts = Object.assign({servicePath, port, clientConfig, fallback}, opts);
 
-    // If scopes are unset in options and we're connecting to a non-default endpoint, set scopes just in case.
-    if (servicePath !== staticMembers.servicePath && !('scopes' in opts)) {
-      opts['scopes'] = staticMembers.scopes;
-    }
+    // // If scopes are unset in options and we're connecting to a non-default endpoint, set scopes just in case.
+    // if (servicePath !== staticMembers.servicePath && !('scopes' in opts)) {
+    //   opts['scopes'] = staticMembers.scopes;
+    // }
 
-    // Load google-gax module synchronously if needed
-    if (!gaxInstance) {
-      gaxInstance = require('google-gax') as typeof gax;
-    }
+    // // Load google-gax module synchronously if needed
+    // if (!gaxInstance) {
+    //   gaxInstance = require('google-gax') as typeof gax;
+    // }
 
-    // Choose either gRPC or proto-over-HTTP implementation of google-gax.
-    this._gaxModule = opts.fallback ? gaxInstance.fallback : gaxInstance;
+    // // Choose either gRPC or proto-over-HTTP implementation of google-gax.
+    // this._gaxModule = opts.fallback ? gaxInstance.fallback : gaxInstance;
 
-    // Create a `gaxGrpc` object, with any grpc-specific options sent to the client.
-    this._gaxGrpc = new this._gaxModule.GrpcClient(opts);
+    // // Create a `gaxGrpc` object, with any grpc-specific options sent to the client.
 
-    // Save options to use in initialize() method.
-    this._opts = opts;
+    // // Save options to use in initialize() method.
+    // this._opts = opts;
 
-    // Save the auth object to the client, for use by other methods.
-    this.auth = this._gaxGrpc.auth as gax.GoogleAuth;
+    // // Save the auth object to the client, for use by other methods.
+    // this.auth = this._gaxGrpc.auth as gax.GoogleAuth;
 
-    // Set useJWTAccessWithScope on the auth object.
-    this.auth.useJWTAccessWithScope = true;
+    // // Set useJWTAccessWithScope on the auth object.
+    // this.auth.useJWTAccessWithScope = true;
 
-    // Set defaultServicePath on the auth object.
-    this.auth.defaultServicePath = staticMembers.servicePath;
+    // // Set defaultServicePath on the auth object.
+    // this.auth.defaultServicePath = staticMembers.servicePath;
 
-    // Set the default scopes in auth client if needed.
-    if (servicePath === staticMembers.servicePath) {
-      this.auth.defaultScopes = staticMembers.scopes;
-    }
+    // // Set the default scopes in auth client if needed.
+    // if (servicePath === staticMembers.servicePath) {
+    //   this.auth.defaultScopes = staticMembers.scopes;
+    // }
 
-    // Determine the client header string.
-    const clientHeader = [`gax/${this._gaxModule.version}`, `gapic/${version}`];
-    if (typeof process !== 'undefined' && 'versions' in process) {
-      clientHeader.push(`gl-node/${process.versions.node}`);
-    } else {
-      clientHeader.push(`gl-web/${this._gaxModule.version}`);
-    }
-    if (!opts.fallback) {
-      clientHeader.push(`grpc/${this._gaxGrpc.grpcVersion}`);
-    } else if (opts.fallback === 'rest') {
-      clientHeader.push(`rest/${this._gaxGrpc.grpcVersion}`);
-    }
-    if (opts.libName && opts.libVersion) {
-      clientHeader.push(`${opts.libName}/${opts.libVersion}`);
-    }
-    // Load the applicable protos.
-    this._protos = this._gaxGrpc.loadProtoJSON(jsonProtos);
+    // // Determine the client header string.
+    // const clientHeader = [`gax/${this._gaxModule.version}`, `gapic/${version}`];
+    // if (typeof process !== 'undefined' && 'versions' in process) {
+    //   clientHeader.push(`gl-node/${process.versions.node}`);
+    // } else {
+    //   clientHeader.push(`gl-web/${this._gaxModule.version}`);
+    // }
+    // if (!opts.fallback) {
+    //   clientHeader.push(`grpc/${this._gaxGrpc.grpcVersion}`);
+    // } else if (opts.fallback === 'rest') {
+    //   clientHeader.push(`rest/${this._gaxGrpc.grpcVersion}`);
+    // }
+    // if (opts.libName && opts.libVersion) {
+    //   clientHeader.push(`${opts.libName}/${opts.libVersion}`);
+    // }
+    // // Load the applicable protos.
+    // this._protos = this._gaxGrpc.loadProtoJSON(jsonProtos);
 
-    // This API contains "path templates"; forward-slash-separated
-    // identifiers to uniquely identify resources within the API.
-    // Create useful helper objects for these.
-    this.pathTemplates = {
-      devicePathTemplate: new this._gaxModule.PathTemplate(
-        'projects/{project}/locations/{location}/registries/{registry}/devices/{device}'
-      ),
-      locationPathTemplate: new this._gaxModule.PathTemplate(
-        'projects/{project}/locations/{location}'
-      ),
-      registryPathTemplate: new this._gaxModule.PathTemplate(
-        'projects/{project}/locations/{location}/registries/{registry}'
-      ),
-    };
+    // // This API contains "path templates"; forward-slash-separated
+    // // identifiers to uniquely identify resources within the API.
+    // // Create useful helper objects for these.
+    // this.pathTemplates = {
+    //   devicePathTemplate: new this._gaxModule.PathTemplate(
+    //     'projects/{project}/locations/{location}/registries/{registry}/devices/{device}'
+    //   ),
+    //   locationPathTemplate: new this._gaxModule.PathTemplate(
+    //     'projects/{project}/locations/{location}'
+    //   ),
+    //   registryPathTemplate: new this._gaxModule.PathTemplate(
+    //     'projects/{project}/locations/{location}/registries/{registry}'
+    //   ),
+    // };
 
-    // Some of the methods on this service return "paged" results,
-    // (e.g. 50 results at a time, with tokens to get subsequent
-    // pages). Denote the keys used for pagination and results.
-    this.descriptors.page = {
-      listDeviceRegistries: new this._gaxModule.PageDescriptor(
-        'pageToken',
-        'nextPageToken',
-        'deviceRegistries'
-      ),
-      listDevices: new this._gaxModule.PageDescriptor(
-        'pageToken',
-        'nextPageToken',
-        'devices'
-      ),
-    };
+    // // Some of the methods on this service return "paged" results,
+    // // (e.g. 50 results at a time, with tokens to get subsequent
+    // // pages). Denote the keys used for pagination and results.
+    // this.descriptors.page = {
+    //   listDeviceRegistries: new this._gaxModule.PageDescriptor(
+    //     'pageToken',
+    //     'nextPageToken',
+    //     'deviceRegistries'
+    //   ),
+    //   listDevices: new this._gaxModule.PageDescriptor(
+    //     'pageToken',
+    //     'nextPageToken',
+    //     'devices'
+    //   ),
+    // };
 
-    // Put together the default options sent with requests.
-    this._defaults = this._gaxGrpc.constructSettings(
-      'google.cloud.iot.v1.DeviceManager',
-      gapicConfig as gax.ClientConfig,
-      opts.clientConfig || {},
-      {'x-goog-api-client': clientHeader.join(' ')}
-    );
+    // // Put together the default options sent with requests.
+    // this._defaults = this._gaxGrpc.constructSettings(
+    //   'google.cloud.iot.v1.DeviceManager',
+    //   gapicConfig as gax.ClientConfig,
+    //   opts.clientConfig || {},
+    //   {'x-goog-api-client': clientHeader.join(' ')}
+    // );
 
-    // Set up a dictionary of "inner API calls"; the core implementation
-    // of calling the API is handled in `google-gax`, with this code
-    // merely providing the destination and request information.
-    this.innerApiCalls = {};
+    // // Set up a dictionary of "inner API calls"; the core implementation
+    // // of calling the API is handled in `google-gax`, with this code
+    // // merely providing the destination and request information.
+    // this.innerApiCalls = {};
 
-    // Add a warn function to the client constructor so it can be easily tested.
-    this.warn = this._gaxModule.warn;
+    // // Add a warn function to the client constructor so it can be easily tested.
+    // this.warn = this._gaxModule.warn;
   }
 
   /**
@@ -253,71 +248,68 @@ export class DeviceManagerClient {
    */
   initialize() {
     // If the client stub promise is already initialized, return immediately.
-    if (this.deviceManagerStub) {
-      return this.deviceManagerStub;
-    }
-
-    // Put together the "service stub" for
-    // google.cloud.iot.v1.DeviceManager.
-    this.deviceManagerStub = this._gaxGrpc.createStub(
-      this._opts.fallback
-        ? (this._protos as protobuf.Root).lookupService(
-            'google.cloud.iot.v1.DeviceManager'
-          )
-        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (this._protos as any).google.cloud.iot.v1.DeviceManager,
-      this._opts,
-      this._providedCustomServicePath
-    ) as Promise<{[method: string]: Function}>;
-
+    // if (this.deviceManagerStub) {
+    //   return this.deviceManagerStub;
+    // }
+    // // Put together the "service stub" for
+    // // google.cloud.iot.v1.DeviceManager.
+    // this.deviceManagerStub = this._gaxGrpc.createStub(
+    //   this._opts.fallback
+    //     ? (this._protos as protobuf.Root).lookupService(
+    //         'google.cloud.iot.v1.DeviceManager'
+    //       )
+    //     : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //       (this._protos as any).google.cloud.iot.v1.DeviceManager,
+    //   this._opts,
+    //   this._providedCustomServicePath
+    // ) as Promise<{[method: string]: Function}>;
     // Iterate over each of the methods that the service provides
     // and create an API call method for each.
-    const deviceManagerStubMethods = [
-      'createDeviceRegistry',
-      'getDeviceRegistry',
-      'updateDeviceRegistry',
-      'deleteDeviceRegistry',
-      'listDeviceRegistries',
-      'createDevice',
-      'getDevice',
-      'updateDevice',
-      'deleteDevice',
-      'listDevices',
-      'modifyCloudToDeviceConfig',
-      'listDeviceConfigVersions',
-      'listDeviceStates',
-      'setIamPolicy',
-      'getIamPolicy',
-      'testIamPermissions',
-      'sendCommandToDevice',
-      'bindDeviceToGateway',
-      'unbindDeviceFromGateway',
-    ];
-    for (const methodName of deviceManagerStubMethods) {
-      const callPromise = this.deviceManagerStub.then(
-        stub =>
-          (...args: Array<{}>) => {
-            if (this._terminated) {
-              return Promise.reject('The client has already been closed.');
-            }
-            const func = stub[methodName];
-            return func.apply(stub, args);
-          },
-        (err: Error | null | undefined) => () => {
-          throw err;
-        }
-      );
-
-      const descriptor = this.descriptors.page[methodName] || undefined;
-      const apiCall = this._gaxModule.createApiCall(
-        callPromise,
-        this._defaults[methodName],
-        descriptor,
-        this._opts.fallback
-      );
-      this.innerApiCalls[methodName] = apiCall;
-    }
-    return this.deviceManagerStub;
+    // const deviceManagerStubMethods = [
+    //   'createDeviceRegistry',
+    //   'getDeviceRegistry',
+    //   'updateDeviceRegistry',
+    //   'deleteDeviceRegistry',
+    //   'listDeviceRegistries',
+    //   'createDevice',
+    //   'getDevice',
+    //   'updateDevice',
+    //   'deleteDevice',
+    //   'listDevices',
+    //   'modifyCloudToDeviceConfig',
+    //   'listDeviceConfigVersions',
+    //   'listDeviceStates',
+    //   'setIamPolicy',
+    //   'getIamPolicy',
+    //   'testIamPermissions',
+    //   'sendCommandToDevice',
+    //   'bindDeviceToGateway',
+    //   'unbindDeviceFromGateway',
+    // ];
+    // for (const methodName of deviceManagerStubMethods) {
+    //   const callPromise = this.deviceManagerStub.then(
+    //     stub =>
+    //       (...args: Array<{}>) => {
+    //         if (this._terminated) {
+    //           return Promise.reject('The client has already been closed.');
+    //         }
+    //         const func = stub[methodName];
+    //         return func.apply(stub, args);
+    //       },
+    //     (err: Error | null | undefined) => () => {
+    //       throw err;
+    //     }
+    //   );
+    //   const descriptor = this.descriptors.page[methodName] || undefined;
+    //   const apiCall = this._gaxModule.createApiCall(
+    //     callPromise,
+    //     this._defaults[methodName],
+    //     descriptor,
+    //     this._opts.fallback
+    //   );
+    //   this.innerApiCalls[methodName] = apiCall;
+    // }
+    // return this.deviceManagerStub;
   }
 
   /**
@@ -366,11 +358,11 @@ export class DeviceManagerClient {
   getProjectId(
     callback?: Callback<string, undefined, undefined>
   ): Promise<string> | void {
-    if (callback) {
-      this.auth.getProjectId(callback);
-      return;
-    }
-    return this.auth.getProjectId();
+    // if (callback) {
+    //   this.auth.getProjectId(callback);
+    //   return;
+    // }
+    // return this.auth.getProjectId();
   }
 
   // -------------------
@@ -454,23 +446,24 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        parent: request.parent || '',
-      });
-    this.initialize();
-    return this.innerApiCalls.createDeviceRegistry(request, options, callback);
+    // request = request || {};
+    // let options: CallOptions;
+    // if (typeof optionsOrCallback === 'function' && callback === undefined) {
+    //   callback = optionsOrCallback;
+    //   options = {};
+    // } else {
+    //   options = optionsOrCallback as CallOptions;
+    // }
+    // options = options || {};
+    // options.otherArgs = options.otherArgs || {};
+    // options.otherArgs.headers = options.otherArgs.headers || {};
+    // options.otherArgs.headers['x-goog-request-params'] =
+    //   this._gaxModule.routingHeader.fromParams({
+    //     parent: request.parent || '',
+    //   });
+    // this.initialize();
+    // return this.innerApiCalls.createDeviceRegistry(request, options, callback);
+    return undefined;
   }
   /**
    * Gets a device registry configuration.
@@ -540,23 +533,24 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        name: request.name || '',
-      });
-    this.initialize();
-    return this.innerApiCalls.getDeviceRegistry(request, options, callback);
+    // request = request || {};
+    // let options: CallOptions;
+    // if (typeof optionsOrCallback === 'function' && callback === undefined) {
+    //   callback = optionsOrCallback;
+    //   options = {};
+    // } else {
+    //   options = optionsOrCallback as CallOptions;
+    // }
+    // options = options || {};
+    // options.otherArgs = options.otherArgs || {};
+    // options.otherArgs.headers = options.otherArgs.headers || {};
+    // options.otherArgs.headers['x-goog-request-params'] =
+    //   this._gaxModule.routingHeader.fromParams({
+    //     name: request.name || '',
+    //   });
+    // this.initialize();
+    // return this.innerApiCalls.getDeviceRegistry(request, options, callback);
+    return undefined;
   }
   /**
    * Updates a device registry configuration.
@@ -759,23 +753,24 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        name: request.name || '',
-      });
-    this.initialize();
-    return this.innerApiCalls.deleteDeviceRegistry(request, options, callback);
+    // request = request || {};
+    // let options: CallOptions;
+    // if (typeof optionsOrCallback === 'function' && callback === undefined) {
+    //   callback = optionsOrCallback;
+    //   options = {};
+    // } else {
+    //   options = optionsOrCallback as CallOptions;
+    // }
+    // options = options || {};
+    // options.otherArgs = options.otherArgs || {};
+    // options.otherArgs.headers = options.otherArgs.headers || {};
+    // options.otherArgs.headers['x-goog-request-params'] =
+    //   this._gaxModule.routingHeader.fromParams({
+    //     name: request.name || '',
+    //   });
+    // this.initialize();
+    // return this.innerApiCalls.deleteDeviceRegistry(request, options, callback);
+    return undefined;
   }
   /**
    * Creates a device in a device registry.
@@ -1819,23 +1814,24 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        resource: request.resource || '',
-      });
-    this.initialize();
-    return this.innerApiCalls.setIamPolicy(request, options, callback);
+    // request = request || {};
+    // let options: CallOptions;
+    // if (typeof optionsOrCallback === 'function' && callback === undefined) {
+    //   callback = optionsOrCallback;
+    //   options = {};
+    // } else {
+    //   options = optionsOrCallback as CallOptions;
+    // }
+    // options = options || {};
+    // options.otherArgs = options.otherArgs || {};
+    // options.otherArgs.headers = options.otherArgs.headers || {};
+    // options.otherArgs.headers['x-goog-request-params'] =
+    //   this._gaxModule.routingHeader.fromParams({
+    //     resource: request.resource || '',
+    //   });
+    // this.initialize();
+    // return this.innerApiCalls.setIamPolicy(request, options, callback);
+    return undefined;
   }
   /**
    * Gets the access control policy for a resource.
@@ -1908,23 +1904,24 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        resource: request.resource || '',
-      });
-    this.initialize();
-    return this.innerApiCalls.getIamPolicy(request, options, callback);
+    // request = request || {};
+    // let options: CallOptions;
+    // if (typeof optionsOrCallback === 'function' && callback === undefined) {
+    //   callback = optionsOrCallback;
+    //   options = {};
+    // } else {
+    //   options = optionsOrCallback as CallOptions;
+    // }
+    // options = options || {};
+    // options.otherArgs = options.otherArgs || {};
+    // options.otherArgs.headers = options.otherArgs.headers || {};
+    // options.otherArgs.headers['x-goog-request-params'] =
+    //   this._gaxModule.routingHeader.fromParams({
+    //     resource: request.resource || '',
+    //   });
+    // this.initialize();
+    // return this.innerApiCalls.getIamPolicy(request, options, callback);
+    return undefined;
   }
   /**
    * Returns permissions that a caller has on the specified resource.
@@ -1999,23 +1996,24 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        resource: request.resource || '',
-      });
-    this.initialize();
-    return this.innerApiCalls.testIamPermissions(request, options, callback);
+    // request = request || {};
+    // let options: CallOptions;
+    // if (typeof optionsOrCallback === 'function' && callback === undefined) {
+    //   callback = optionsOrCallback;
+    //   options = {};
+    // } else {
+    //   options = optionsOrCallback as CallOptions;
+    // }
+    // options = options || {};
+    // options.otherArgs = options.otherArgs || {};
+    // options.otherArgs.headers = options.otherArgs.headers || {};
+    // options.otherArgs.headers['x-goog-request-params'] =
+    //   this._gaxModule.routingHeader.fromParams({
+    //     resource: request.resource || '',
+    //   });
+    // this.initialize();
+    // return this.innerApiCalls.testIamPermissions(request, options, callback);
+    return undefined;
   }
   /**
    * Sends a command to the specified device. In order for a device to be able
@@ -2672,27 +2670,27 @@ export class DeviceManagerClient {
    *   [documentation](https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination)
    *   for more details and examples.
    */
-  listDeviceRegistriesStream(
-    request?: protos.google.cloud.iot.v1.IListDeviceRegistriesRequest,
-    options?: CallOptions
-  ): Transform {
-    request = request || {};
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        parent: request.parent || '',
-      });
-    const defaultCallSettings = this._defaults['listDeviceRegistries'];
-    const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
-    return this.descriptors.page.listDeviceRegistries.createStream(
-      this.innerApiCalls.listDeviceRegistries as GaxCall,
-      request,
-      callSettings
-    );
-  }
+  // listDeviceRegistriesStream(
+  //   request?: protos.google.cloud.iot.v1.IListDeviceRegistriesRequest,
+  //   options?: CallOptions
+  // ): Transform {
+  // request = request || {};
+  // options = options || {};
+  // options.otherArgs = options.otherArgs || {};
+  // options.otherArgs.headers = options.otherArgs.headers || {};
+  // options.otherArgs.headers['x-goog-request-params'] =
+  //   this._gaxModule.routingHeader.fromParams({
+  //     parent: request.parent || '',
+  //   });
+  // const defaultCallSettings = this._defaults['listDeviceRegistries'];
+  // const callSettings = defaultCallSettings.merge(options);
+  // this.initialize();
+  // return this.descriptors.page.listDeviceRegistries.createStream(
+  //   this.innerApiCalls.listDeviceRegistries as GaxCall,
+  //   request,
+  //   callSettings
+  // );
+  //}
 
   /**
    * Equivalent to `listDeviceRegistries`, but returns an iterable object.
@@ -2725,27 +2723,27 @@ export class DeviceManagerClient {
    * @example <caption>include:samples/generated/v1/device_manager.list_device_registries.js</caption>
    * region_tag:cloudiot_v1_generated_DeviceManager_ListDeviceRegistries_async
    */
-  listDeviceRegistriesAsync(
-    request?: protos.google.cloud.iot.v1.IListDeviceRegistriesRequest,
-    options?: CallOptions
-  ): AsyncIterable<protos.google.cloud.iot.v1.IDeviceRegistry> {
-    request = request || {};
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        parent: request.parent || '',
-      });
-    const defaultCallSettings = this._defaults['listDeviceRegistries'];
-    const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
-    return this.descriptors.page.listDeviceRegistries.asyncIterate(
-      this.innerApiCalls['listDeviceRegistries'] as GaxCall,
-      request as {},
-      callSettings
-    ) as AsyncIterable<protos.google.cloud.iot.v1.IDeviceRegistry>;
-  }
+  // listDeviceRegistriesAsync(
+  //   request?: protos.google.cloud.iot.v1.IListDeviceRegistriesRequest,
+  //   options?: CallOptions
+  // ): AsyncIterable<protos.google.cloud.iot.v1.IDeviceRegistry> {
+  //   request = request || {};
+  //   options = options || {};
+  //   options.otherArgs = options.otherArgs || {};
+  //   options.otherArgs.headers = options.otherArgs.headers || {};
+  //   options.otherArgs.headers['x-goog-request-params'] =
+  //     this._gaxModule.routingHeader.fromParams({
+  //       parent: request.parent || '',
+  //     });
+  //   const defaultCallSettings = this._defaults['listDeviceRegistries'];
+  //   const callSettings = defaultCallSettings.merge(options);
+  //   this.initialize();
+  //   return this.descriptors.page.listDeviceRegistries.asyncIterate(
+  //     this.innerApiCalls['listDeviceRegistries'] as GaxCall,
+  //     request as {},
+  //     callSettings
+  //   ) as AsyncIterable<protos.google.cloud.iot.v1.IDeviceRegistry>;
+  // }
   /**
    * List devices in a device registry.
    *
@@ -2926,27 +2924,27 @@ export class DeviceManagerClient {
    *   [documentation](https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination)
    *   for more details and examples.
    */
-  listDevicesStream(
-    request?: protos.google.cloud.iot.v1.IListDevicesRequest,
-    options?: CallOptions
-  ): Transform {
-    request = request || {};
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        parent: request.parent || '',
-      });
-    const defaultCallSettings = this._defaults['listDevices'];
-    const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
-    return this.descriptors.page.listDevices.createStream(
-      this.innerApiCalls.listDevices as GaxCall,
-      request,
-      callSettings
-    );
-  }
+  // listDevicesStream(
+  //   request?: protos.google.cloud.iot.v1.IListDevicesRequest,
+  //   options?: CallOptions
+  // ): Transform {
+  //   request = request || {};
+  //   options = options || {};
+  //   options.otherArgs = options.otherArgs || {};
+  //   options.otherArgs.headers = options.otherArgs.headers || {};
+  //   options.otherArgs.headers['x-goog-request-params'] =
+  //     this._gaxModule.routingHeader.fromParams({
+  //       parent: request.parent || '',
+  //     });
+  //   const defaultCallSettings = this._defaults['listDevices'];
+  //   const callSettings = defaultCallSettings.merge(options);
+  //   this.initialize();
+  //   return this.descriptors.page.listDevices.createStream(
+  //     this.innerApiCalls.listDevices as GaxCall,
+  //     request,
+  //     callSettings
+  //   );
+  // }
 
   /**
    * Equivalent to `listDevices`, but returns an iterable object.
@@ -2992,27 +2990,27 @@ export class DeviceManagerClient {
    * @example <caption>include:samples/generated/v1/device_manager.list_devices.js</caption>
    * region_tag:cloudiot_v1_generated_DeviceManager_ListDevices_async
    */
-  listDevicesAsync(
-    request?: protos.google.cloud.iot.v1.IListDevicesRequest,
-    options?: CallOptions
-  ): AsyncIterable<protos.google.cloud.iot.v1.IDevice> {
-    request = request || {};
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        parent: request.parent || '',
-      });
-    const defaultCallSettings = this._defaults['listDevices'];
-    const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
-    return this.descriptors.page.listDevices.asyncIterate(
-      this.innerApiCalls['listDevices'] as GaxCall,
-      request as {},
-      callSettings
-    ) as AsyncIterable<protos.google.cloud.iot.v1.IDevice>;
-  }
+  // listDevicesAsync(
+  //   request?: protos.google.cloud.iot.v1.IListDevicesRequest,
+  //   options?: CallOptions
+  // ): AsyncIterable<protos.google.cloud.iot.v1.IDevice> {
+  //   request = request || {};
+  //   options = options || {};
+  //   options.otherArgs = options.otherArgs || {};
+  //   options.otherArgs.headers = options.otherArgs.headers || {};
+  //   options.otherArgs.headers['x-goog-request-params'] =
+  //     this._gaxModule.routingHeader.fromParams({
+  //       parent: request.parent || '',
+  //     });
+  //   const defaultCallSettings = this._defaults['listDevices'];
+  //   const callSettings = defaultCallSettings.merge(options);
+  //   this.initialize();
+  //   return this.descriptors.page.listDevices.asyncIterate(
+  //     this.innerApiCalls['listDevices'] as GaxCall,
+  //     request as {},
+  //     callSettings
+  //   ) as AsyncIterable<protos.google.cloud.iot.v1.IDevice>;
+  // }
   // --------------------
   // -- Path templates --
   // --------------------
@@ -3032,12 +3030,12 @@ export class DeviceManagerClient {
     registry: string,
     device: string
   ) {
-    return this.pathTemplates.devicePathTemplate.render({
-      project: project,
-      location: location,
-      registry: registry,
-      device: device,
-    });
+    // return this.pathTemplates.devicePathTemplate.render({
+    //   project: project,
+    //   location: location,
+    //   registry: registry,
+    //   device: device,
+    // });
   }
 
   /**
@@ -3048,7 +3046,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the project.
    */
   matchProjectFromDeviceName(deviceName: string) {
-    return this.pathTemplates.devicePathTemplate.match(deviceName).project;
+    //return this.pathTemplates.devicePathTemplate.match(deviceName).project;
   }
 
   /**
@@ -3059,7 +3057,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the location.
    */
   matchLocationFromDeviceName(deviceName: string) {
-    return this.pathTemplates.devicePathTemplate.match(deviceName).location;
+    //return this.pathTemplates.devicePathTemplate.match(deviceName).location;
   }
 
   /**
@@ -3070,7 +3068,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the registry.
    */
   matchRegistryFromDeviceName(deviceName: string) {
-    return this.pathTemplates.devicePathTemplate.match(deviceName).registry;
+    //return this.pathTemplates.devicePathTemplate.match(deviceName).registry;
   }
 
   /**
@@ -3081,7 +3079,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the device.
    */
   matchDeviceFromDeviceName(deviceName: string) {
-    return this.pathTemplates.devicePathTemplate.match(deviceName).device;
+    //return this.pathTemplates.devicePathTemplate.match(deviceName).device;
   }
 
   /**
@@ -3092,10 +3090,10 @@ export class DeviceManagerClient {
    * @returns {string} Resource name string.
    */
   locationPath(project: string, location: string) {
-    return this.pathTemplates.locationPathTemplate.render({
-      project: project,
-      location: location,
-    });
+    // return this.pathTemplates.locationPathTemplate.render({
+    //   project: project,
+    //   location: location,
+    // });
   }
 
   /**
@@ -3106,7 +3104,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the project.
    */
   matchProjectFromLocationName(locationName: string) {
-    return this.pathTemplates.locationPathTemplate.match(locationName).project;
+    //return this.pathTemplates.locationPathTemplate.match(locationName).project;
   }
 
   /**
@@ -3117,7 +3115,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the location.
    */
   matchLocationFromLocationName(locationName: string) {
-    return this.pathTemplates.locationPathTemplate.match(locationName).location;
+    //return this.pathTemplates.locationPathTemplate.match(locationName).location;
   }
 
   /**
@@ -3129,11 +3127,11 @@ export class DeviceManagerClient {
    * @returns {string} Resource name string.
    */
   registryPath(project: string, location: string, registry: string) {
-    return this.pathTemplates.registryPathTemplate.render({
-      project: project,
-      location: location,
-      registry: registry,
-    });
+    // return this.pathTemplates.registryPathTemplate.render({
+    //   project: project,
+    //   location: location,
+    //   registry: registry,
+    // });
   }
 
   /**
@@ -3144,7 +3142,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the project.
    */
   matchProjectFromRegistryName(registryName: string) {
-    return this.pathTemplates.registryPathTemplate.match(registryName).project;
+    //return this.pathTemplates.registryPathTemplate.match(registryName).project;
   }
 
   /**
@@ -3155,7 +3153,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the location.
    */
   matchLocationFromRegistryName(registryName: string) {
-    return this.pathTemplates.registryPathTemplate.match(registryName).location;
+    //return this.pathTemplates.registryPathTemplate.match(registryName).location;
   }
 
   /**
@@ -3166,7 +3164,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the registry.
    */
   matchRegistryFromRegistryName(registryName: string) {
-    return this.pathTemplates.registryPathTemplate.match(registryName).registry;
+    //return this.pathTemplates.registryPathTemplate.match(registryName).registry;
   }
 
   /**
@@ -3176,12 +3174,12 @@ export class DeviceManagerClient {
    * @returns {Promise} A promise that resolves when the client is closed.
    */
   close(): Promise<void> {
-    if (this.deviceManagerStub && !this._terminated) {
-      return this.deviceManagerStub.then(stub => {
-        this._terminated = true;
-        stub.close();
-      });
-    }
+    // if (this.deviceManagerStub && !this._terminated) {
+    //   return this.deviceManagerStub.then(stub => {
+    //     this._terminated = true;
+    //     stub.close();
+    //   });
+    // }
     return Promise.resolve();
   }
 }

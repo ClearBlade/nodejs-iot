@@ -16,17 +16,11 @@
 
 async function main() {
   // [START iot_quickstart]
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const region = 'us-central1';
   const registry = 'ingressRegistry';
   const projectId = 'ingressdevelopmentenv';
-  const client = new iot.v1.DeviceManagerClient(
-    null, //Will plan to remove this object
-    null, //Will plan to remove this object
-    region,
-    registry,
-    projectId
-  );
+  const client = new iot.v1.DeviceManagerClient(region, registry, projectId);
 
   async function quickstart() {
     /**
