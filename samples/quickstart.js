@@ -120,21 +120,44 @@ async function main() {
     /*
     Device Registry Update
     */
+    // const request = {
+    //   deviceRegistry: {
+    //     id: 'prashant-registry',
+    //     name: 'projects/ingressdevelopmentenv/locations/us-central1/registries/prashant-registry',
+    //     logLevel: '',
+    //     httpConfig: {
+    //       httpEnabledState: 'HTTP_ENABLED',
+    //     },
+    //   },
+    //   updateMask: 'httpConfig.http_enabled_state',
+    // };
+    // const [response] = await client.updateDeviceRegistry(request);
+    // console.log('Update Start');
+    // console.log(response);
+    // console.log('Update End');
+    /*
+    Device Registry Create
+    */
+    const projectId = await client.getProjectId();
+    const parent = client.locationPath(projectId, 'us-central1');
+
     const request = {
       deviceRegistry: {
-        id: 'prashant-registry',
-        name: 'projects/ingressdevelopmentenv/locations/us-central1/registries/prashant-registry',
-        logLevel: '',
-        httpConfig: {
-          httpEnabledState: 'HTTP_ENABLED',
-        },
+        id: 'test-create-2',
+        name: 'test-create-2',
+        eventNotificationConfigs: [],
+        stateNotificationConfig: {},
+        mqttConfig: {},
+        httpConfig: {},
+        logLevel: 'NONE',
+        credentials: [],
       },
-      updateMask: 'httpConfig.http_enabled_state',
+      parent: parent,
     };
-    const [response] = await client.updateDeviceRegistry(request);
-    console.log('Update Start');
+    const [response] = await client.createDeviceRegistry(request);
+    console.log('Create Start');
     console.log(response);
-    console.log('Update End');
+    console.log('Create End');
   }
   quickstart();
   // [END iot_quickstart]
