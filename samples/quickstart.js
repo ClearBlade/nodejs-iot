@@ -150,7 +150,30 @@ async function main() {
       parent: 'projects/ingressdevelopmentenv/locations/us-central1',
     };
     const [response] = await client.listDeviceRegistries(req);
-    console.log('Delete State: ', response);
+    console.log('List State: ', response);
+    /*
+    Device Registry Create
+    */
+    // const projectId = await client.getProjectId();
+    // const parent = client.locationPath(projectId, 'us-central1');
+
+    // const request = {
+    //   deviceRegistry: {
+    //     id: 'test-create-2',
+    //     name: 'test-create-2',
+    //     eventNotificationConfigs: [],
+    //     stateNotificationConfig: {},
+    //     mqttConfig: {},
+    //     httpConfig: {},
+    //     logLevel: 'NONE',
+    //     credentials: [],
+    //   },
+    //   parent: parent,
+    // };
+    // const [response] = await client.createDeviceRegistry(request);
+    // console.log('Create Start');
+    // console.log(response);
+    // console.log('Create End');
   }
   quickstart();
   // [END iot_quickstart]
