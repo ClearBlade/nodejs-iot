@@ -44,7 +44,7 @@ const version = require('../../../package.json').version;
  */
 const adminSystemKey = '84abb9b30ca4ece486d4bcf7ad71';
 const adminSystemUserToken =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5NGFiYjliMzBjOTRjMGE1ZGNhOGE4ODRiYzU5Iiwic2lkIjoiMmQ5ZTAzZjUtZmQ2OC00MWM4LTg5OGYtYWQzMWE4ZjMzMmIwIiwidXQiOjIsInR0IjoxLCJleHAiOi0xLCJpYXQiOjE2NjQ1NTk5NDR9.0RrKIrs9vBY1fcp_nei3mTRhYxcZU5mdar9ribHlso0';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI4MGM0ZGZiNTBjOTBhOWQ2YThlYWNmYjdlZmFkMDEiLCJzaWQiOiIwM2EyN2QxNi04Y2Y5LTQyMmUtYmJhMC0xYTRkNTYyZjRlMGYiLCJ1dCI6MiwidHQiOjEsImV4cCI6LTEsImlhdCI6MTY2Njk2OTg1Nn0.wA0ryKgbJDssFAuBbfOwirOh2yHkggJqX7FFQBlTW0o';
 /**
  * User Constants (Needs to fetch from service account auth JSON)
  */
@@ -753,23 +753,22 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
-      const token = JSON.parse(token_response);
       const payload = JSON.stringify({
         name: request?.name,
       });
       const options = {
         host: 'iot-sandbox.clearblade.com',
         path:
-          '/api/v/1/code/' +
-          token.systemKey +
+          '/api/v/4/webhook/execute/' +
+          adminSystemKey +
           '/cloudiot?name=' +
           request?.name,
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token.serviceAccountToken,
+          'ClearBlade-UserToken': adminSystemUserToken,
         },
       };
 
@@ -2581,25 +2580,17 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
-      const token = JSON.parse(token_response);
-
-      const payload = JSON.stringify({
-        parent: request?.parent,
-      });
-
       const options = {
         host: 'iot-sandbox.clearblade.com',
         path:
           '/api/v/4/webhook/execute/' +
-          token.systemKey +
+          adminSystemKey +
           '/cloudiot?parent=' +
           request?.parent,
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token.serviceAccountToken,
-          'Content-Length': payload.length,
+          'ClearBlade-UserToken': adminSystemUserToken,
         },
       };
 
@@ -2620,9 +2611,6 @@ export class DeviceManagerClient {
       req.on('error', e => {
         reject(e);
       });
-      if (payload) {
-        req.write(payload);
-      }
       req.end();
     });
   }
