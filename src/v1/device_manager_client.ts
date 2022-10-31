@@ -2625,9 +2625,9 @@ export class DeviceManagerClient {
           let data = '';
           res.on('data', chunk => (data += chunk));
           res.on('end', () => {
-            const registry: protos.google.cloud.iot.v1.IDeviceRegistry[] =
+            const deviceRegistries: protos.google.cloud.iot.v1.IDeviceRegistry[] =
               JSON.parse(data);
-            resolve([registry, {}, {}]);
+            resolve([deviceRegistries, {}, {}]);
           });
         }
       );
