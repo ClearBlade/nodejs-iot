@@ -136,28 +136,44 @@ async function main() {
     // console.log(response);
     // console.log('Update End');
     /*
+     * Delete Registry
+     */
+    // const req = {
+    //   name: 'projects/ingressdevelopmentenv/locations/us-central1/registries/Test12',
+    // };
+    // const [response] = await client.deleteDeviceRegistry(req);
+    // console.log('Delete State: ', response);
+    /*
+     * List Registry
+     */
+    const req = {
+      parent: 'projects/ingressdevelopmentenv/locations/us-central1',
+    };
+    const [response] = await client.listDeviceRegistries(req);
+    console.log('List State: ', response);
+    /*
     Device Registry Create
     */
-    const projectId = await client.getProjectId();
-    const parent = client.locationPath(projectId, 'us-central1');
+    // const projectId = await client.getProjectId();
+    // const parent = client.locationPath(projectId, 'us-central1');
 
-    const request = {
-      deviceRegistry: {
-        id: 'test-create-2',
-        name: 'test-create-2',
-        eventNotificationConfigs: [],
-        stateNotificationConfig: {},
-        mqttConfig: {},
-        httpConfig: {},
-        logLevel: 'NONE',
-        credentials: [],
-      },
-      parent: parent,
-    };
-    const [response] = await client.createDeviceRegistry(request);
-    console.log('Create Start');
-    console.log(response);
-    console.log('Create End');
+    // const request = {
+    //   deviceRegistry: {
+    //     id: 'test-create-2',
+    //     name: 'test-create-2',
+    //     eventNotificationConfigs: [],
+    //     stateNotificationConfig: {},
+    //     mqttConfig: {},
+    //     httpConfig: {},
+    //     logLevel: 'NONE',
+    //     credentials: [],
+    //   },
+    //   parent: parent,
+    // };
+    // const [response] = await client.createDeviceRegistry(request);
+    // console.log('Create Start');
+    // console.log(response);
+    // console.log('Create End');
   }
   quickstart();
   // [END iot_quickstart]

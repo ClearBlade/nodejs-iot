@@ -44,7 +44,7 @@ const version = require('../../../package.json').version;
  */
 const adminSystemKey = '84abb9b30ca4ece486d4bcf7ad71';
 const adminSystemUserToken =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5NGFiYjliMzBjOTRjMGE1ZGNhOGE4ODRiYzU5Iiwic2lkIjoiMmQ5ZTAzZjUtZmQ2OC00MWM4LTg5OGYtYWQzMWE4ZjMzMmIwIiwidXQiOjIsInR0IjoxLCJleHAiOi0xLCJpYXQiOjE2NjQ1NTk5NDR9.0RrKIrs9vBY1fcp_nei3mTRhYxcZU5mdar9ribHlso0';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI4MGM0ZGZiNTBjOTBhOWQ2YThlYWNmYjdlZmFkMDEiLCJzaWQiOiIwM2EyN2QxNi04Y2Y5LTQyMmUtYmJhMC0xYTRkNTYyZjRlMGYiLCJ1dCI6MiwidHQiOjEsImV4cCI6LTEsImlhdCI6MTY2Njk2OTg1Nn0.wA0ryKgbJDssFAuBbfOwirOh2yHkggJqX7FFQBlTW0o';
 /**
  * User Constants (Needs to fetch from service account auth JSON)
  */
@@ -776,23 +776,61 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    request = request || {};
-    let options: CallOptions;
-    if (typeof optionsOrCallback === 'function' && callback === undefined) {
-      callback = optionsOrCallback;
-      options = {};
-    } else {
-      options = optionsOrCallback as CallOptions;
-    }
-    options = options || {};
-    options.otherArgs = options.otherArgs || {};
-    options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        name: request.name || '',
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve, reject) => {
+      const payload = JSON.stringify({
+        name: request?.name,
       });
-    this.initialize();
-    return this.innerApiCalls.deleteDeviceRegistry(request, options, callback);
+      const options = {
+        host: 'iot-sandbox.clearblade.com',
+        path:
+          '/api/v/4/webhook/execute/' +
+          adminSystemKey +
+          '/cloudiot?name=' +
+          request?.name,
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'ClearBlade-UserToken': adminSystemUserToken,
+        },
+      };
+
+      const req = https.request(
+        {
+          ...options,
+        },
+        res => {
+          let data = '';
+          const chunks: any[] = [];
+          res.on('data', chunk => (data += chunk));
+          res.on('end', () => {
+            let array: [
+              protos.google.protobuf.IEmpty,
+              (
+                | protos.google.cloud.iot.v1.IDeleteDeviceRegistryRequest
+                | undefined
+              ),
+              {} | undefined
+            ];
+
+            const IDeleteDeviceRegistryRequest:
+              | protos.google.cloud.iot.v1.IDeleteDeviceRegistryRequest
+              | undefined = {};
+            const iempty: protos.google.protobuf.IEmpty = {};
+            // eslint-disable-next-line prefer-const
+            array = [IDeleteDeviceRegistryRequest, iempty, {}];
+            resolve(array);
+          });
+        }
+      );
+      req.on('error', e => {
+        reject(e);
+      });
+      if (payload) {
+        req.write(payload);
+      }
+      req.end();
+    });
   }
   /**
    * Creates a device in a device registry.
@@ -1243,8 +1281,12 @@ export class DeviceManagerClient {
       });
       const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: '/api/v/1/code/' + token.systemKey + '/devicesDelete',
-        method: 'POST',
+        path:
+          '/api/v/1/code/' +
+          token.systemKey +
+          '/cloudiot_devices?name=' +
+          request?.name,
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'ClearBlade-UserToken': token.serviceAccountToken,
@@ -2561,13 +2603,14 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const payload = JSON.stringify({
-        parent: request?.parent,
-      });
       const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: '/api/v/1/code/' + adminSystemKey + '/registriesList',
-        method: 'POST',
+        path:
+          '/api/v/4/webhook/execute/' +
+          adminSystemKey +
+          '/cloudiot?parent=' +
+          request?.parent,
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'ClearBlade-UserToken': adminSystemUserToken,
@@ -2580,49 +2623,22 @@ export class DeviceManagerClient {
         },
         res => {
           let data = '';
-          const chunks: any[] = [];
           res.on('data', chunk => (data += chunk));
           res.on('end', () => {
-            let array: [
-              protos.google.cloud.iot.v1.IDeviceRegistry[],
-              protos.google.cloud.iot.v1.IListDeviceRegistriesRequest | null,
-              protos.google.cloud.iot.v1.IListDeviceRegistriesResponse
-            ];
-
-            const ideviceregistry: protos.google.cloud.iot.v1.IDeviceRegistry[] =
-              [];
-
-            //for loop fetching JSON
-            const registry: protos.google.cloud.iot.v1.IDeviceRegistry = {};
-
-            const registriesList = JSON.parse(data);
-            for (const index in registriesList.deviceRegistries) {
-              registry.name = registriesList.deviceRegistries[index].name;
-              registry.id = registriesList.deviceRegistries[index].id;
-              ideviceregistry.push(registry);
-            }
-
-            const ilistDeviceregistriesrequest: protos.google.cloud.iot.v1.IListDeviceRegistriesRequest =
-              {};
-            const ilistdeviceregistriesresponse: protos.google.cloud.iot.v1.IListDeviceRegistriesResponse =
-              {};
-            ilistdeviceregistriesresponse.deviceRegistries = ideviceregistry;
-            // eslint-disable-next-line prefer-const
-            array = [
-              ideviceregistry,
-              ilistDeviceregistriesrequest,
-              ilistdeviceregistriesresponse,
-            ];
-            resolve(array);
+            const deviceRegistries: protos.google.cloud.iot.v1.IDeviceRegistry[] =
+              JSON.parse(data).deviceRegistries;
+            const nextPageToken: string = JSON.parse(data).nextPageToken || '0';
+            resolve([
+              deviceRegistries,
+              null,
+              {deviceRegistries, nextPageToken},
+            ]);
           });
         }
       );
       req.on('error', e => {
         reject(e);
       });
-      if (payload) {
-        req.write(payload);
-      }
       req.end();
     });
   }
