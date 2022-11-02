@@ -2350,7 +2350,7 @@ export class DeviceManagerClient {
       });
       const options = {
         host: this.BASE_URL,
-        path: '/api/v/1/code/' + token.systemKey + '/bindDeviceToGateway',
+        path: '/api/v/4/webhook/execute/' + token.systemKey + '/cloudiot?method=bindDeviceToGateway',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -121,20 +121,20 @@ async function main() {
     /**
      * bind gateway to device - Parent - RegistryPath
      */
-    // const registryPath = client.registryPath(
-    //   projectId,
-    //   cloudRegion,
-    //   registryId
-    // );
-    // const requestBindGateway = {
-    //   parent: registryPath,
-    //   deviceId: 'ingress_device_node',
-    //   gatewayId: 'gateway_ingress',
-    // };
-    // const [responseBindGateway] = await client.bindDeviceToGateway(
-    //   requestBindGateway
-    // );
-    // console.log('RES: ', responseBindGateway);
+    const registryPath = client.registryPath(
+      projectId,
+      cloudRegion,
+      registryId
+    );
+    const requestBindGateway = {
+      parent: registryPath,
+      deviceId: 'ingress_device_node',
+      gatewayId: 'gateway_ingress',
+    };
+    const [responseBindGateway] = await client.bindDeviceToGateway(
+      requestBindGateway
+    );
+    console.log('RES: ', responseBindGateway);
     /**
      * Get device state list - Device Path - Parent
      */
@@ -310,20 +310,20 @@ async function main() {
     // console.log('Sent command: ', response);
 
     /**
-    * delete device
+    * Delete device - Device Path - name
     */
-    const devicePath = client.devicePath(
-      projectId,
-      cloudRegion,
-      registryId,
-      'ingress_device_node_second'
-    );
-    const request = {
-      name: devicePath
-    };
+    // const devicePath = client.devicePath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId,
+    //   'temp_device'
+    // );
+    // const request = {
+    //   name: devicePath
+    // };
 
-    const [resDeleteDevice] = await client.deleteDevice(request);
-    console.log(`RES : `, resDeleteDevice);
+    // const [resDeleteDevice] = await client.deleteDevice(request);
+    // console.log(`RES : `, resDeleteDevice);
   }
   quickstart();
   // [END iot_quickstart]
