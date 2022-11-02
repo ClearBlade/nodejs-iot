@@ -316,7 +316,7 @@ async function main() {
       projectId,
       cloudRegion,
       registryId,
-      '987'
+      'sdk_device_dummy'
     );
     const request = {
       name: devicePath

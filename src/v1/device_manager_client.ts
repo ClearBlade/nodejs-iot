@@ -1303,9 +1303,10 @@ export class DeviceManagerClient {
       );
       const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
-      const payload = JSON.stringify({
-        name: deviceName,
-      });
+      // const payload = JSON.stringify({
+      //   name: deviceName,
+      //   id: deviceName,
+      // });
       const options = {
         host: this.BASE_URL,
         path:
@@ -1316,8 +1317,8 @@ export class DeviceManagerClient {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token.serviceAccountToken,
-          'Content-Length': payload.length,
+          'ClearBlade-UserToken': token.serviceAccountToken
+          //'Content-Length': payload.length,
         },
       };
 
@@ -1349,9 +1350,9 @@ export class DeviceManagerClient {
       req.on('error', e => {
         reject(e);
       });
-      if (payload) {
-        req.write(payload);
-      }
+      // if (payload) {
+      //   req.write(payload);
+      // }
       req.end();
     });
   }
