@@ -927,6 +927,7 @@ export class DeviceManagerClient {
       console.log("sdk registry: ", registry);
       console.log("sdk region: ", region);
       const token_response = await this.getRegistryToken(registry, region);
+      console.log("sdk token_response: ", token_response);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify({
         id: request?.device?.id,
