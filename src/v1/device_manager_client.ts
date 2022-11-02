@@ -2489,18 +2489,22 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
+      const registry = this.getRegistryFromRegistryPath(request?.parent);
+      const region = this.getRegionFromRegistryPath(request?.parent);
+      const token_response = await this.getRegistryToken(registry, region);
+      const token = JSON.parse(token_response);
+      
       const payload = JSON.stringify({
         gatewayId: request?.gatewayId,
         deviceId: request?.deviceId,
       });
       const options = {
         host: this.BASE_URL,
-        path:
-          '/api/v/1/code/' + this.ADMIN_SYSTEM_KEY + '/unbindDeviceFromGateway',
+        path: '/api/v/4/webhook/execute/' + token.systemKey + '/cloudiot?method=unbindDeviceFromGateway',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
+          'ClearBlade-UserToken': token.serviceAccountToken,
           'Content-Length': payload.length,
         },
       };
