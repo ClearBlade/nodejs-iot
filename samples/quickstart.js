@@ -257,27 +257,27 @@ async function main() {
     //   registryId
     // );
 
-    // const device = {
-    //   id: 'sdk_device_dummy',
-    //   name: 'sdk_device_dummy',
-    //   numId: 987,
-    //   credentials: [
-    //     // {
-    //     //   publicKey: {
-    //     //     format: publicKeyFormat,
-    //     //     key: readFileSync(publicKeyFile).toString(),
-    //     //   },
-    //     // },
-    //   ],
-    // };
+    const device = {
+      id: 'sdk_device_dummy',
+      name: 'sdk_device_dummy',
+      numId: 987,
+      credentials: [
+        // {
+        //   publicKey: {
+        //     format: publicKeyFormat,
+        //     key: readFileSync(publicKeyFile).toString(),
+        //   },
+        // },
+      ],
+    };
 
-    // const requestCreateDevice = {
-    //   parent: registryPath,
-    //   device,
-    // };
+    const requestCreateDevice = {
+      parent: registryPath,
+      device,
+    };
 
-    // const [responseCreateDevice] = await client.createDevice(requestCreateDevice);
-    // console.log('Created device: ', responseCreateDevice);
+    const [responseCreateDevice] = await client.createDevice(requestCreateDevice);
+    console.log('Created device: ', responseCreateDevice);
 
     /**
      * Get list config version device = Device Path - Name
