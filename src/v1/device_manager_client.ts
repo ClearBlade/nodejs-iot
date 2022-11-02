@@ -938,7 +938,7 @@ export class DeviceManagerClient {
           'Content-Length': payload.length,
         },
       };
-      console.log('sdk payload: ', payload);
+      console.log('sdk options: ', options);
       const req = https.request(
         {
           ...options,
