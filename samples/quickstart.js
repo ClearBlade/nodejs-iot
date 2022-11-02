@@ -17,105 +17,154 @@
 async function main() {
   // [START iot_quickstart]
   const iot = require('@clearblade/iot');
-  const region = 'us-central1';
-  const registry = 'ingressRegistry';
-  const projectId = 'ingressdevelopmentenv';
-  const client = new iot.v1.DeviceManagerClient(region, registry, projectId);
+  const cloudRegion = 'us-central1';
+  const registryId = 'ingressRegistry';
+  const deviceId = 'device_ingress';
+  const client = new iot.v1.DeviceManagerClient();
 
   async function quickstart() {
     /**
      * Get list device registry
      */
-    // const projectId = await client.getProjectId();
-    // const parent = client.locationPath(projectId, 'us-central1');
-    // const [resources] = await client.listDeviceRegistries({parent});
-    // console.log(`${resources.length}resource(s) found.`);
-    // for (const resource of resources) {
-    //   console.log(resource);
-    // }
-    // /**
-    //  * Send Command to Device
-    //  */
-    // const binaryData = Buffer.from("c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl");
-    // const request = {
-    //   subfolder : 'sub',
-    //   name: 'device_ingress',
-    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
-    // };
-    // const [response] = await client.sendCommandToDevice(request);
-    // console.log('Sent command: ', response);
-    //Get List of device
-
     const projectId = await client.getProjectId();
     const parent = client.locationPath(projectId, 'us-central1');
-    const [response] = await client.listDevices({parent});
-    console.log('Device list: ', response[0]);
-    //Get Device Information
-    // const request = {
-    //   name: 'projects/ingressdevelopmentenv/locations/us-central1/registries/ingressRegistry/devices/device_ingress',
+    const [resources] = await client.listDeviceRegistries({parent});
+    //console.log('parent', parent);
+    //console.log(`${resources.length}resource(s) found.`);
+    for (const resource of resources) {
+      //console.log(resource);
+    }
+
+    /**
+     * Send Command to Device - DevicePath - name
+     */
+    // const devicePath = client.devicePath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId,
+    //   deviceId
+    // );
+    // const requestSendCommandDevice = {
+    //   subfolder: 'sub',
+    //   name: devicePath,
+    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl', //64 encoded
     // };
-    // const [response] = await client.getDevice(request);
-    // console.log('Device Information');
-    // console.log(response);
-    // console.log('Device Information End');
-    /*
-    Device Update
-    */
-    // const request = {
-    //   device: {
-    //     id: 'prashant-device',
-    //     name: 'prashant-device',
-    //     logLevel: 'NONE',
-    //     metadata: {
-    //       Test1: 13,
-    //     },
+    // const [responseSendCommandDevice] = await client.sendCommandToDevice(
+    //   requestSendCommandDevice
+    // );
+    // console.log('Sent command: ', responseSendCommandDevice);
+
+    /**
+     * Get List Devices - Parent
+     */
+    // const parentName = client.registryPath(
+    //   projectId,
+    //   'us-central1',
+    //   'ingressRegistry'
+    // );
+    // const [responseListDevices] = await client.listDevices({
+    //   parent: parentName,
+    // });
+    // console.log('Device list: ', responseListDevices);
+
+    /**
+     * Device Update - Device Path - deviceName
+     */
+    // const devicePath = client.devicePath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId,
+    //   deviceId
+    // );
+
+    // const device = {
+    //   name: devicePath,
+    //   logLevel: 'NONE',
+    //   metadata: {
+    //     Test1: 123,
     //   },
+    //   credentials: [
+    //     {
+    //       // publicKey: {
+    //       //   format: 'RSA_X509_PEM',
+    //       //   key: readFileSync(rsaPublicKeyFile).toString(),
+    //       // },
+    //     },
+    //   ],
+    // };
+    // const requestUpdateDevice = {
+    //   device,
     //   updateMask: 'logLevel,metadata',
     // };
-    // const [response] = await client.updateDevice(request);
-    // console.log('Update Start');
-    // console.log(response);
-    // console.log('Update End');
+    // const [responseUpdateDevice] = await client.updateDevice(
+    //   requestUpdateDevice
+    // );
+    // console.log(responseUpdateDevice);
+
     /**
-     * Un bind gateway to device
+     * Un bind gateway to device - Parent - RegistryPath
      */
-    // const requestUnBindGateway = {
-    //   deviceId: 'myOldDevice',
-    //   gatewayId: 'ingress_registry_second',
+    // const registryPath = client.registryPath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId
+    // );
+    // const unbindRequest = {
+    //   parent: registryPath,
+    //   deviceId: 'ingress_device_node',
+    //   gatewayId: 'gateway_ingress',
     // };
     // const [responseUnBindGateway] = await client.unbindDeviceFromGateway(
-    //   requestUnBindGateway
+    //   unbindRequest
     // );
     // console.log('RES: ', responseUnBindGateway);
     /**
-     * bind gateway to device
+     * bind gateway to device - Parent - RegistryPath
      */
+    // const registryPath = client.registryPath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId
+    // );
     // const requestBindGateway = {
-    //   deviceId: 'myOldDevice',
-    //   gatewayId: 'ingress_registry_second',
+    //   parent: registryPath,
+    //   deviceId: 'ingress_device_node',
+    //   gatewayId: 'gateway_ingress',
     // };
     // const [responseBindGateway] = await client.bindDeviceToGateway(
     //   requestBindGateway
     // );
     // console.log('RES: ', responseBindGateway);
     /**
-     * Get device state list
+     * Get device state list - Device Path - Parent
      */
+    // const devicePath = client.devicePath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId,
+    //   deviceId
+    // );
     // const requestGetDeviceState = {
-    //   name: 'device_ingress',
+    //   name: devicePath,
     //   numStates: -1,
     // };
     // const [responseDeviceStateList] = await client.listDeviceStates(
     //   requestGetDeviceState
     // );
     // console.log('RES: ', responseDeviceStateList);
+
     /*
-    Device Registry Update
-    */
+     * Device Registry Update - RegistryPath - name
+     */
+    // const registryPath = client.registryPath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId
+    // );
     // const request = {
     //   deviceRegistry: {
-    //     id: 'prashant-registry',
-    //     name: 'projects/ingressdevelopmentenv/locations/us-central1/registries/prashant-registry',
+    //     id: registryId,
+    //     name: registryPath,
     //     logLevel: '',
     //     httpConfig: {
     //       httpEnabledState: 'HTTP_ENABLED',
@@ -124,15 +173,11 @@ async function main() {
     //   updateMask: 'httpConfig.http_enabled_state',
     // };
     // const [response] = await client.updateDeviceRegistry(request);
-    // console.log('Update Start');
     // console.log(response);
-    // console.log('Update End');
-    /*
-    Device Registry Create
-    */
-    // const projectId = await client.getProjectId();
-    // const parent = client.locationPath(projectId, 'us-central1');
 
+    /*
+     * Device Registry Create - No parent/name needed
+     */
     // const request = {
     //   deviceRegistry: {
     //     id: 'test-create-2',
@@ -150,6 +195,18 @@ async function main() {
     // console.log('Create Start');
     // console.log(response);
     // console.log('Create End');
+
+    /**
+     * Get Device - name {devicePath}
+     */
+    // const devicePath = client.devicePath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId,
+    //   deviceId
+    // );
+    //const [responseDevice] = await client.getDevice({name: devicePath});
+    //console.log('Device', responseDevice);
   }
   quickstart();
   // [END iot_quickstart]

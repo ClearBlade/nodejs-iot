@@ -110,7 +110,7 @@ export class DeviceManagerClient {
    *     const client = new DeviceManagerClient({fallback: 'rest'}, gax);
    *     ```
    */
-  constructor(region?: string, registry?: string, projectId?: string) {
+  constructor() {
     // Ensure that options include all the required fields.
     var opts: ClientOptions = {};
     const clerabladeConfigFile = process.env.CLEARBLADE_CONFIGURATION;
@@ -120,20 +120,21 @@ export class DeviceManagerClient {
     let json = require('' + clerabladeConfigFile);
     this.ADMIN_SYSTEM_KEY = json.systemKey;
     this.ADMIN_USER_TOKEN = json.token;
+    this.projectId = json.projectId;
     //var gaxInstance: typeof gax | typeof gax.fallback | null = null;
     const gaxInstance = require('google-gax/build/src/fallback'); // avoids loading google-gax with gRPC
-    this.region = region;
-    this.registry = registry;
-    this.projectId = projectId;
-    if (region === null || region === '') {
-      throw 'region can not be empty';
-    }
-    if (registry === null || registry === '') {
-      throw 'registry can not be empty';
-    }
-    if (projectId === null || projectId === '') {
-      throw 'projectId can not be empty';
-    }
+    // this.region = region;
+    // this.registry = registry;
+    // this.projectId = projectId;
+    // if (region === null || region === '') {
+    //   throw 'region can not be empty';
+    // }
+    // if (registry === null || registry === '') {
+    //   throw 'registry can not be empty';
+    // }
+    // if (projectId === null || projectId === '') {
+    //   throw 'projectId can not be empty';
+    // }
     // const staticMembers = this.constructor as typeof DeviceManagerClient;
     // const servicePath =
     //   opts?.servicePath || opts?.apiEndpoint || staticMembers.servicePath;
@@ -369,11 +370,7 @@ export class DeviceManagerClient {
   getProjectId(
     callback?: Callback<string, undefined, undefined>
   ): Promise<string> | void {
-    // if (callback) {
-    //   this.auth.getProjectId(callback);
-    //   return;
-    // }
-    // return this.auth.getProjectId();
+    return Promise.resolve('' + this.projectId);
   }
 
   // -------------------
@@ -668,7 +665,13 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
+      const registry = this.getRegistryFromRegistryPath(
+        request?.deviceRegistry?.name
+      );
+      const region = this.getRegionFromRegistryPath(
+        request?.deviceRegistry?.name
+      );
+      const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify(request?.deviceRegistry);
 
@@ -1024,7 +1027,9 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
+      const registry = this.getRegistryFromDevicePath(request?.name);
+      const region = this.getRegionFromDevicePath(request?.name);
+      const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const options = {
         host: 'iot-sandbox.clearblade.com',
@@ -1135,7 +1140,12 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
+      const registry = this.getRegistryFromDevicePath(request?.device?.name);
+      const region = this.getRegionFromDevicePath(request?.device?.name);
+      const deviceName = this.getDeviceNameFromDevicePath(
+        request?.device?.name
+      );
+      const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify(request?.device);
 
@@ -1145,7 +1155,7 @@ export class DeviceManagerClient {
           '/api/v/4/webhook/execute/' +
           token.systemKey +
           '/cloudiot_devices?name=' +
-          request?.device?.name +
+          deviceName +
           '&updateMask=' +
           request?.updateMask,
         method: 'PATCH',
@@ -1701,7 +1711,10 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
+      const registry = this.getRegistryFromDevicePath(request?.name);
+      const region = this.getRegionFromDevicePath(request?.name);
+      const deviceName = this.getDeviceNameFromDevicePath(request?.name);
+      const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const options = {
         host: 'iot-sandbox.clearblade.com',
@@ -1710,7 +1723,7 @@ export class DeviceManagerClient {
           `/api/v/4/webhook/execute/` +
           token.systemKey +
           `/cloudiot_devices_states?name=` +
-          request?.name +
+          deviceName +
           `&numStates=` +
           request?.numStates,
         method: 'GET',
@@ -2139,7 +2152,11 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
+      const registry = this.getRegistryFromDevicePath(request?.name);
+      const region = this.getRegionFromDevicePath(request?.name);
+      const deviceName = this.getDeviceNameFromDevicePath(request?.name);
+
+      const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify({
         binaryData: request?.binaryData,
@@ -2152,7 +2169,7 @@ export class DeviceManagerClient {
           `/api/v/4/webhook/execute/` +
           token.systemKey +
           `/devices?method=sendCommandToDevice&name=` +
-          request?.name,
+          deviceName,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -2280,7 +2297,9 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
+      const registry = this.getRegistryFromRegistryPath(request?.parent);
+      const region = this.getRegionFromRegistryPath(request?.parent);
+      const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify({
         gatewayId: request?.gatewayId,
@@ -2427,7 +2446,9 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
+      const registry = this.getRegistryFromRegistryPath(request?.parent);
+      const region = this.getRegionFromRegistryPath(request?.parent);
+      const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify({
         gatewayId: request?.gatewayId,
@@ -2642,10 +2663,10 @@ export class DeviceManagerClient {
     });
   }
 
-  async getRegistryToken() {
+  async getRegistryToken(registry: string = '', region: string = '') {
     const payload = JSON.stringify({
-      region: this.region,
-      registry: this.registry,
+      region: region,
+      registry: registry,
       project: this.projectId,
     });
     // eslint-disable-next-line no-async-promise-executor
@@ -2872,7 +2893,9 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
+      const registry = this.getRegistryFromRegistryPath(request?.parent);
+      const region = this.getRegionFromRegistryPath(request?.parent);
+      const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
 
       const payload = JSON.stringify({
@@ -3095,12 +3118,16 @@ export class DeviceManagerClient {
     registry: string,
     device: string
   ) {
-    // return this.pathTemplates.devicePathTemplate.render({
-    //   project: project,
-    //   location: location,
-    //   registry: registry,
-    //   device: device,
-    // });
+    return (
+      'projects/' +
+      project +
+      '/locations/' +
+      location +
+      '/registries/' +
+      registry +
+      '/devices/' +
+      device
+    );
   }
 
   /**
@@ -3155,10 +3182,7 @@ export class DeviceManagerClient {
    * @returns {string} Resource name string.
    */
   locationPath(project: string, location: string) {
-    // return this.pathTemplates.locationPathTemplate.render({
-    //   project: project,
-    //   location: location,
-    // });
+    return 'projects/' + project + '/locations/' + location;
   }
 
   /**
@@ -3192,11 +3216,14 @@ export class DeviceManagerClient {
    * @returns {string} Resource name string.
    */
   registryPath(project: string, location: string, registry: string) {
-    // return this.pathTemplates.registryPathTemplate.render({
-    //   project: project,
-    //   location: location,
-    //   registry: registry,
-    // });
+    return (
+      'projects/' +
+      project +
+      '/locations/' +
+      location +
+      '/registries/' +
+      registry
+    );
   }
 
   /**
@@ -3230,6 +3257,56 @@ export class DeviceManagerClient {
    */
   matchRegistryFromRegistryName(registryName: string) {
     //return this.pathTemplates.registryPathTemplate.match(registryName).registry;
+  }
+
+  getRegistryFromRegistryPath(registryPath: string | null | undefined) {
+    if (registryPath == null || registryPath == undefined) {
+      throw 'registryPath is empty';
+    }
+    return registryPath.substring(
+      registryPath.indexOf('/registries/') + 12,
+      registryPath.length
+    );
+  }
+
+  getRegionFromRegistryPath(registryPath: string | null | undefined) {
+    if (registryPath == null || registryPath == undefined) {
+      throw 'registryPath is empty';
+    }
+    return registryPath.substring(
+      registryPath.indexOf('/locations/') + 11,
+      registryPath.lastIndexOf('/registries')
+    );
+  }
+
+  getRegistryFromDevicePath(devicePath: string | null | undefined) {
+    if (devicePath == null || devicePath == undefined) {
+      throw 'devicePath is empty';
+    }
+    return devicePath.substring(
+      devicePath.indexOf('/registries/') + 12,
+      devicePath.lastIndexOf('/devices')
+    );
+  }
+
+  getRegionFromDevicePath(devicePath: string | null | undefined) {
+    if (devicePath == null || devicePath == undefined) {
+      throw 'devicePath is empty';
+    }
+    return devicePath.substring(
+      devicePath.indexOf('/locations/') + 11,
+      devicePath.lastIndexOf('/registries')
+    );
+  }
+
+  getDeviceNameFromDevicePath(devicePath: string | null | undefined) {
+    if (devicePath == null || devicePath == undefined) {
+      throw 'devicePath is empty';
+    }
+    return devicePath.substring(
+      devicePath.indexOf('/devices/') + 9,
+      devicePath.length
+    );
   }
 
   /**
