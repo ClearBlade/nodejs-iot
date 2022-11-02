@@ -28,7 +28,7 @@ async function main() {
      */
     const projectId = await client.getProjectId();
     const parent = client.locationPath(projectId, 'us-central1');
-    const [resources] = await client.listDeviceRegistries({parent});
+    const [resources] = await client.listDeviceRegistries({ parent });
     //console.log('parent', parent);
     //console.log(`${resources.length}resource(s) found.`);
     for (const resource of resources) {
@@ -216,13 +216,13 @@ async function main() {
     // const [response] = await client.deleteDeviceRegistry(req);
     // console.log('Delete State: ', response);
     /*
-     * List Registry
+     * List Registry - Admin
      */
-    const req = {
-      parent: 'projects/ingressdevelopmentenv/locations/us-central1',
-    };
-    const [response] = await client.listDeviceRegistries(req);
-    console.log('List State: ', response);
+    // const req = {
+    //   parent: 'projects/ingressdevelopmentenv/locations/us-central1',
+    // };
+    // const [response] = await client.listDeviceRegistries(req);
+    // console.log('List State: ', response);
     /*
     Device Registry Create
     */
@@ -246,6 +246,35 @@ async function main() {
     // console.log('Create Start');
     // console.log(response);
     // console.log('Create End');
+
+    /**
+     * Create Device
+     */
+
+    const registryPath = client.registryPath(
+      projectId,
+      cloudRegion,
+      registryId
+    );
+    const device = {
+      id: "New Node Device SDK",
+      credentials: [
+        {
+          publicKey: {
+            //format: publicKeyFormat,
+            //key: readFileSync(publicKeyFile).toString(),
+          },
+        },
+      ],
+    };
+
+    const requestCreateDevice = {
+      parent: registryPath,
+      device,
+    };
+
+    const [responseCreateDevice] = await client.createDevice(requestCreateDevice);
+    console.log('Created device: ', responseCreateDevice);
   }
   quickstart();
   // [END iot_quickstart]

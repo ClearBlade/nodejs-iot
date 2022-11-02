@@ -918,7 +918,13 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
+      const registry = this.getRegistryFromRegistryPath(
+        request?.parent
+      );
+      const region = this.getRegionFromRegistryPath(
+        request?.parent
+      );
+      const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify({
         id: request?.device?.id,
