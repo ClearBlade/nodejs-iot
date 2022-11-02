@@ -1448,15 +1448,14 @@ export class DeviceManagerClient {
       const token = JSON.parse(token_response);
       const payload = JSON.stringify({
         binaryData: request?.binaryData,
-        versionToUpdate: request?.versionToUpdate,
-        deviceId: deviceName,
+        versionToUpdate: request?.versionToUpdate
       });
       const options = {
         host: this.BASE_URL,
         path:
-          '/api/v/1/code/' +
+          'api/v/4/webhook/execute/' +
           token.systemKey +
-          '/devicesModifyCloudToDeviceConfig',
+          '/cloudiot_devices?name='+deviceName+'&method=modifyCloudToDeviceConfig',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
