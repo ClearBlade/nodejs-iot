@@ -316,7 +316,7 @@ async function main() {
       projectId,
       cloudRegion,
       registryId,
-      'sdk_device_dummy'
+      'ingress_device_node_second'
     );
     const request = {
       name: devicePath

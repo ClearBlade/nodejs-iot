@@ -1303,22 +1303,17 @@ export class DeviceManagerClient {
       );
       const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
-      // const payload = JSON.stringify({
-      //   name: deviceName,
-      //   id: deviceName,
-      // });
       const options = {
         host: this.BASE_URL,
         path:
-          '/api/v/1/code/' +
+          '/api/v/4/webhook/execute/' +
           token.systemKey +
           '/cloudiot_devices?name=' +
-          deviceName,
+          request?.name,
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'ClearBlade-UserToken': token.serviceAccountToken
-          //'Content-Length': payload.length,
         },
       };
 
@@ -1350,9 +1345,6 @@ export class DeviceManagerClient {
       req.on('error', e => {
         reject(e);
       });
-      // if (payload) {
-      //   req.write(payload);
-      // }
       req.end();
     });
   }
