@@ -929,7 +929,7 @@ export class DeviceManagerClient {
       const payload = JSON.stringify(request?.device);
       const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: '/v/4/webhook/execute/'+ token.systemKey +'/cloudiot_devices',
+        path: '/api/v/4/webhook/execute/'+ token.systemKey +'/cloudiot_devices',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
