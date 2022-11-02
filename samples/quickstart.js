@@ -28,7 +28,7 @@ async function main() {
      */
     const projectId = await client.getProjectId();
     const parent = client.locationPath(projectId, 'us-central1');
-    const [resources] = await client.listDeviceRegistries({parent});
+    const [resources] = await client.listDeviceRegistries({ parent });
     //console.log('parent', parent);
     //console.log(`${resources.length}resource(s) found.`);
     for (const resource of resources) {
@@ -38,21 +38,21 @@ async function main() {
     /**
      * Send Command to Device - DevicePath - name
      */
-    // const devicePath = client.devicePath(
-    //   projectId,
-    //   cloudRegion,
-    //   registryId,
-    //   deviceId
-    // );
-    // const requestSendCommandDevice = {
-    //   subfolder: 'sub',
-    //   name: devicePath,
-    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl', //64 encoded
-    // };
-    // const [responseSendCommandDevice] = await client.sendCommandToDevice(
-    //   requestSendCommandDevice
-    // );
-    // console.log('Sent command: ', responseSendCommandDevice);
+    const devicePath = client.devicePath(
+      projectId,
+      cloudRegion,
+      registryId,
+      deviceId
+    );
+    const requestSendCommandDevice = {
+      subfolder: 'sub',
+      name: devicePath,
+      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl', //64 encoded
+    };
+    const [responseSendCommandDevice] = await client.sendCommandToDevice(
+      requestSendCommandDevice
+    );
+    console.log('Sent command: ', responseSendCommandDevice);
 
     /**
      * Get List Devices - Parent
@@ -216,13 +216,13 @@ async function main() {
     // const [response] = await client.deleteDeviceRegistry(req);
     // console.log('Delete State: ', response);
     /*
-     * List Registry
+     * List Registry - Admin
      */
-    const req = {
-      parent: 'projects/ingressdevelopmentenv/locations/us-central1',
-    };
-    const [response] = await client.listDeviceRegistries(req);
-    console.log('List State: ', response);
+    // const req = {
+    //   parent: 'projects/ingressdevelopmentenv/locations/us-central1',
+    // };
+    // const [response] = await client.listDeviceRegistries(req);
+    // console.log('List State: ', response);
     /*
     Device Registry Create
     */
@@ -246,6 +246,84 @@ async function main() {
     // console.log('Create Start');
     // console.log(response);
     // console.log('Create End');
+
+    /**
+     * Create Device -- Registry Path -- Parent
+     */
+
+    const registryPath = client.registryPath(
+      projectId,
+      cloudRegion,
+      registryId
+    );
+
+    const device = {
+      id: 'sdk_device_dummy',
+      name: 'sdk_device_dummy',
+      numId: 987,
+      credentials: [
+        // {
+        //   publicKey: {
+        //     format: publicKeyFormat,
+        //     key: readFileSync(publicKeyFile).toString(),
+        //   },
+        // },
+      ],
+    };
+    
+    const requestCreateDevice = {
+      parent: registryPath,
+      device,
+    };
+    console.log('Created device Start');
+    const [responseCreateDevice] = await client.createDevice(requestCreateDevice);
+    console.log('Created device: ', responseCreateDevice);
+
+    /**
+     * Get list config version device = Device Path - Name
+     */
+    //  const devicePath = client.devicePath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId,
+    //   deviceId
+    // );
+
+    // const requestGetDeviceConfigVersions = {
+    //   name: devicePath,
+    //   numVersions : 5
+    // };
+    // const [version] = await client.listDeviceConfigVersions(requestGetDeviceConfigVersions);
+    // console.log(`RES : `, version);
+
+    /**
+     * Device config modify - Device Path - name
+     */
+
+    const request = {
+      versionToUpdate : '5',
+      name: devicePath,
+      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    };
+
+    const [response] = await client.modifyCloudToDeviceConfig(request);
+    console.log('Sent command: ', response);
+
+    /**
+    * Delete device - Device Path - name
+    */
+    // const devicePath = client.devicePath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId,
+    //   'temp_device'
+    // );
+    // const request = {
+    //   name: devicePath
+    // };
+
+    // const [resDeleteDevice] = await client.deleteDevice(request);
+    // console.log(`RES : `, resDeleteDevice);
   }
   quickstart();
   // [END iot_quickstart]
