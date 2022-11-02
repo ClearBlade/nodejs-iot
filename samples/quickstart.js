@@ -248,36 +248,54 @@ async function main() {
     // console.log('Create End');
 
     /**
-     * Create Device
+     * Create Device -- Registry Path -- Parent
      */
 
-    const registryPath = client.registryPath(
+    // const registryPath = client.registryPath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId
+    // );
+
+    // const device = {
+    //   id: 'New Node Device SDK',
+    //   name: 'New Node Device SDK',
+    //   numId: 987,
+    //   credentials: [
+    //     // {
+    //     //   publicKey: {
+    //     //     format: publicKeyFormat,
+    //     //     key: readFileSync(publicKeyFile).toString(),
+    //     //   },
+    //     // },
+    //   ],
+    // };
+    
+    // const requestCreateDevice = {
+    //   parent: registryPath,
+    //   device,
+    // };
+
+    // const [responseCreateDevice] = await client.createDevice(requestCreateDevice);
+    // console.log('Created device: ', responseCreateDevice);
+
+    /**
+     * Device config modify
+     */
+    const devicePath = client.devicePath(
       projectId,
       cloudRegion,
-      registryId
+      registryId,
+      deviceId
     );
-
-    const device = {
-      id: 'New Node Device SDK',
-      name: 'New Node Device SDK',
-      numId: 987,
-      credentials: [
-        // {
-        //   publicKey: {
-        //     format: publicKeyFormat,
-        //     key: readFileSync(publicKeyFile).toString(),
-        //   },
-        // },
-      ],
-    };
-    
-    const requestCreateDevice = {
-      parent: registryPath,
-      device,
+    const request = {
+      versionToUpdate : '7',
+      name: devicePath,
+      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
     };
 
-    const [responseCreateDevice] = await client.createDevice(requestCreateDevice);
-    console.log('Created device: ', responseCreateDevice);
+    const [response] = await client.modifyCloudToDeviceConfig(request);
+    console.log('Sent command: ', response);
   }
   quickstart();
   // [END iot_quickstart]

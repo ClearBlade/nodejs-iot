@@ -927,7 +927,6 @@ export class DeviceManagerClient {
       const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify(request?.device);
-      console.log('sdk payload: ', payload);
       const options = {
         host: this.BASE_URL,
         path: '/api/v/4/webhook/execute/'+ token.systemKey +'/cloudiot_devices',
@@ -938,7 +937,6 @@ export class DeviceManagerClient {
           'Content-Length': payload.length,
         },
       };
-      console.log('sdk options: ', options);
       const req = https.request(
         {
           ...options,
@@ -947,7 +945,6 @@ export class DeviceManagerClient {
           let data = '';
           res.on('data', chunk => (data += chunk));
           res.on('end', () => {
-            console.log('sdk res: ', data);
             if (!this.isJsonString(data)) {
               reject(data);
               return;
@@ -1441,12 +1438,18 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
+      const registry = this.getRegistryFromDevicePath(request?.name);
+      const region = this.getRegionFromDevicePath(request?.name);
+      const deviceName = this.getDeviceNameFromDevicePath(
+        request?.name
+      );
+      const token_response = await this.getRegistryToken(registry, region);
+
       const token = JSON.parse(token_response);
       const payload = JSON.stringify({
         binaryData: request?.binaryData,
         versionToUpdate: request?.versionToUpdate,
-        deviceId: request?.name,
+        deviceId: deviceName,
       });
       const options = {
         host: this.BASE_URL,
