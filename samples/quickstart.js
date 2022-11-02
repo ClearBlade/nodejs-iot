@@ -291,7 +291,7 @@ async function main() {
 
     const requestGetDeviceConfigVersions = {
       name: devicePath,
-      numVersions : 2
+      numVersions : 5
     };
     const [version] = await client.listDeviceConfigVersions(requestGetDeviceConfigVersions);
     console.log(`RES : `, version);
@@ -301,7 +301,7 @@ async function main() {
      */
     
     const request = {
-      versionToUpdate : '3',
+      versionToUpdate : '5',
       name: devicePath,
       binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
     };
