@@ -259,6 +259,8 @@ async function main() {
 
     const device = {
       id: 'New Node Device SDK',
+      name: 'New Node Device SDK',
+      numId: 987,
       credentials: [
         // {
         //   publicKey: {

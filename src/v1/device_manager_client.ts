@@ -926,13 +926,10 @@ export class DeviceManagerClient {
       );
       const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
-      const payload = JSON.stringify({
-        id: request?.device?.id,
-        credentials: request?.device?.credentials,
-      });
+      const payload = JSON.stringify(request?.device);
       const options = {
         host: 'iot-sandbox.clearblade.com',
-        path: '/api/v/1/code/' + token.systemKey + '/devicesCreate',
+        path: '/v/4/webhook/execute/'+ token.systemKey +'/cloudiot_devices',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
