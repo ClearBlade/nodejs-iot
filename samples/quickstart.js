@@ -267,6 +267,7 @@ async function main() {
         },
       ],
     };
+    console.log(registryPath);
 
     const requestCreateDevice = {
       parent: registryPath,
