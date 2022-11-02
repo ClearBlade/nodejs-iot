@@ -251,11 +251,11 @@ async function main() {
      * Create Device -- Registry Path -- Parent
      */
 
-    // const registryPath = client.registryPath(
-    //   projectId,
-    //   cloudRegion,
-    //   registryId
-    // );
+    const registryPath = client.registryPath(
+      projectId,
+      cloudRegion,
+      registryId
+    );
 
     const device = {
       id: 'sdk_device_dummy',
