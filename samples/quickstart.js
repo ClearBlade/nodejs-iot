@@ -270,12 +270,12 @@ async function main() {
         // },
       ],
     };
-
+    
     const requestCreateDevice = {
       parent: registryPath,
       device,
     };
-
+    console.log('Created device Start');
     const [responseCreateDevice] = await client.createDevice(requestCreateDevice);
     console.log('Created device: ', responseCreateDevice);
 
