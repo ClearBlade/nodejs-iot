@@ -2,30 +2,24 @@
 
 [![npm version](https://img.shields.io/npm/v/@clearblade/iot.svg)](https://www.npmjs.org/package/@clearblade/iot)
 
-
 > Node.js idiomatic client for [ClearBlade IoT Core][product-docs].
 
 [ClearBlade Internet of Things (IoT) Core](https://clearblade.atlassian.net/wiki/spaces/IC/overview?homepageId=2170716228) is a fully managed service for securely connecting and managing IoT devices, from a few to millions. Ingest data from connected devices and build rich applications that integrate with the other big data services of Google Cloud Platform.
 
-
-
-* [ClearBlade Internet of Things (IoT) Core Node.js Client API Reference][client-docs]
-* [Clearblade Internet of Things (IoT) Core Documentation][product-docs]
-* [github.com/clearblade/nodejs-iot](https://github.com/clearblade/nodejs-iot)
-
-
+- [ClearBlade Internet of Things (IoT) Core Node.js Client API Reference][client-docs]
+- [Clearblade Internet of Things (IoT) Core Documentation][product-docs]
+- [github.com/clearblade/nodejs-iot](https://github.com/clearblade/nodejs-iot)
 
 **Table of contents:**
 
-
-* [Quickstart](#quickstart)
-  * [Before you begin](#before-you-begin)
-  * [Installing the client library](#installing-the-client-library)
-  * [Using the client library](#using-the-client-library)
-* [Samples](#samples)
-* [Versioning](#versioning)
-* [Contributing](#contributing)
-* [License](#license)
+- [Quickstart](#quickstart)
+  - [Before you begin](#before-you-begin)
+  - [Installing the client library](#installing-the-client-library)
+  - [Using the client library](#using-the-client-library)
+- [Samples](#samples)
+- [Versioning](#versioning)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Quickstart
 
@@ -43,9 +37,15 @@
 npm install @clearblade/iot
 ```
 
+### Setting up service account credentials
+
+[Create a service account](https://clearblade.atlassian.net/wiki/spaces/IC/pages/2240675843/Add+service+accounts+to+a+project) in your project and download the credentials .json file. Define an environment variable named `CLEARBLADE_CONFIGURATION` which represents the path to the credentials .json file. Example:
+
+```
+export CLEARBLADE_CONFIGURATION=/path/to/file.json
+```
 
 ### Using the client library
-
 
 ```javascript
 const iot = require('@clearblade/iot');
@@ -61,20 +61,15 @@ async function quickstart() {
   }
 }
 quickstart();
-
 ```
-
-
 
 ## Samples
 
 Samples are in the [`samples/`](https://github.com/clearblade/nodejs-iot/tree/main/samples) directory. Each sample's `README.md` has instructions for running its sample.
 
-| Sample                      | Source Code                       | Try it |
-| --------------------------- | --------------------------------- | ------ |
+| Sample     | Source Code                                                                             | Try it                                                                                                                                                                                                     |
+| ---------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Quickstart | [source code](https://github.com/clearblade/nodejs-iot/blob/main/samples/quickstart.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/clearblade/nodejs-iot&page=editor&open_in_editor=samples/quickstart.js,samples/README.md) |
-
-
 
 The [ClearBlade Internet of Things (IoT) Core Node.js Client API Reference][client-docs] documentation
 also contains samples.
@@ -90,9 +85,9 @@ as soon as possible to an actively supported LTS version.
 ClearBlade's client libraries support legacy versions of Node.js runtimes on a
 best-efforts basis with the following warnings:
 
-* Legacy versions are not tested in continuous integration.
-* Some security patches and features cannot be backported.
-* Dependencies cannot be kept up-to-date.
+- Legacy versions are not tested in continuous integration.
+- Some security patches and features cannot be backported.
+- Dependencies cannot be kept up-to-date.
 
 Client libraries targeting some end-of-life versions of Node.js are available, and
 can be installed through npm [dist-tags](https://docs.npmjs.com/cli/dist-tag).
@@ -104,20 +99,14 @@ for versions compatible with Node.js 8.
 
 This library follows [Semantic Versioning](http://semver.org/).
 
-
-
 This library is considered to be **stable**. The code surface will not change in backwards-incompatible ways
 unless absolutely necessary (e.g. because of critical security issues) or with
 an extensive deprecation period. Issues and requests against **stable** libraries
 are addressed with the highest priority.
 
-
-
-
 ## Contributing
 
 Contributions welcome! See the [Contributing Guide](https://github.com/clearblade/nodejs-iot/blob/main/CONTRIBUTING.md).
-
 
 ## License
 
