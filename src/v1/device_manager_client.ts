@@ -1453,7 +1453,7 @@ export class DeviceManagerClient {
       const options = {
         host: this.BASE_URL,
         path:
-          'api/v/4/webhook/execute/' +
+          '/api/v/4/webhook/execute/' +
           token.systemKey +
           '/cloudiot_devices?name='+deviceName+'&method=modifyCloudToDeviceConfig',
         method: 'POST',
