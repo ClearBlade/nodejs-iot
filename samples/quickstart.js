@@ -289,7 +289,7 @@ async function main() {
       deviceId
     );
     const request = {
-      versionToUpdate : '7',
+      versionToUpdate : '6',
       name: devicePath,
       binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
     };
