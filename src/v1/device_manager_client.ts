@@ -918,18 +918,15 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const registry = this.getRegistryFromRegistryPath(
-        request?.parent
-      );
-      const region = this.getRegionFromRegistryPath(
-        request?.parent
-      );
+      const registry = this.getRegistryFromRegistryPath(request?.parent);
+      const region = this.getRegionFromRegistryPath(request?.parent);
       const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify(request?.device);
       const options = {
         host: this.BASE_URL,
-        path: '/api/v/4/webhook/execute/'+ token.systemKey +'/cloudiot_devices',
+        path:
+          '/api/v/4/webhook/execute/' + token.systemKey + '/cloudiot_devices',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1298,9 +1295,7 @@ export class DeviceManagerClient {
     return new Promise(async (resolve, reject) => {
       const registry = this.getRegistryFromDevicePath(request?.name);
       const region = this.getRegionFromDevicePath(request?.name);
-      const deviceName = this.getDeviceNameFromDevicePath(
-        request?.name
-      );
+      const deviceName = this.getDeviceNameFromDevicePath(request?.name);
       const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const options = {
@@ -1313,7 +1308,7 @@ export class DeviceManagerClient {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token.serviceAccountToken
+          'ClearBlade-UserToken': token.serviceAccountToken,
         },
       };
 
@@ -1437,22 +1432,22 @@ export class DeviceManagerClient {
     return new Promise(async (resolve, reject) => {
       const registry = this.getRegistryFromDevicePath(request?.name);
       const region = this.getRegionFromDevicePath(request?.name);
-      const deviceName = this.getDeviceNameFromDevicePath(
-        request?.name
-      );
+      const deviceName = this.getDeviceNameFromDevicePath(request?.name);
       const token_response = await this.getRegistryToken(registry, region);
 
       const token = JSON.parse(token_response);
       const payload = JSON.stringify({
         binaryData: request?.binaryData,
-        versionToUpdate: request?.versionToUpdate
+        versionToUpdate: request?.versionToUpdate,
       });
       const options = {
         host: this.BASE_URL,
         path:
           '/api/v/4/webhook/execute/' +
           token.systemKey +
-          '/cloudiot_devices?name='+deviceName+'&method=modifyCloudToDeviceConfig',
+          '/cloudiot_devices?name=' +
+          deviceName +
+          '&method=modifyCloudToDeviceConfig',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1600,18 +1595,22 @@ export class DeviceManagerClient {
     return new Promise(async (resolve, reject) => {
       const registry = this.getRegistryFromDevicePath(request?.name);
       const region = this.getRegionFromDevicePath(request?.name);
-      const deviceName = this.getDeviceNameFromDevicePath(
-        request?.name
-      );
+      const deviceName = this.getDeviceNameFromDevicePath(request?.name);
       const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const options = {
         host: this.BASE_URL,
-        path: '/api/v/4/webhook/execute/' + token.systemKey + '/cloudiot_devices_configVersions?name='+deviceName+'&numVersions=' + request?.numVersions,
+        path:
+          '/api/v/4/webhook/execute/' +
+          token.systemKey +
+          '/cloudiot_devices_configVersions?name=' +
+          deviceName +
+          '&numVersions=' +
+          request?.numVersions,
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token.serviceAccountToken
+          'ClearBlade-UserToken': token.serviceAccountToken,
         },
       };
 
@@ -1674,7 +1673,7 @@ export class DeviceManagerClient {
       );
       req.on('error', e => {
         reject(e);
-      });      
+      });
       req.end();
     });
   }
@@ -2350,7 +2349,10 @@ export class DeviceManagerClient {
       });
       const options = {
         host: this.BASE_URL,
-        path: '/api/v/4/webhook/execute/' + token.systemKey + '/cloudiot?method=bindDeviceToGateway',
+        path:
+          '/api/v/4/webhook/execute/' +
+          token.systemKey +
+          '/cloudiot?method=bindDeviceToGateway',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -2488,7 +2490,7 @@ export class DeviceManagerClient {
     ]
   > | void {
     // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {      
+    return new Promise(async (resolve, reject) => {
       const payload = JSON.stringify({
         gatewayId: request?.gatewayId,
         deviceId: request?.deviceId,
