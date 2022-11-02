@@ -1296,7 +1296,12 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
+      const registry = this.getRegistryFromDevicePath(request?.name);
+      const region = this.getRegionFromDevicePath(request?.name);
+      const deviceName = this.getDeviceNameFromDevicePath(
+        request?.name
+      );
+      const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify({
         name: request?.name,
@@ -1307,7 +1312,7 @@ export class DeviceManagerClient {
           '/api/v/1/code/' +
           token.systemKey +
           '/cloudiot_devices?name=' +
-          request?.name,
+          deviceName,
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

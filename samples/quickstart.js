@@ -270,7 +270,7 @@ async function main() {
     //     // },
     //   ],
     // };
-    
+
     // const requestCreateDevice = {
     //   parent: registryPath,
     //   device,
@@ -280,34 +280,50 @@ async function main() {
     // console.log('Created device: ', responseCreateDevice);
 
     /**
-     * Get list config version device
+     * Get list config version device = Device Path - Name
      */
-     const devicePath = client.devicePath(
+    //  const devicePath = client.devicePath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId,
+    //   deviceId
+    // );
+
+    // const requestGetDeviceConfigVersions = {
+    //   name: devicePath,
+    //   numVersions : 5
+    // };
+    // const [version] = await client.listDeviceConfigVersions(requestGetDeviceConfigVersions);
+    // console.log(`RES : `, version);
+
+    /**
+     * Device config modify - Device Path - name
+     */
+
+    // const request = {
+    //   versionToUpdate : '5',
+    //   name: devicePath,
+    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    // };
+
+    // const [response] = await client.modifyCloudToDeviceConfig(request);
+    // console.log('Sent command: ', response);
+
+    /**
+    * delete device
+    */
+    const devicePath = client.devicePath(
       projectId,
       cloudRegion,
       registryId,
-      deviceId
+      '987'
     );
-
-    const requestGetDeviceConfigVersions = {
-      name: devicePath,
-      numVersions : 5
-    };
-    const [version] = await client.listDeviceConfigVersions(requestGetDeviceConfigVersions);
-    console.log(`RES : `, version);
-
-    /**
-     * Device config modify
-     */
-    
     const request = {
-      versionToUpdate : '5',
-      name: devicePath,
-      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+      name: devicePath
     };
 
-    const [response] = await client.modifyCloudToDeviceConfig(request);
-    console.log('Sent command: ', response);
+    const [resDeleteDevice] = await client.deleteDevice(request);
+    console.log(`RES : `, resDeleteDevice);
   }
   quickstart();
   // [END iot_quickstart]
