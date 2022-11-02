@@ -121,7 +121,6 @@ export class DeviceManagerClient {
     this.ADMIN_USER_TOKEN = json.token;
     this.PROJECT_ID = json.project;
     this.BASE_URL = json.url.replace(/^https?:\/\//, '');
-    console.log("sdk base: ", this.BASE_URL);
     //var gaxInstance: typeof gax | typeof gax.fallback | null = null;
     const gaxInstance = require('google-gax/build/src/fallback'); // avoids loading google-gax with gRPC
     // this.region = region;
@@ -459,7 +458,7 @@ export class DeviceManagerClient {
     return new Promise(async (resolve, reject) => {
       const payload = JSON.stringify(request?.deviceRegistry);
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path:
           '/api/v/4/webhook/execute/' +
           this.ADMIN_SYSTEM_KEY +
@@ -677,7 +676,7 @@ export class DeviceManagerClient {
       const payload = JSON.stringify(request?.deviceRegistry);
 
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path:
           '/api/v/4/webhook/execute/' +
           token.systemKey +
@@ -796,7 +795,7 @@ export class DeviceManagerClient {
         name: request?.name,
       });
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path:
           '/api/v/4/webhook/execute/' +
           this.ADMIN_SYSTEM_KEY +
@@ -930,7 +929,7 @@ export class DeviceManagerClient {
       const payload = JSON.stringify(request?.device);
       console.log('sdk payload: ', payload);
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path: '/api/v/4/webhook/execute/'+ token.systemKey +'/cloudiot_devices',
         method: 'POST',
         headers: {
@@ -1076,7 +1075,7 @@ export class DeviceManagerClient {
       const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path:
           '/api/v/4/webhook/execute/' +
           token?.systemKey +
@@ -1194,7 +1193,7 @@ export class DeviceManagerClient {
       const payload = JSON.stringify(request?.device);
 
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path:
           '/api/v/4/webhook/execute/' +
           token.systemKey +
@@ -1307,7 +1306,7 @@ export class DeviceManagerClient {
         name: request?.name,
       });
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path:
           '/api/v/1/code/' +
           token.systemKey +
@@ -1450,7 +1449,7 @@ export class DeviceManagerClient {
         deviceId: request?.name,
       });
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path:
           '/api/v/1/code/' +
           token.systemKey +
@@ -1607,7 +1606,7 @@ export class DeviceManagerClient {
         numVersions: request?.numVersions,
       });
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path: '/api/v/1/code/' + token.systemKey + '/devicesConfigVersionsList',
         method: 'POST',
         headers: {
@@ -1765,7 +1764,7 @@ export class DeviceManagerClient {
       const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         port: '443',
         path:
           `/api/v/4/webhook/execute/` +
@@ -2211,7 +2210,7 @@ export class DeviceManagerClient {
         subfolder: request?.subfolder,
       });
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         port: '443',
         path:
           `/api/v/4/webhook/execute/` +
@@ -2354,7 +2353,7 @@ export class DeviceManagerClient {
         deviceId: request?.deviceId,
       });
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path: '/api/v/1/code/' + token.systemKey + '/bindDeviceToGateway',
         method: 'POST',
         headers: {
@@ -2503,7 +2502,7 @@ export class DeviceManagerClient {
         deviceId: request?.deviceId,
       });
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path:
           '/api/v/1/code/' + this.ADMIN_SYSTEM_KEY + '/unbindDeviceFromGateway',
         method: 'POST',
@@ -2646,7 +2645,7 @@ export class DeviceManagerClient {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path:
           '/api/v/4/webhook/execute/' +
           this.ADMIN_SYSTEM_KEY +
@@ -2694,7 +2693,7 @@ export class DeviceManagerClient {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise<string>(async (resolve, reject) => {
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path:
           `/api/v/1/code/` + this.ADMIN_SYSTEM_KEY + `/getRegistryCredentials`,
         method: 'POST',
@@ -2925,7 +2924,7 @@ export class DeviceManagerClient {
       });
 
       const options = {
-        host: 'iot-sandbox.clearblade.com',
+        host: this.BASE_URL,
         path:
           '/api/v/4/webhook/execute/' +
           token.systemKey +
