@@ -251,51 +251,63 @@ async function main() {
      * Create Device -- Registry Path -- Parent
      */
 
-    const registryPath = client.registryPath(
+    // const registryPath = client.registryPath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId
+    // );
+
+    // const device = {
+    //   id: 'sdk_device_dummy',
+    //   name: 'sdk_device_dummy',
+    //   numId: 987,
+    //   credentials: [
+    //     // {
+    //     //   publicKey: {
+    //     //     format: publicKeyFormat,
+    //     //     key: readFileSync(publicKeyFile).toString(),
+    //     //   },
+    //     // },
+    //   ],
+    // };
+    
+    // const requestCreateDevice = {
+    //   parent: registryPath,
+    //   device,
+    // };
+
+    // const [responseCreateDevice] = await client.createDevice(requestCreateDevice);
+    // console.log('Created device: ', responseCreateDevice);
+
+    /**
+     * Get list config version device
+     */
+     const devicePath = client.devicePath(
       projectId,
       cloudRegion,
-      registryId
+      registryId,
+      deviceId
     );
 
-    const device = {
-      id: 'sdk_device_dummy',
-      name: 'sdk_device_dummy',
-      numId: 987,
-      credentials: [
-        // {
-        //   publicKey: {
-        //     format: publicKeyFormat,
-        //     key: readFileSync(publicKeyFile).toString(),
-        //   },
-        // },
-      ],
+    const requestGetDeviceConfigVersions = {
+      name: devicePath,
+      numVersions : 2
     };
-    
-    const requestCreateDevice = {
-      parent: registryPath,
-      device,
-    };
-
-    const [responseCreateDevice] = await client.createDevice(requestCreateDevice);
-    console.log('Created device: ', responseCreateDevice);
+    const [version] = await client.listDeviceConfigVersions(requestGetDeviceConfigVersions);
+    console.log(`RES : `, version);
 
     /**
      * Device config modify
      */
-    // const devicePath = client.devicePath(
-    //   projectId,
-    //   cloudRegion,
-    //   registryId,
-    //   deviceId
-    // );
-    // const request = {
-    //   versionToUpdate : '6',
-    //   name: devicePath,
-    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
-    // };
+    
+    const request = {
+      versionToUpdate : '6',
+      name: devicePath,
+      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    };
 
-    // const [response] = await client.modifyCloudToDeviceConfig(request);
-    // console.log('Sent command: ', response);
+    const [response] = await client.modifyCloudToDeviceConfig(request);
+    console.log('Sent command: ', response);
   }
   quickstart();
   // [END iot_quickstart]
