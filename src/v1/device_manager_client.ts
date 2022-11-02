@@ -120,7 +120,7 @@ export class DeviceManagerClient {
     let json = require('' + clerabladeConfigFile);
     this.ADMIN_SYSTEM_KEY = json.systemKey;
     this.ADMIN_USER_TOKEN = json.token;
-    this.projectId = json.projectId;
+    this.projectId = json.project;
     //var gaxInstance: typeof gax | typeof gax.fallback | null = null;
     const gaxInstance = require('google-gax/build/src/fallback'); // avoids loading google-gax with gRPC
     // this.region = region;
@@ -924,10 +924,7 @@ export class DeviceManagerClient {
       const region = this.getRegionFromRegistryPath(
         request?.parent
       );
-      console.log("sdk registry: ", registry);
-      console.log("sdk region: ", region);
       const token_response = await this.getRegistryToken(registry, region);
-      console.log("sdk token_response: ", token_response);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify({
         id: request?.device?.id,
