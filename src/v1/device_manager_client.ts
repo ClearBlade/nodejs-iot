@@ -1304,7 +1304,7 @@ export class DeviceManagerClient {
       const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify({
-        name: request?.name,
+        name: deviceName,
       });
       const options = {
         host: this.BASE_URL,
