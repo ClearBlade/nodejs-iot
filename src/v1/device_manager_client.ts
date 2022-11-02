@@ -2500,11 +2500,11 @@ export class DeviceManagerClient {
       const options = {
         host: this.BASE_URL,
         path:
-          '/api/v/4/webhook/execute/' + token.systemKey + '/cloudiot?method=unbindDeviceFromGateway',
+          '/api/v/1/code/' + this.ADMIN_SYSTEM_KEY + '/unbindDeviceFromGateway',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-            'ClearBlade-UserToken': token.serviceAccountToken,
+          'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
           'Content-Length': payload.length,
         },
       };
