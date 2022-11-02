@@ -104,11 +104,11 @@ async function main() {
     /**
      * Un bind gateway to device - Parent - RegistryPath
      */
-    // const registryPath = client.registryPath(
-    //   projectId,
-    //   cloudRegion,
-    //   registryId
-    // );
+    const registryPath = client.registryPath(
+      projectId,
+      cloudRegion,
+      registryId
+    );
     const unbindRequest = {
       parent: registryPath,
       deviceId: 'ingress_device_node',
@@ -121,11 +121,11 @@ async function main() {
     /**
      * bind gateway to device - Parent - RegistryPath
      */
-    const registryPath = client.registryPath(
-      projectId,
-      cloudRegion,
-      registryId
-    );
+    // const registryPath = client.registryPath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId
+    // );
     const requestBindGateway = {
       parent: registryPath,
       deviceId: 'ingress_device_node',
