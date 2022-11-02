@@ -954,7 +954,6 @@ export class DeviceManagerClient {
               protos.google.cloud.iot.v1.ICreateDeviceRequest | undefined,
               {} | undefined
             ];
-            console.log("sdk res: ", data);
             const deviceResponse = JSON.parse(data);
             const icreatedevicerequest:
               | protos.google.cloud.iot.v1.ICreateDeviceRequest
@@ -1601,20 +1600,20 @@ export class DeviceManagerClient {
   > | void {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      const token_response = await this.getRegistryToken();
+      const registry = this.getRegistryFromDevicePath(request?.name);
+      const region = this.getRegionFromDevicePath(request?.name);
+      const deviceName = this.getDeviceNameFromDevicePath(
+        request?.name
+      );
+      const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
-      const payload = JSON.stringify({
-        name: request?.name,
-        numVersions: request?.numVersions,
-      });
       const options = {
         host: this.BASE_URL,
-        path: '/api/v/1/code/' + token.systemKey + '/devicesConfigVersionsList',
-        method: 'POST',
+        path: '/api/v/4/webhook/execute/' + token.systemKey + '/cloudiot_devices_configVersions?name='+deviceName+'&numVersions=' + request?.numVersions,
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token.serviceAccountToken,
-          'Content-Length': payload.length,
+          'ClearBlade-UserToken': token.serviceAccountToken
         },
       };
 
@@ -1677,10 +1676,7 @@ export class DeviceManagerClient {
       );
       req.on('error', e => {
         reject(e);
-      });
-      if (payload) {
-        req.write(payload);
-      }
+      });      
       req.end();
     });
   }
