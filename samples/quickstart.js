@@ -256,19 +256,19 @@ async function main() {
       cloudRegion,
       registryId
     );
+
     const device = {
-      id: "New Node Device SDK",
+      id: 'New Node Device SDK',
       credentials: [
-        {
-          publicKey: {
-            //format: publicKeyFormat,
-            //key: readFileSync(publicKeyFile).toString(),
-          },
-        },
+        // {
+        //   publicKey: {
+        //     format: publicKeyFormat,
+        //     key: readFileSync(publicKeyFile).toString(),
+        //   },
+        // },
       ],
     };
-    console.log(registryPath);
-
+    
     const requestCreateDevice = {
       parent: registryPath,
       device,

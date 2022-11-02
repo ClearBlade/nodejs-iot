@@ -949,6 +949,7 @@ export class DeviceManagerClient {
           let data = '';
           res.on('data', chunk => (data += chunk));
           res.on('end', () => {
+            console.log('sdk res: ', data);
             if (!this.isJsonString(data)) {
               reject(data);
               return;
