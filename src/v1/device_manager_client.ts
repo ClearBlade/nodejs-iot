@@ -927,6 +927,7 @@ export class DeviceManagerClient {
       const token_response = await this.getRegistryToken(registry, region);
       const token = JSON.parse(token_response);
       const payload = JSON.stringify(request?.device);
+      console.log('sdk payload: ', payload);
       const options = {
         host: 'iot-sandbox.clearblade.com',
         path: '/api/v/4/webhook/execute/'+ token.systemKey +'/cloudiot_devices',
@@ -937,7 +938,7 @@ export class DeviceManagerClient {
           'Content-Length': payload.length,
         },
       };
-
+      console.log('sdk payload: ', payload);
       const req = https.request(
         {
           ...options,
