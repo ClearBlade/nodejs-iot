@@ -46,9 +46,8 @@ const version = require('../../../package.json').version;
  * @memberof v1
  */
 export class DeviceManagerClient {
-  private region?: string;
-  private registry?: string;
-  private projectId?: string;
+  private PROJECT_ID?: string;
+  private BASE_URL?: string;
   private ADMIN_SYSTEM_KEY?: string;
   private ADMIN_USER_TOKEN?: string;
   //private _terminated = false;
@@ -84,11 +83,11 @@ export class DeviceManagerClient {
    *     using a .pem or .p12 keyFilename.
    * @param {string} [options.keyFilename] - Full path to the a .json, .pem, or
    *     .p12 key downloaded from the Google Developers Console. If you provide
-   *     a path to a JSON file, the projectId option below is not necessary.
+   *     a path to a JSON file, the PROJECT_ID option below is not necessary.
    *     NOTE: .pem and .p12 require you to specify options.email as well.
    * @param {number} [options.port] - The port on which to connect to
    *     the remote host.
-   * @param {string} [options.projectId] - The project ID from the Google
+   * @param {string} [options.PROJECT_ID] - The project ID from the Google
    *     Developer's Console, e.g. 'grape-spaceship-123'. We will also check
    *     the environment variable GCLOUD_PROJECT for your project ID. If your
    *     app is running in an environment which supports
@@ -120,20 +119,22 @@ export class DeviceManagerClient {
     let json = require('' + clerabladeConfigFile);
     this.ADMIN_SYSTEM_KEY = json.systemKey;
     this.ADMIN_USER_TOKEN = json.token;
-    this.projectId = json.project;
+    this.PROJECT_ID = json.project;
+    this.BASE_URL = json.url.replace(/^https?:\/\//, '');
+    console.log("sdk base: ", this.BASE_URL);
     //var gaxInstance: typeof gax | typeof gax.fallback | null = null;
     const gaxInstance = require('google-gax/build/src/fallback'); // avoids loading google-gax with gRPC
     // this.region = region;
     // this.registry = registry;
-    // this.projectId = projectId;
+    // this.PROJECT_ID = PROJECT_ID;
     // if (region === null || region === '') {
     //   throw 'region can not be empty';
     // }
     // if (registry === null || registry === '') {
     //   throw 'registry can not be empty';
     // }
-    // if (projectId === null || projectId === '') {
-    //   throw 'projectId can not be empty';
+    // if (PROJECT_ID === null || PROJECT_ID === '') {
+    //   throw 'PROJECT_ID can not be empty';
     // }
     // const staticMembers = this.constructor as typeof DeviceManagerClient;
     // const servicePath =
@@ -370,7 +371,7 @@ export class DeviceManagerClient {
   getProjectId(
     callback?: Callback<string, undefined, undefined>
   ): Promise<string> | void {
-    return Promise.resolve('' + this.projectId);
+    return Promise.resolve('' + this.PROJECT_ID);
   }
 
   // -------------------
@@ -2688,7 +2689,7 @@ export class DeviceManagerClient {
     const payload = JSON.stringify({
       region: region,
       registry: registry,
-      project: this.projectId,
+      project: this.PROJECT_ID,
     });
     // eslint-disable-next-line no-async-promise-executor
     return new Promise<string>(async (resolve, reject) => {
