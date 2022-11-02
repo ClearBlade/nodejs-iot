@@ -38,21 +38,21 @@ async function main() {
     /**
      * Send Command to Device - DevicePath - name
      */
-    // const devicePath = client.devicePath(
-    //   projectId,
-    //   cloudRegion,
-    //   registryId,
-    //   deviceId
-    // );
-    // const requestSendCommandDevice = {
-    //   subfolder: 'sub',
-    //   name: devicePath,
-    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl', //64 encoded
-    // };
-    // const [responseSendCommandDevice] = await client.sendCommandToDevice(
-    //   requestSendCommandDevice
-    // );
-    // console.log('Sent command: ', responseSendCommandDevice);
+    const devicePath = client.devicePath(
+      projectId,
+      cloudRegion,
+      registryId,
+      deviceId
+    );
+    const requestSendCommandDevice = {
+      subfolder: 'sub',
+      name: devicePath,
+      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl', //64 encoded
+    };
+    const [responseSendCommandDevice] = await client.sendCommandToDevice(
+      requestSendCommandDevice
+    );
+    console.log('Sent command: ', responseSendCommandDevice);
 
     /**
      * Get List Devices - Parent
@@ -104,20 +104,20 @@ async function main() {
     /**
      * Un bind gateway to device - Parent - RegistryPath
      */
-    const registryPath = client.registryPath(
-      projectId,
-      cloudRegion,
-      registryId
-    );
-    const unbindRequest = {
-      parent: registryPath,
-      deviceId: 'ingress_device_node',
-      gatewayId: 'gateway_ingress',
-    };
-    const [responseUnBindGateway] = await client.unbindDeviceFromGateway(
-      unbindRequest
-    );
-    console.log('RES: ', responseUnBindGateway);
+    // const registryPath = client.registryPath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId
+    // );
+    // const unbindRequest = {
+    //   parent: registryPath,
+    //   deviceId: 'ingress_device_node',
+    //   gatewayId: 'gateway_ingress',
+    // };
+    // const [responseUnBindGateway] = await client.unbindDeviceFromGateway(
+    //   unbindRequest
+    // );
+    // console.log('RES: ', responseUnBindGateway);
     /**
      * bind gateway to device - Parent - RegistryPath
      */
@@ -126,15 +126,15 @@ async function main() {
     //   cloudRegion,
     //   registryId
     // );
-    const requestBindGateway = {
-      parent: registryPath,
-      deviceId: 'ingress_device_node',
-      gatewayId: 'gateway_ingress',
-    };
-    const [responseBindGateway] = await client.bindDeviceToGateway(
-      requestBindGateway
-    );
-    console.log('RES: ', responseBindGateway);
+    // const requestBindGateway = {
+    //   parent: registryPath,
+    //   deviceId: 'ingress_device_node',
+    //   gatewayId: 'gateway_ingress',
+    // };
+    // const [responseBindGateway] = await client.bindDeviceToGateway(
+    //   requestBindGateway
+    // );
+    // console.log('RES: ', responseBindGateway);
     /**
      * Get device state list - Device Path - Parent
      */
@@ -300,14 +300,14 @@ async function main() {
      * Device config modify - Device Path - name
      */
 
-    // const request = {
-    //   versionToUpdate : '5',
-    //   name: devicePath,
-    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
-    // };
+    const request = {
+      versionToUpdate : '5',
+      name: devicePath,
+      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    };
 
-    // const [response] = await client.modifyCloudToDeviceConfig(request);
-    // console.log('Sent command: ', response);
+    const [response] = await client.modifyCloudToDeviceConfig(request);
+    console.log('Sent command: ', response);
 
     /**
     * Delete device - Device Path - name
