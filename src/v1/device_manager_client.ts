@@ -960,6 +960,7 @@ export class DeviceManagerClient {
               protos.google.cloud.iot.v1.ICreateDeviceRequest | undefined,
               {} | undefined
             ];
+            console.log("sdk res: ", data);
             const deviceResponse = JSON.parse(data);
             const icreatedevicerequest:
               | protos.google.cloud.iot.v1.ICreateDeviceRequest
