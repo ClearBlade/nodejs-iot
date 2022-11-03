@@ -38,21 +38,21 @@ async function main() {
     /**
      * Send Command to Device - DevicePath - name
      */
-    const devicePath = client.devicePath(
-      projectId,
-      cloudRegion,
-      registryId,
-      deviceId
-    );
-    const requestSendCommandDevice = {
-      subfolder: 'sub',
-      name: devicePath,
-      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl', //64 encoded
-    };
-    const [responseSendCommandDevice] = await client.sendCommandToDevice(
-      requestSendCommandDevice
-    );
-    console.log('Sent command: ', responseSendCommandDevice);
+    // const devicePath = client.devicePath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId,
+    //   deviceId
+    // );
+    // const requestSendCommandDevice = {
+    //   subfolder: 'sub',
+    //   name: devicePath,
+    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl', //64 encoded
+    // };
+    // const [responseSendCommandDevice] = await client.sendCommandToDevice(
+    //   requestSendCommandDevice
+    // );
+    // console.log('Sent command: ', responseSendCommandDevice);
 
     /**
      * Get List Devices - Parent
@@ -104,20 +104,20 @@ async function main() {
     /**
      * Un bind gateway to device - Parent - RegistryPath
      */
-    // const registryPath = client.registryPath(
-    //   projectId,
-    //   cloudRegion,
-    //   registryId
-    // );
-    // const unbindRequest = {
-    //   parent: registryPath,
-    //   deviceId: 'ingress_device_node',
-    //   gatewayId: 'gateway_ingress',
-    // };
-    // const [responseUnBindGateway] = await client.unbindDeviceFromGateway(
-    //   unbindRequest
-    // );
-    // console.log('RES: ', responseUnBindGateway);
+    const registryPath = client.registryPath(
+      projectId,
+      cloudRegion,
+      registryId
+    );
+    const unbindRequest = {
+      parent: registryPath,
+      deviceId: 'ingress_device_node',
+      gatewayId: 'gateway_ingress',
+    };
+    const [responseUnBindGateway] = await client.unbindDeviceFromGateway(
+      unbindRequest
+    );
+    console.log('RES: ', responseUnBindGateway);
     /**
      * bind gateway to device - Parent - RegistryPath
      */
@@ -251,33 +251,33 @@ async function main() {
      * Create Device -- Registry Path -- Parent
      */
 
-    const registryPath = client.registryPath(
-      projectId,
-      cloudRegion,
-      registryId
-    );
+    // const registryPath = client.registryPath(
+    //   projectId,
+    //   cloudRegion,
+    //   registryId
+    // );
 
-    const device = {
-      id: 'sdk_device_dummy',
-      name: 'sdk_device_dummy',
-      numId: 987,
-      credentials: [
-        // {
-        //   publicKey: {
-        //     format: publicKeyFormat,
-        //     key: readFileSync(publicKeyFile).toString(),
-        //   },
-        // },
-      ],
-    };
+    // const device = {
+    //   id: 'sdk_device_dummy',
+    //   name: 'sdk_device_dummy',
+    //   numId: 987,
+    //   credentials: [
+    //     // {
+    //     //   publicKey: {
+    //     //     format: publicKeyFormat,
+    //     //     key: readFileSync(publicKeyFile).toString(),
+    //     //   },
+    //     // },
+    //   ],
+    // };
     
-    const requestCreateDevice = {
-      parent: registryPath,
-      device,
-    };
-    console.log('Created device Start');
-    const [responseCreateDevice] = await client.createDevice(requestCreateDevice);
-    console.log('Created device: ', responseCreateDevice);
+    // const requestCreateDevice = {
+    //   parent: registryPath,
+    //   device,
+    // };
+    // console.log('Created device Start');
+    // const [responseCreateDevice] = await client.createDevice(requestCreateDevice);
+    // console.log('Created device: ', responseCreateDevice);
 
     /**
      * Get list config version device = Device Path - Name
@@ -300,14 +300,14 @@ async function main() {
      * Device config modify - Device Path - name
      */
 
-    const request = {
-      versionToUpdate : '5',
-      name: devicePath,
-      binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
-    };
+    // const request = {
+    //   versionToUpdate : '5',
+    //   name: devicePath,
+    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    // };
 
-    const [response] = await client.modifyCloudToDeviceConfig(request);
-    console.log('Sent command: ', response);
+    // const [response] = await client.modifyCloudToDeviceConfig(request);
+    // console.log('Sent command: ', response);
 
     /**
     * Delete device - Device Path - name
