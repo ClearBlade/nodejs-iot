@@ -186,28 +186,22 @@ describe('v1.DeviceManagerClient', () => {
       assert((client.getProjectId as SinonStub).calledWithExactly());
     });
 
-    //   it('has getProjectId method with callback', async () => {
-    //     const fakeProjectId = 'fake-project-id';
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.auth.getProjectId = sinon
-    //       .stub()
-    //       .callsArgWith(0, null, fakeProjectId);
-    //     const promise = new Promise((resolve, reject) => {
-    //       client.getProjectId((err?: Error | null, projectId?: string | null) => {
-    //         if (err) {
-    //           reject(err);
-    //         } else {
-    //           resolve(projectId);
-    //         }
-    //       });
-    //     });
-    //     const result = await promise;
-    //     assert.strictEqual(result, fakeProjectId);
-    //   });
-    // });
+    it('has getProjectId method with callback', async () => {
+      const fakeProjectId = 'fake-project-id';
+      const client = new devicemanagerModule.v1.DeviceManagerClient();
+      client.getProjectId = sinon.stub().callsArgWith(0, null, fakeProjectId);
+      const promise = new Promise((resolve, reject) => {
+        client.getProjectId((err?: Error | null, projectId?: string | null) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(projectId);
+          }
+        });
+      });
+      const result = await promise;
+      assert.strictEqual(result, fakeProjectId);
+    });
 
     // describe('createDeviceRegistry', () => {
     //   it('invokes createDeviceRegistry without error', async () => {

@@ -180,8 +180,9 @@ export class DeviceManagerClient {
   ): Promise<string> | void {
     if (typeof callback !== 'undefined') {
       callback(null, this.PROJECT_ID);
+    } else {
+      return Promise.resolve('' + this.PROJECT_ID);
     }
-    return Promise.resolve('' + this.PROJECT_ID);
   }
 
   // -------------------
