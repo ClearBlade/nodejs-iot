@@ -177,17 +177,17 @@ describe('v1.DeviceManagerClient', () => {
     //     });
     //   });
 
-    //   it('has getProjectId method', async () => {
-    //     const fakeProjectId = 'fake-project-id';
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.auth.getProjectId = sinon.stub().resolves(fakeProjectId);
-    //     const result = await client.getProjectId();
-    //     assert.strictEqual(result, fakeProjectId);
-    //     assert((client.auth.getProjectId as SinonStub).calledWithExactly());
-    //   });
+    it('has getProjectId method', async () => {
+      const fakeProjectId = 'fake-project-id';
+      const client = new devicemanagerModule.v1.DeviceManagerClient({
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
+        projectId: 'bogus',
+      });
+      client.auth.getProjectId = sinon.stub().resolves(fakeProjectId);
+      const result = await client.getProjectId();
+      assert.strictEqual(result, fakeProjectId);
+      assert((client.auth.getProjectId as SinonStub).calledWithExactly());
+    });
 
     //   it('has getProjectId method with callback', async () => {
     //     const fakeProjectId = 'fake-project-id';

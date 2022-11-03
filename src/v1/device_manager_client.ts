@@ -17,28 +17,10 @@
 // ** All changes to this file may be overwritten. **
 
 /* global window */
-import type * as gax from 'google-gax';
-import type {
-  Callback,
-  CallOptions,
-  Descriptors,
-  ClientOptions,
-  PaginationCallback,
-  GaxCall,
-} from 'google-gax';
+import type {Callback, CallOptions, PaginationCallback} from 'google-gax';
 //import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
-import jsonProtos = require('../../protos/protos.json');
 import * as https from 'https';
-
-/**
- * Client JSON configuration object, loaded from
- * `src/v1/device_manager_client_config.json`.
- * This file defines retry strategy and timeouts for all API methods in this library.
- */
-import * as gapicConfig from './device_manager_client_config.json';
-import {assert} from 'console';
-const version = require('../../../package.json').version;
 
 /**
  *  Internet of Things (IoT) service. Securely connect and manage IoT devices.
@@ -46,18 +28,10 @@ const version = require('../../../package.json').version;
  * @memberof v1
  */
 export class DeviceManagerClient {
-  private PROJECT_ID?: string;
+  private PROJECT_ID: string;
   private BASE_URL?: string;
   private ADMIN_SYSTEM_KEY?: string;
   private ADMIN_USER_TOKEN?: string;
-  //private _terminated = false;
-  // private _opts: ClientOptions;
-  // private _providedCustomServicePath: boolean;
-  private _gaxModule: typeof gax | typeof gax.fallback;
-  private _gaxGrpc: gax.GrpcClient | gax.fallback.GrpcClient;
-  private _protos: {};
-  // private _defaults: {[method: string]: gax.CallSettings};
-  // auth: gax.GoogleAuth;
   // descriptors: Descriptors = {
   //   page: {},
   //   stream: {},
@@ -69,182 +43,16 @@ export class DeviceManagerClient {
   //pathTemplates: {[name: string]: gax.PathTemplate};
   // deviceManagerStub?: Promise<{[name: string]: Function}>;
 
-  /**
-   * Construct an instance of DeviceManagerClient.
-   *
-   * @param {object} [options] - The configuration object.
-   * The options accepted by the constructor are described in detail
-   * in [this document](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#creating-the-client-instance).
-   * The common options are:
-   * @param {object} [options.credentials] - Credentials object.
-   * @param {string} [options.credentials.client_email]
-   * @param {string} [options.credentials.private_key]
-   * @param {string} [options.email] - Account email address. Required when
-   *     using a .pem or .p12 keyFilename.
-   * @param {string} [options.keyFilename] - Full path to the a .json, .pem, or
-   *     .p12 key downloaded from the Google Developers Console. If you provide
-   *     a path to a JSON file, the PROJECT_ID option below is not necessary.
-   *     NOTE: .pem and .p12 require you to specify options.email as well.
-   * @param {number} [options.port] - The port on which to connect to
-   *     the remote host.
-   * @param {string} [options.PROJECT_ID] - The project ID from the Google
-   *     Developer's Console, e.g. 'grape-spaceship-123'. We will also check
-   *     the environment variable GCLOUD_PROJECT for your project ID. If your
-   *     app is running in an environment which supports
-   *     {@link https://developers.google.com/identity/protocols/application-default-credentials Application Default Credentials},
-   *     your project ID will be detected automatically.
-   * @param {string} [options.apiEndpoint] - The domain name of the
-   *     API remote host.
-   * @param {gax.ClientConfig} [options.clientConfig] - Client configuration override.
-   *     Follows the structure of {@link gapicConfig}.
-   * @param {boolean | "rest"} [options.fallback] - Use HTTP fallback mode.
-   *     Pass "rest" to use HTTP/1.1 REST API instead of gRPC.
-   *     For more information, please check the
-   *     {@link https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#http11-rest-api-mode documentation}.
-   * @param {gax} [gaxInstance]: loaded instance of `google-gax`. Useful if you
-   *     need to avoid loading the default gRPC version and want to use the fallback
-   *     HTTP implementation. Load only fallback version and pass it to the constructor:
-   *     ```
-   *     const gax = require('google-gax/build/src/fallback'); // avoids loading google-gax with gRPC
-   *     const client = new DeviceManagerClient({fallback: 'rest'}, gax);
-   *     ```
-   */
   constructor() {
-    // Ensure that options include all the required fields.
-    var opts: ClientOptions = {};
     const clerabladeConfigFile = process.env.CLEARBLADE_CONFIGURATION;
     if (!clerabladeConfigFile) {
       throw '[ERROR] : The "CLEARBLADE_CONFIGURATION" environment variable is required.!';
     }
-    let json = require('' + clerabladeConfigFile);
+    const json = require('' + clerabladeConfigFile);
     this.ADMIN_SYSTEM_KEY = json.systemKey;
     this.ADMIN_USER_TOKEN = json.token;
     this.PROJECT_ID = json.project;
     this.BASE_URL = json.url.replace(/^https?:\/\//, '');
-    //var gaxInstance: typeof gax | typeof gax.fallback | null = null;
-    const gaxInstance = require('google-gax/build/src/fallback'); // avoids loading google-gax with gRPC
-    // this.region = region;
-    // this.registry = registry;
-    // this.PROJECT_ID = PROJECT_ID;
-    // if (region === null || region === '') {
-    //   throw 'region can not be empty';
-    // }
-    // if (registry === null || registry === '') {
-    //   throw 'registry can not be empty';
-    // }
-    // if (PROJECT_ID === null || PROJECT_ID === '') {
-    //   throw 'PROJECT_ID can not be empty';
-    // }
-    // const staticMembers = this.constructor as typeof DeviceManagerClient;
-    // const servicePath =
-    //   opts?.servicePath || opts?.apiEndpoint || staticMembers.servicePath;
-    // this._providedCustomServicePath = !!(
-    //   opts?.servicePath || opts?.apiEndpoint
-    // );
-    // const port = opts?.port || staticMembers.port;
-    // const clientConfig = opts?.clientConfig ?? {};
-    // const fallback =
-    //   opts?.fallback ??
-    //   (typeof window !== 'undefined' && typeof window?.fetch === 'function');
-    // opts = Object.assign({servicePath, port, clientConfig, fallback}, opts);
-
-    // // If scopes are unset in options and we're connecting to a non-default endpoint, set scopes just in case.
-    // if (servicePath !== staticMembers.servicePath && !('scopes' in opts)) {
-    //   opts['scopes'] = staticMembers.scopes;
-    // }
-
-    // // Load google-gax module synchronously if needed
-    // if (!gaxInstance) {
-    //   gaxInstance = require('google-gax') as typeof gax;
-    // }
-
-    // // Choose either gRPC or proto-over-HTTP implementation of google-gax.
-    this._gaxModule = opts.fallback ? gaxInstance.fallback : gaxInstance;
-    this._gaxGrpc = new this._gaxModule.GrpcClient(opts);
-
-    // // Create a `gaxGrpc` object, with any grpc-specific options sent to the client.
-
-    // // Save options to use in initialize() method.
-    // this._opts = opts;
-
-    // // Save the auth object to the client, for use by other methods.
-    // this.auth = this._gaxGrpc.auth as gax.GoogleAuth;
-
-    // // Set useJWTAccessWithScope on the auth object.
-    // this.auth.useJWTAccessWithScope = true;
-
-    // // Set defaultServicePath on the auth object.
-    // this.auth.defaultServicePath = staticMembers.servicePath;
-
-    // // Set the default scopes in auth client if needed.
-    // if (servicePath === staticMembers.servicePath) {
-    //   this.auth.defaultScopes = staticMembers.scopes;
-    // }
-
-    // // Determine the client header string.
-    // const clientHeader = [`gax/${this._gaxModule.version}`, `gapic/${version}`];
-    // if (typeof process !== 'undefined' && 'versions' in process) {
-    //   clientHeader.push(`gl-node/${process.versions.node}`);
-    // } else {
-    //   clientHeader.push(`gl-web/${this._gaxModule.version}`);
-    // }
-    // if (!opts.fallback) {
-    //   clientHeader.push(`grpc/${this._gaxGrpc.grpcVersion}`);
-    // } else if (opts.fallback === 'rest') {
-    //   clientHeader.push(`rest/${this._gaxGrpc.grpcVersion}`);
-    // }
-    // if (opts.libName && opts.libVersion) {
-    //   clientHeader.push(`${opts.libName}/${opts.libVersion}`);
-    // }
-    // // Load the applicable protos.
-    this._protos = this._gaxGrpc.loadProtoJSON(jsonProtos);
-
-    // // This API contains "path templates"; forward-slash-separated
-    // // identifiers to uniquely identify resources within the API.
-    // // Create useful helper objects for these.
-    // this.pathTemplates = {
-    //   devicePathTemplate: new this._gaxModule.PathTemplate(
-    //     'projects/{project}/locations/{location}/registries/{registry}/devices/{device}'
-    //   ),
-    //   locationPathTemplate: new this._gaxModule.PathTemplate(
-    //     'projects/{project}/locations/{location}'
-    //   ),
-    //   registryPathTemplate: new this._gaxModule.PathTemplate(
-    //     'projects/{project}/locations/{location}/registries/{registry}'
-    //   ),
-    // };
-
-    // // Some of the methods on this service return "paged" results,
-    // // (e.g. 50 results at a time, with tokens to get subsequent
-    // // pages). Denote the keys used for pagination and results.
-    // this.descriptors.page = {
-    //   listDeviceRegistries: new this._gaxModule.PageDescriptor(
-    //     'pageToken',
-    //     'nextPageToken',
-    //     'deviceRegistries'
-    //   ),
-    //   listDevices: new this._gaxModule.PageDescriptor(
-    //     'pageToken',
-    //     'nextPageToken',
-    //     'devices'
-    //   ),
-    // };
-
-    // // Put together the default options sent with requests.
-    // this._defaults = this._gaxGrpc.constructSettings(
-    //   'google.cloud.iot.v1.DeviceManager',
-    //   gapicConfig as gax.ClientConfig,
-    //   opts.clientConfig || {},
-    //   {'x-goog-api-client': clientHeader.join(' ')}
-    // );
-
-    // // Set up a dictionary of "inner API calls"; the core implementation
-    // // of calling the API is handled in `google-gax`, with this code
-    // // merely providing the destination and request information.
-    // this.innerApiCalls = {};
-
-    // // Add a warn function to the client constructor so it can be easily tested.
-    // this.warn = this._gaxModule.warn;
   }
 
   /**
@@ -370,6 +178,9 @@ export class DeviceManagerClient {
   getProjectId(
     callback?: Callback<string, undefined, undefined>
   ): Promise<string> | void {
+    if (typeof callback !== 'undefined') {
+      callback(null, this.PROJECT_ID);
+    }
     return Promise.resolve('' + this.PROJECT_ID);
   }
 
@@ -3275,7 +3086,7 @@ export class DeviceManagerClient {
   }
 
   getRegistryFromRegistryPath(registryPath: string | null | undefined) {
-    if (registryPath == null || registryPath == undefined) {
+    if (registryPath === null || typeof registryPath === 'undefined') {
       throw 'registryPath is empty';
     }
     return registryPath.substring(
@@ -3285,7 +3096,7 @@ export class DeviceManagerClient {
   }
 
   getRegionFromRegistryPath(registryPath: string | null | undefined) {
-    if (registryPath == null || registryPath == undefined) {
+    if (registryPath === null || typeof registryPath === 'undefined') {
       throw 'registryPath is empty';
     }
     return registryPath.substring(
@@ -3295,7 +3106,7 @@ export class DeviceManagerClient {
   }
 
   getRegistryFromDevicePath(devicePath: string | null | undefined) {
-    if (devicePath == null || devicePath == undefined) {
+    if (devicePath === null || typeof devicePath === 'undefined') {
       throw 'devicePath is empty';
     }
     return devicePath.substring(
@@ -3305,7 +3116,7 @@ export class DeviceManagerClient {
   }
 
   getRegionFromDevicePath(devicePath: string | null | undefined) {
-    if (devicePath == null || devicePath == undefined) {
+    if (devicePath === null || typeof devicePath === 'undefined') {
       throw 'devicePath is empty';
     }
     return devicePath.substring(
@@ -3315,7 +3126,7 @@ export class DeviceManagerClient {
   }
 
   getDeviceNameFromDevicePath(devicePath: string | null | undefined) {
-    if (devicePath == null || devicePath == undefined) {
+    if (devicePath === null || typeof devicePath === 'undefined') {
       throw 'devicePath is empty';
     }
     return devicePath.substring(
