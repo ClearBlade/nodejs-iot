@@ -126,15 +126,15 @@ async function main() {
     //   cloudRegion,
     //   registryId
     // );
-    // const requestBindGateway = {
-    //   parent: registryPath,
-    //   deviceId: 'ingress_device_node',
-    //   gatewayId: 'gateway_ingress',
-    // };
-    // const [responseBindGateway] = await client.bindDeviceToGateway(
-    //   requestBindGateway
-    // );
-    // console.log('RES: ', responseBindGateway);
+    const requestBindGateway = {
+      parent: registryPath,
+      deviceId: 'ingress_device_node',
+      gatewayId: 'gateway_ingress',
+    };
+    const [responseBindGateway] = await client.bindDeviceToGateway(
+      requestBindGateway
+    );
+    console.log('RES: ', responseBindGateway);
     /**
      * Get device state list - Device Path - Parent
      */
