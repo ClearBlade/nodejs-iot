@@ -2523,6 +2523,7 @@ export class DeviceManagerClient {
           const chunks: any[] = [];
           res.on('data', chunk => (data += chunk));
           res.on('end', () => {
+            console.log('sdk data: ', data);
             if (!this.isJsonString(data)) {
               reject(data);
               return;
