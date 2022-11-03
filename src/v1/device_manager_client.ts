@@ -117,6 +117,7 @@ export class DeviceManagerClient {
       throw '[ERROR] : The "CLEARBLADE_CONFIGURATION" environment variable is required.!';
     }
     let json = require('' + clerabladeConfigFile);
+    console.log(json);
     this.ADMIN_SYSTEM_KEY = json.systemKey;
     this.ADMIN_USER_TOKEN = json.token;
     this.PROJECT_ID = json.project;
