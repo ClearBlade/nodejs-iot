@@ -2498,7 +2498,9 @@ export class DeviceManagerClient {
       const options = {
         host: this.BASE_URL,
         path:
-          '/api/v/1/code/' + this.ADMIN_SYSTEM_KEY + '/unbindDeviceFromGateway',
+          '/api/v/4/webhook/execute/' +
+          this.ADMIN_SYSTEM_KEY +
+          '/cloudiot?method=unbindDeviceFromGateway',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
