@@ -22,6 +22,42 @@ import type {Callback, CallOptions, PaginationCallback} from 'google-gax';
 import * as protos from '../../protos/protos';
 import * as https from 'https';
 
+function requestFactory<
+  RequestObject,
+  ResponseObject,
+  NextRequestObject,
+  RawResponseObject
+>(
+  fetcher: (request: RequestObject) => Promise<RawResponseObject>,
+  {
+    getResponseObject,
+    getNextRequestObject,
+  }: {
+    getResponseObject: (rawResponseObject: RawResponseObject) => ResponseObject;
+    getNextRequestObject: () => NextRequestObject;
+  }
+) {
+  return function makeRequest(
+    request: RequestObject,
+    options: CallOptions,
+    callback?: Callback<ResponseObject, NextRequestObject, RawResponseObject>
+  ): Promise<[ResponseObject, NextRequestObject, RawResponseObject]> | void {
+    if (callback) {
+      fetcher(request)
+        .then(data => {
+          callback(null, getResponseObject(data), getNextRequestObject(), data);
+        })
+        .catch(e => {
+          callback(new Error(e));
+        });
+    } else {
+      return fetcher(request).then(data => {
+        return [getResponseObject(data), getNextRequestObject(), data];
+      });
+    }
+  };
+}
+
 /**
  *  Internet of Things (IoT) service. Securely connect and manage IoT devices.
  * @class
@@ -29,9 +65,9 @@ import * as https from 'https';
  */
 export class DeviceManagerClient {
   private PROJECT_ID: string;
-  private BASE_URL?: string;
-  private ADMIN_SYSTEM_KEY?: string;
-  private ADMIN_USER_TOKEN?: string;
+  private BASE_URL: string;
+  private ADMIN_SYSTEM_KEY: string;
+  private ADMIN_USER_TOKEN: string;
   // descriptors: Descriptors = {
   //   page: {},
   //   stream: {},
@@ -39,7 +75,7 @@ export class DeviceManagerClient {
   //   batching: {},
   // };
   // warn: (code: string, message: string, warnType?: string) => void;
-  // innerApiCalls: {[name: string]: Function};
+  innerApiCalls: {[name: string]: Function};
   //pathTemplates: {[name: string]: gax.PathTemplate};
   // deviceManagerStub?: Promise<{[name: string]: Function}>;
 
@@ -53,6 +89,10 @@ export class DeviceManagerClient {
     this.ADMIN_USER_TOKEN = json.token;
     this.PROJECT_ID = json.project;
     this.BASE_URL = json.url.replace(/^https?:\/\//, '');
+
+    this.innerApiCalls = {
+      createDeviceRegistry: this._createDeviceRegistry,
+    };
   }
 
   /**
@@ -67,69 +107,69 @@ export class DeviceManagerClient {
    * @returns {Promise} A promise that resolves to an authenticated service stub.
    */
   initialize() {
-    // If the client stub promise is already initialized, return immediately.
-    // if (this.deviceManagerStub) {
-    //   return this.deviceManagerStub;
-    // }
-    // // Put together the "service stub" for
-    // // google.cloud.iot.v1.DeviceManager.
-    // this.deviceManagerStub = this._gaxGrpc.createStub(
-    //   this._opts.fallback
-    //     ? (this._protos as protobuf.Root).lookupService(
-    //         'google.cloud.iot.v1.DeviceManager'
-    //       )
-    //     : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    //       (this._protos as any).google.cloud.iot.v1.DeviceManager,
-    //   this._opts,
-    //   this._providedCustomServicePath
-    // ) as Promise<{[method: string]: Function}>;
-    // Iterate over each of the methods that the service provides
-    // and create an API call method for each.
-    // const deviceManagerStubMethods = [
-    //   'createDeviceRegistry',
-    //   'getDeviceRegistry',
-    //   'updateDeviceRegistry',
-    //   'deleteDeviceRegistry',
-    //   'listDeviceRegistries',
-    //   'createDevice',
-    //   'getDevice',
-    //   'updateDevice',
-    //   'deleteDevice',
-    //   'listDevices',
-    //   'modifyCloudToDeviceConfig',
-    //   'listDeviceConfigVersions',
-    //   'listDeviceStates',
-    //   'setIamPolicy',
-    //   'getIamPolicy',
-    //   'testIamPermissions',
-    //   'sendCommandToDevice',
-    //   'bindDeviceToGateway',
-    //   'unbindDeviceFromGateway',
-    // ];
-    // for (const methodName of deviceManagerStubMethods) {
-    //   const callPromise = this.deviceManagerStub.then(
-    //     stub =>
-    //       (...args: Array<{}>) => {
-    //         if (this._terminated) {
-    //           return Promise.reject('The client has already been closed.');
-    //         }
-    //         const func = stub[methodName];
-    //         return func.apply(stub, args);
-    //       },
-    //     (err: Error | null | undefined) => () => {
-    //       throw err;
-    //     }
-    //   );
-    //   const descriptor = this.descriptors.page[methodName] || undefined;
-    //   const apiCall = this._gaxModule.createApiCall(
-    //     callPromise,
-    //     this._defaults[methodName],
-    //     descriptor,
+    //   // If the client stub promise is already initialized, return immediately.
+    //   if (this.deviceManagerStub) {
+    //     return this.deviceManagerStub;
+    //   }
+    //   // Put together the "service stub" for
+    //   // google.cloud.iot.v1.DeviceManager.
+    //   this.deviceManagerStub = this._gaxGrpc.createStub(
     //     this._opts.fallback
-    //   );
-    //   this.innerApiCalls[methodName] = apiCall;
-    // }
-    // return this.deviceManagerStub;
+    //       ? (this._protos as protobuf.Root).lookupService(
+    //           'google.cloud.iot.v1.DeviceManager'
+    //         )
+    //       : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //         (this._protos as any).google.cloud.iot.v1.DeviceManager,
+    //     this._opts,
+    //     this._providedCustomServicePath
+    //   ) as Promise<{[method: string]: Function}>;
+    //   // Iterate over each of the methods that the service provides
+    //   // and create an API call method for each.
+    //   const deviceManagerStubMethods = [
+    //     'createDeviceRegistry',
+    //     'getDeviceRegistry',
+    //     'updateDeviceRegistry',
+    //     'deleteDeviceRegistry',
+    //     'listDeviceRegistries',
+    //     'createDevice',
+    //     'getDevice',
+    //     'updateDevice',
+    //     'deleteDevice',
+    //     'listDevices',
+    //     'modifyCloudToDeviceConfig',
+    //     'listDeviceConfigVersions',
+    //     'listDeviceStates',
+    //     'setIamPolicy',
+    //     'getIamPolicy',
+    //     'testIamPermissions',
+    //     'sendCommandToDevice',
+    //     'bindDeviceToGateway',
+    //     'unbindDeviceFromGateway',
+    //   ];
+    //   for (const methodName of deviceManagerStubMethods) {
+    //     const callPromise = this.deviceManagerStub.then(
+    //       stub =>
+    //         (...args: Array<{}>) => {
+    //           if (this._terminated) {
+    //             return Promise.reject('The client has already been closed.');
+    //           }
+    //           const func = stub[methodName];
+    //           return func.apply(stub, args);
+    //         },
+    //       (err: Error | null | undefined) => () => {
+    //         throw err;
+    //       }
+    //     );
+    //     const descriptor = this.descriptors.page[methodName] || undefined;
+    //     const apiCall = this._gaxModule.createApiCall(
+    //       callPromise,
+    //       this._defaults[methodName],
+    //       descriptor,
+    //       this._opts.fallback
+    //     );
+    //     this.innerApiCalls[methodName] = apiCall;
+    //   }
+    //   return this.deviceManagerStub;
   }
 
   /**
@@ -266,47 +306,67 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
-      const payload = JSON.stringify(request?.deviceRegistry);
-      const options = {
-        host: this.BASE_URL,
-        path:
-          '/api/v/4/webhook/execute/' +
-          this.ADMIN_SYSTEM_KEY +
-          '/cloudiot?parent=' +
-          request?.parent,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
-          'Content-Length': payload.length,
-        },
-      };
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
 
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          let data = '';
-          res.on('data', chunk => (data += chunk));
-          res.on('end', () => {
-            const deviceRegistry: protos.google.cloud.iot.v1.IDeviceRegistry =
-              JSON.parse(data);
-            resolve([deviceRegistry, {}, {}]);
-          });
-        }
-      );
-      req.on('error', e => {
-        reject(e);
-      });
-      if (payload) {
-        req.write(payload);
-      }
-      req.end();
-    });
+    return this.innerApiCalls.createDeviceRegistry(request, options, callback);
   }
+
+  private _createDeviceRegistry = requestFactory<
+    protos.google.cloud.iot.v1.ICreateDeviceRegistryRequest,
+    protos.google.cloud.iot.v1.IDeviceRegistry,
+    protos.google.cloud.iot.v1.ICreateDeviceRegistryRequest | undefined,
+    protos.google.cloud.iot.v1.IDeviceRegistry
+  >(
+    request => {
+      return new Promise((resolve, reject) => {
+        const payload = JSON.stringify(request?.deviceRegistry);
+        const options = {
+          host: this.BASE_URL,
+          path: `/api/v/4/webhook/execute/${this.ADMIN_SYSTEM_KEY}/cloudiot?parent=${request?.parent}`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
+            'Content-Length': payload.length,
+          },
+        };
+
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            let data = '';
+            res.on('data', chunk => (data += chunk));
+            res.on('end', () => {
+              const deviceRegistry: protos.google.cloud.iot.v1.IDeviceRegistry =
+                JSON.parse(data);
+              resolve(deviceRegistry);
+            });
+          }
+        );
+        req.on('error', e => {
+          reject(e);
+        });
+        if (payload) {
+          req.write(payload);
+        }
+        req.end();
+      });
+    },
+    {
+      getResponseObject: response => response,
+      getNextRequestObject: () => undefined,
+    }
+  );
   /**
    * Gets a device registry configuration.
    *
