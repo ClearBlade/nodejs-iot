@@ -50,6 +50,7 @@ export class DeviceManagerClient {
   private BASE_URL?: string;
   private ADMIN_SYSTEM_KEY?: string;
   private ADMIN_USER_TOKEN?: string;
+  private CACHED_CLIENT_INFO?: string;
   //private _terminated = false;
   // private _opts: ClientOptions;
   // private _providedCustomServicePath: boolean;
@@ -112,6 +113,7 @@ export class DeviceManagerClient {
   constructor() {
     // Ensure that options include all the required fields.
     var opts: ClientOptions = {};
+    this.CACHED_CLIENT_INFO = '';
     const clerabladeConfigFile = process.env.CLEARBLADE_CONFIGURATION;
     if (!clerabladeConfigFile) {
       throw '[ERROR] : The "CLEARBLADE_CONFIGURATION" environment variable is required.!';
@@ -2686,30 +2688,37 @@ export class DeviceManagerClient {
     });
     // eslint-disable-next-line no-async-promise-executor
     return new Promise<string>(async (resolve, reject) => {
-      const options = {
-        host: this.BASE_URL,
-        path:
-          `/api/v/1/code/` + this.ADMIN_SYSTEM_KEY + `/getRegistryCredentials`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
-          'Content-Length': payload.length,
-        },
-      };
-      const req = https.request(options, res => {
-        let data = '';
-        const chunks: any[] = [];
-        res.on('data', chunk => (data += chunk));
-        res.on('end', () => {
-          resolve(data);
+      if (this.CACHED_CLIENT_INFO) {
+        resolve(this.CACHED_CLIENT_INFO);
+      } else {
+        const options = {
+          host: this.BASE_URL,
+          path:
+            `/api/v/1/code/` +
+            this.ADMIN_SYSTEM_KEY +
+            `/getRegistryCredentials`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
+            'Content-Length': payload.length,
+          },
+        };
+        const req = https.request(options, res => {
+          let data = '';
+          const chunks: any[] = [];
+          res.on('data', chunk => (data += chunk));
+          res.on('end', () => {
+            this.CACHED_CLIENT_INFO = data;
+            resolve(data);
+          });
         });
-      });
-      req.on('error', e => {
-        reject(e);
-      });
-      req.write(payload);
-      req.end();
+        req.on('error', e => {
+          reject(e);
+        });
+        req.write(payload);
+        req.end();
+      }
     });
   }
 
