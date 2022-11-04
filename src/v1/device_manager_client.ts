@@ -40,6 +40,22 @@ import * as gapicConfig from './device_manager_client_config.json';
 import {assert} from 'console';
 const version = require('../../../package.json').version;
 
+function IoTCoreError(msg: string) {
+  return {
+    details: msg,
+  };
+}
+IoTCoreError.KNOWN_ERRORS = {
+  NO_STATUS_CODE: 'Networking error. No status code was returned',
+};
+
+function isErrorStatusCode(statusCode: number): boolean {
+  if (statusCode < 200 || statusCode > 299) {
+    return true;
+  }
+  return false;
+}
+
 /**
  *  Internet of Things (IoT) service. Securely connect and manage IoT devices.
  * @class
@@ -1442,12 +1458,7 @@ export class DeviceManagerClient {
       });
       const options = {
         host: this.BASE_URL,
-        path:
-          '/api/v/4/webhook/execute/' +
-          token.systemKey +
-          '/cloudiot_devices?name=' +
-          deviceName +
-          '&method=modifyCloudToDeviceConfig',
+        path: `/api/v/4/webhook/execute/${token.systemKey}/cloudiot_devices?name=${deviceName}&method=modifyCloudToDeviceConfig`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1461,35 +1472,45 @@ export class DeviceManagerClient {
           ...options,
         },
         res => {
-          let data = '';
-          const chunks: any[] = [];
-          res.on('data', chunk => (data += chunk));
-          res.on('end', () => {
-            if (!this.isJsonString(data)) {
-              reject(data);
-              return;
-            }
-            let array: [
-              protos.google.cloud.iot.v1.IDeviceConfig,
-              (
+          if (typeof res.statusCode === 'undefined') {
+            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+          } else if (isErrorStatusCode(res.statusCode)) {
+            let errorData = '';
+            res.on('data', chunk => (errorData += chunk));
+            res.on('end', () => {
+              reject(IoTCoreError(errorData));
+            });
+          } else {
+            let data = '';
+            res.on('data', chunk => (data += chunk));
+            res.on('end', () => {
+              if (!this.isJsonString(data)) {
+                reject(data);
+                return;
+              }
+              let array: [
+                protos.google.cloud.iot.v1.IDeviceConfig,
+                (
+                  | protos.google.cloud.iot.v1.IModifyCloudToDeviceConfigRequest
+                  | undefined
+                ),
+                {} | undefined
+              ];
+              const deviceConfig = JSON.parse(data);
+              const imodifycloudtodeviceconfigrequest:
                 | protos.google.cloud.iot.v1.IModifyCloudToDeviceConfigRequest
-                | undefined
-              ),
-              {} | undefined
-            ];
-            const deviceConfig = JSON.parse(data);
-            const imodifycloudtodeviceconfigrequest:
-              | protos.google.cloud.iot.v1.IModifyCloudToDeviceConfigRequest
-              | undefined = {};
-            const ideviceconfig: protos.google.cloud.iot.v1.IDeviceConfig = {};
-            ideviceconfig.binaryData = deviceConfig.binaryData;
-            ideviceconfig.version = deviceConfig.version;
-            ideviceconfig.cloudUpdateTime = deviceConfig.cloudUpdateTime;
-            ideviceconfig.deviceAckTime = deviceConfig.deviceAckTime;
-            // eslint-disable-next-line prefer-const
-            array = [ideviceconfig, imodifycloudtodeviceconfigrequest, {}];
-            resolve(array);
-          });
+                | undefined = {};
+              const ideviceconfig: protos.google.cloud.iot.v1.IDeviceConfig =
+                {};
+              ideviceconfig.binaryData = deviceConfig.binaryData;
+              ideviceconfig.version = deviceConfig.version;
+              ideviceconfig.cloudUpdateTime = deviceConfig.cloudUpdateTime;
+              ideviceconfig.deviceAckTime = deviceConfig.deviceAckTime;
+              // eslint-disable-next-line prefer-const
+              array = [ideviceconfig, imodifycloudtodeviceconfigrequest, {}];
+              resolve(array);
+            });
+          }
         }
       );
       req.on('error', e => {
@@ -2207,11 +2228,7 @@ export class DeviceManagerClient {
       const options = {
         host: this.BASE_URL,
         port: '443',
-        path:
-          `/api/v/4/webhook/execute/` +
-          token.systemKey +
-          `/devices?method=sendCommandToDevice&name=` +
-          deviceName,
+        path: `/api/v/4/webhook/execute/${token.systemKey}/cloudiot_devices?method=sendCommandToDevice&name=${deviceName}`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -2225,32 +2242,41 @@ export class DeviceManagerClient {
           ...options,
         },
         res => {
-          let data = '';
-          const chunks: any[] = [];
-          res.on('data', chunk => (data += chunk));
-          res.on('end', () => {
-            let array: [
-              protos.google.cloud.iot.v1.ISendCommandToDeviceResponse,
-              (
-                | protos.google.cloud.iot.v1.ISendCommandToDeviceRequest
-                | undefined
-              ),
-              {} | undefined
-            ];
+          if (typeof res.statusCode === 'undefined') {
+            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+          } else if (isErrorStatusCode(res.statusCode)) {
+            let errorData = '';
+            res.on('data', chunk => (errorData += chunk));
+            res.on('end', () => {
+              reject(IoTCoreError(errorData));
+            });
+          } else {
+            let data = '';
+            res.on('data', chunk => (data += chunk));
+            res.on('end', () => {
+              let array: [
+                protos.google.cloud.iot.v1.ISendCommandToDeviceResponse,
+                (
+                  | protos.google.cloud.iot.v1.ISendCommandToDeviceRequest
+                  | undefined
+                ),
+                {} | undefined
+              ];
 
-            const isendcommandtodevicerequest:
-              | protos.google.cloud.iot.v1.ISendCommandToDeviceRequest
-              | undefined = {};
-            const isendcommandtodeviceresponse: protos.google.cloud.iot.v1.ISendCommandToDeviceResponse =
-              {};
-            // eslint-disable-next-line prefer-const
-            array = [
-              isendcommandtodevicerequest,
-              isendcommandtodeviceresponse,
-              {},
-            ];
-            resolve(array);
-          });
+              const isendcommandtodevicerequest:
+                | protos.google.cloud.iot.v1.ISendCommandToDeviceRequest
+                | undefined = {};
+              const isendcommandtodeviceresponse: protos.google.cloud.iot.v1.ISendCommandToDeviceResponse =
+                {};
+              // eslint-disable-next-line prefer-const
+              array = [
+                isendcommandtodevicerequest,
+                isendcommandtodeviceresponse,
+                {},
+              ];
+              resolve(array);
+            });
+          }
         }
       );
       req.on('error', e => {
