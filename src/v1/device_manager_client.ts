@@ -197,6 +197,7 @@ export class DeviceManagerClient {
       deleteDeviceRegistry: this._deleteDeviceRegistry,
       createDevice: this._createDevice,
       getDevice: this._getDevice,
+      updateDevice: this._updateDevice,
     };
   }
 
@@ -1301,66 +1302,92 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+
+    return this.innerApiCalls.updateDevice(request, options, callback);
+  }
+
+  private _updateDevice = requestFactory<
+    protos.google.cloud.iot.v1.IUpdateDeviceRequest,
+    protos.google.cloud.iot.v1.IDevice,
+    protos.google.cloud.iot.v1.IUpdateDeviceRequest | null | undefined,
+    protos.google.cloud.iot.v1.IDevice
+  >(
+    async request => {
       const registry = this.getRegistryFromDevicePath(request?.device?.name);
       const region = this.getRegionFromDevicePath(request?.device?.name);
-      const deviceName = this.getDeviceNameFromDevicePath(
-        request?.device?.name
-      );
+
       const token_response = await this.getRegistryToken(registry, region);
-      const payload = JSON.stringify(request?.device);
+      return new Promise((resolve, reject) => {
+        const deviceName = this.getDeviceNameFromDevicePath(
+          request?.device?.name
+        );
+        const payload = JSON.stringify(request?.device);
 
-      const options = {
-        host: token_response.host,
-        path:
-          '/api/v/4/webhook/execute/' +
-          token_response.systemKey +
-          '/cloudiot_devices?name=' +
-          deviceName +
-          '&updateMask=' +
-          request?.updateMask,
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token_response.serviceAccountToken,
-          'Content-Length': payload.length,
-        },
-      };
+        const options = {
+          host: token_response.host,
+          path:
+            '/api/v/4/webhook/execute/' +
+            token_response.systemKey +
+            '/cloudiot_devices?name=' +
+            deviceName +
+            '&updateMask=' +
+            request?.updateMask,
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': token_response.serviceAccountToken,
+            'Content-Length': payload.length,
+          },
+        };
 
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          if (typeof res.statusCode === 'undefined') {
-            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-          } else if (isErrorStatusCode(res.statusCode)) {
-            let errorData = '';
-            res.on('data', chunk => (errorData += chunk));
-            res.on('end', () => {
-              reject(IoTCoreError(errorData));
-            });
-          } else {
-            let data = '';
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              const device: protos.google.cloud.iot.v1.IDevice =
-                JSON.parse(data);
-              resolve([device, {}, {}]);
-            });
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk => (data += chunk));
+              res.on('end', () => {
+                const device: protos.google.cloud.iot.v1.IDevice =
+                  JSON.parse(data);
+                resolve(device);
+              });
+            }
           }
+        );
+        req.on('error', e => {
+          reject(e);
+        });
+        if (payload) {
+          req.write(payload);
         }
-      );
-      req.on('error', e => {
-        reject(e);
+        req.end();
       });
-      if (payload) {
-        req.write(payload);
-      }
-      req.end();
-    });
-  }
+    },
+    {
+      getNextRequestObject: () => ({}),
+      getResponseObject: response => response,
+    }
+  );
+
   /**
    * Deletes a device.
    *
