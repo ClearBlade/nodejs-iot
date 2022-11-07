@@ -199,7 +199,14 @@ describe('v1.DeviceManagerClient', () => {
 
     it('has getProjectId method with callback', async () => {
       const fakeProjectId = 'fake-project-id';
-      const client = new devicemanagerModule.v1.DeviceManagerClient();
+      const client = new devicemanagerModule.v1.DeviceManagerClient({
+        credentials: {
+          systemKey: 'bogus',
+          project: 'bogus',
+          token: 'bogus',
+          url: 'https://bogus.com',
+        },
+      });
       client.getProjectId = sinon.stub().callsArgWith(0, null, fakeProjectId);
       const promise = new Promise((resolve, reject) => {
         client.getProjectId((err?: Error | null, projectId?: string | null) => {
@@ -289,7 +296,14 @@ describe('v1.DeviceManagerClient', () => {
 
     describe('createDeviceRegistry', () => {
       it('invokes createDeviceRegistry without error', async () => {
-        const client = new devicemanagerModule.v1.DeviceManagerClient();
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: 'bogus',
+            project: 'bogus',
+            token: 'bogus',
+            url: 'https://bogus.com',
+          },
+        });
         client.initialize();
         const request = generateSampleMessage(
           new protos.google.cloud.iot.v1.CreateDeviceRegistryRequest()
@@ -312,7 +326,14 @@ describe('v1.DeviceManagerClient', () => {
       });
 
       it('invokes createDeviceRegistry without error using callback', async () => {
-        const client = new devicemanagerModule.v1.DeviceManagerClient();
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: 'bogus',
+            project: 'bogus',
+            token: 'bogus',
+            url: 'https://bogus.com',
+          },
+        });
         client.initialize();
         const request = generateSampleMessage(
           new protos.google.cloud.iot.v1.CreateDeviceRegistryRequest()
@@ -349,7 +370,14 @@ describe('v1.DeviceManagerClient', () => {
       });
 
       it('invokes createDeviceRegistry with error', async () => {
-        const client = new devicemanagerModule.v1.DeviceManagerClient();
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: 'bogus',
+            project: 'bogus',
+            token: 'bogus',
+            url: 'https://bogus.com',
+          },
+        });
         client.initialize();
         const request = generateSampleMessage(
           new protos.google.cloud.iot.v1.CreateDeviceRegistryRequest()
