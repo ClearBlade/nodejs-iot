@@ -195,6 +195,7 @@ export class DeviceManagerClient {
       getDeviceRegistry: this._getDeviceRegistry,
       updateDeviceRegistry: this._updateDeviceRegistry,
       deleteDeviceRegistry: this._deleteDeviceRegistry,
+      createDevice: this._createDevice,
     };
   }
 
@@ -1003,91 +1004,83 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+
+    return this.innerApiCalls.createDevice(request, options, callback);
+  }
+
+  private _createDevice = requestFactory<
+    protos.google.cloud.iot.v1.ICreateDeviceRequest,
+    protos.google.cloud.iot.v1.IDevice,
+    protos.google.cloud.iot.v1.ICreateDeviceRequest | undefined,
+    protos.google.cloud.iot.v1.IDevice
+  >(
+    async request => {
       const registry = this.getRegistryFromRegistryPath(request?.parent);
       const region = this.getRegionFromRegistryPath(request?.parent);
       const token_response = await this.getRegistryToken(registry, region);
-      const payload = JSON.stringify(request?.device);
-      const options = {
-        host: token_response.host,
-        path:
-          '/api/v/4/webhook/execute/' +
-          token_response.systemKey +
-          '/cloudiot_devices',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token_response.serviceAccountToken,
-          'Content-Length': payload.length,
-        },
-      };
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          if (typeof res.statusCode === 'undefined') {
-            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-          } else if (isErrorStatusCode(res.statusCode)) {
-            let errorData = '';
-            res.on('data', chunk => (errorData += chunk));
-            res.on('end', () => {
-              reject(IoTCoreError(errorData));
-            });
-          } else {
-            let data = '';
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              if (!this.isJsonString(data)) {
-                reject(data);
-                return;
-              }
-              let array: [
-                protos.google.cloud.iot.v1.IDevice,
-                protos.google.cloud.iot.v1.ICreateDeviceRequest | undefined,
-                {} | undefined
-              ];
-              const deviceResponse = JSON.parse(data);
-              const icreatedevicerequest:
-                | protos.google.cloud.iot.v1.ICreateDeviceRequest
-                | undefined = {};
-              const device: protos.google.cloud.iot.v1.IDevice = {};
-              device.id = deviceResponse.id;
-              device.name = deviceResponse.name;
-              device.numId = deviceResponse.numId;
-              device.credentials = deviceResponse.credentials;
-              device.lastHeartbeatTime = deviceResponse.lastHeartbeatTime;
-              device.lastEventTime = deviceResponse.lastEventTime;
-              device.lastStateTime = deviceResponse.lastStateTime;
-              device.lastConfigAckTime = deviceResponse.lastConfigAckTime;
-              device.lastConfigSendTime = deviceResponse.lastConfigSendTime;
-              device.blocked = deviceResponse.blocked;
-              device.lastErrorTime = deviceResponse.lastErrorTime;
-              device.lastErrorStatus = deviceResponse.lastErrorStatus;
-              device.config = deviceResponse.config;
-              device.state = deviceResponse.state;
-              device.logLevel = deviceResponse.logLevel;
-              device.metadata = deviceResponse.metadata;
-              device.gatewayConfig = deviceResponse.gatewayConfig;
-
-              // eslint-disable-next-line prefer-const
-              array = [device, icreatedevicerequest, {}];
-              resolve(array);
-            });
+      return new Promise((resolve, reject) => {
+        const payload = JSON.stringify(request?.device);
+        const options = {
+          host: token_response.host,
+          path:
+            '/api/v/4/webhook/execute/' +
+            token_response.systemKey +
+            '/cloudiot_devices',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': token_response.serviceAccountToken,
+            'Content-Length': payload.length,
+          },
+        };
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk => (data += chunk));
+              res.on('end', () => {
+                const deviceResponse = JSON.parse(data);
+                resolve(deviceResponse);
+              });
+            }
           }
+        );
+        req.on('error', e => {
+          console.log('error: ', e);
+          reject(e);
+        });
+        if (payload) {
+          req.write(payload);
         }
-      );
-      req.on('error', e => {
-        console.log('error: ', e);
-        reject(e);
+        req.end();
       });
-      if (payload) {
-        req.write(payload);
-      }
-      req.end();
-    });
-  }
+    },
+    {
+      getResponseObject: response => response,
+      getNextRequestObject: () => ({}),
+    }
+  );
+
   /**
    * Gets details about a device.
    *
