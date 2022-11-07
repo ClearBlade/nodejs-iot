@@ -194,6 +194,7 @@ export class DeviceManagerClient {
       createDeviceRegistry: this._createDeviceRegistry,
       getDeviceRegistry: this._getDeviceRegistry,
       updateDeviceRegistry: this._updateDeviceRegistry,
+      deleteDeviceRegistry: this._deleteDeviceRegistry,
     };
   }
 
@@ -858,72 +859,79 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
-      const payload = JSON.stringify({
-        name: request?.name,
-      });
-      const options = {
-        host: this.BASE_URL,
-        path:
-          '/api/v/4/webhook/execute/' +
-          this.ADMIN_SYSTEM_KEY +
-          '/cloudiot?name=' +
-          request?.name,
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
-        },
-      };
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
 
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          if (typeof res.statusCode === 'undefined') {
-            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-          } else if (isErrorStatusCode(res.statusCode)) {
-            let errorData = '';
-            res.on('data', chunk => (errorData += chunk));
-            res.on('end', () => {
-              reject(IoTCoreError(errorData));
-            });
-          } else {
-            let data = '';
-            const chunks: any[] = [];
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              let array: [
-                protos.google.protobuf.IEmpty,
-                (
-                  | protos.google.cloud.iot.v1.IDeleteDeviceRegistryRequest
-                  | undefined
-                ),
-                {} | undefined
-              ];
-
-              const IDeleteDeviceRegistryRequest:
-                | protos.google.cloud.iot.v1.IDeleteDeviceRegistryRequest
-                | undefined = {};
-              const iempty: protos.google.protobuf.IEmpty = {};
-              // eslint-disable-next-line prefer-const
-              array = [IDeleteDeviceRegistryRequest, iempty, {}];
-              resolve(array);
-            });
-          }
-        }
-      );
-      req.on('error', e => {
-        reject(e);
-      });
-      if (payload) {
-        req.write(payload);
-      }
-      req.end();
-    });
+    return this.innerApiCalls.deleteDeviceRegistry(request, options, callback);
   }
+
+  private _deleteDeviceRegistry = requestFactory<
+    protos.google.cloud.iot.v1.IDeleteDeviceRegistryRequest,
+    protos.google.protobuf.IEmpty,
+    protos.google.cloud.iot.v1.IDeleteDeviceRegistryRequest | undefined,
+    protos.google.protobuf.IEmpty
+  >(
+    request => {
+      return new Promise((resolve, reject) => {
+        const payload = JSON.stringify({
+          name: request?.name,
+        });
+        const options = {
+          host: this.BASE_URL,
+          path:
+            '/api/v/4/webhook/execute/' +
+            this.ADMIN_SYSTEM_KEY +
+            '/cloudiot?name=' +
+            request?.name,
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
+          },
+        };
+
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              res.on('end', () => {
+                resolve({});
+              });
+            }
+          }
+        );
+        req.on('error', e => {
+          reject(e);
+        });
+        if (payload) {
+          req.write(payload);
+        }
+        req.end();
+      });
+    },
+    {
+      getNextRequestObject: () => ({}),
+      getResponseObject: response => response,
+    }
+  );
+
   /**
    * Creates a device in a device registry.
    *
