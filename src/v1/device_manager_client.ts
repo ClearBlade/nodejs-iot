@@ -198,6 +198,7 @@ export class DeviceManagerClient {
       createDevice: this._createDevice,
       getDevice: this._getDevice,
       updateDevice: this._updateDevice,
+      deleteDevice: this._deleteDevice,
     };
   }
 
@@ -1455,68 +1456,78 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+
+    return this.innerApiCalls.deleteDevice(request, options, callback);
+  }
+
+  private _deleteDevice = requestFactory<
+    protos.google.cloud.iot.v1.IDeleteDeviceRequest,
+    protos.google.protobuf.IEmpty,
+    protos.google.cloud.iot.v1.IDeleteDeviceRequest | null | undefined,
+    protos.google.protobuf.IEmpty
+  >(
+    async request => {
       const registry = this.getRegistryFromDevicePath(request?.name);
       const region = this.getRegionFromDevicePath(request?.name);
-      const deviceName = this.getDeviceNameFromDevicePath(request?.name);
       const token_response = await this.getRegistryToken(registry, region);
+      return new Promise((resolve, reject) => {
+        const options = {
+          host: token_response.host,
+          path:
+            '/api/v/4/webhook/execute/' +
+            token_response.systemKey +
+            '/cloudiot_devices?name=' +
+            request?.name,
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': token_response.serviceAccountToken,
+          },
+        };
 
-      const options = {
-        host: token_response.host,
-        path:
-          '/api/v/4/webhook/execute/' +
-          token_response.systemKey +
-          '/cloudiot_devices?name=' +
-          request?.name,
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token_response.serviceAccountToken,
-        },
-      };
-
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          if (typeof res.statusCode === 'undefined') {
-            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-          } else if (isErrorStatusCode(res.statusCode)) {
-            let errorData = '';
-            res.on('data', chunk => (errorData += chunk));
-            res.on('end', () => {
-              reject(IoTCoreError(errorData));
-            });
-          } else {
-            let data = '';
-            const chunks: any[] = [];
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              let array: [
-                protos.google.protobuf.IEmpty,
-                protos.google.cloud.iot.v1.IDeleteDeviceRequest | undefined,
-                {} | undefined
-              ];
-
-              const ideletedevicerequest:
-                | protos.google.cloud.iot.v1.IDeleteDeviceRequest
-                | undefined = {};
-              const iempty: protos.google.protobuf.IEmpty = {};
-              // eslint-disable-next-line prefer-const
-              array = [ideletedevicerequest, iempty, {}];
-              resolve(array);
-            });
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk => (data += chunk));
+              res.on('end', () => {
+                resolve({});
+              });
+            }
           }
-        }
-      );
-      req.on('error', e => {
-        reject(e);
+        );
+        req.on('error', e => {
+          reject(e);
+        });
+        req.end();
       });
-      req.end();
-    });
-  }
+    },
+    {
+      getNextRequestObject: () => ({}),
+      getResponseObject: response => response,
+    }
+  );
+
   /**
    * Modifies the configuration for the device, which is eventually sent from
    * the Cloud IoT Core servers. Returns the modified configuration version and

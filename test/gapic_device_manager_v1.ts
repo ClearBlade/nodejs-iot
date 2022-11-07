@@ -1143,131 +1143,122 @@ describe('v1.DeviceManagerClient', () => {
       // });
     });
 
-    // describe('deleteDevice', () => {
-    //   it('invokes deleteDevice without error', async () => {
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.initialize();
-    //     const request = generateSampleMessage(
-    //       new protos.google.cloud.iot.v1.DeleteDeviceRequest()
-    //     );
-    //     request.name = '';
-    //     const expectedHeaderRequestParams = 'name=';
-    //     const expectedOptions = {
-    //       otherArgs: {
-    //         headers: {
-    //           'x-goog-request-params': expectedHeaderRequestParams,
-    //         },
-    //       },
-    //     };
-    //     const expectedResponse = generateSampleMessage(
-    //       new protos.google.protobuf.Empty()
-    //     );
-    //     client.innerApiCalls.deleteDevice = stubSimpleCall(expectedResponse);
-    //     const [response] = await client.deleteDevice(request);
-    //     assert.deepStrictEqual(response, expectedResponse);
-    //     assert(
-    //       (client.innerApiCalls.deleteDevice as SinonStub)
-    //         .getCall(0)
-    //         .calledWith(request, expectedOptions, undefined)
-    //     );
-    //   });
+    describe('deleteDevice', () => {
+      it('invokes deleteDevice without error', async () => {
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: 'bogus',
+            project: 'bogus',
+            token: 'bogus',
+            url: 'https://bogus.com',
+          },
+        });
+        client.initialize();
+        const request = generateSampleMessage(
+          new protos.google.cloud.iot.v1.DeleteDeviceRequest()
+        );
+        request.name = '';
+        const expectedOptions = {};
+        const expectedResponse = generateSampleMessage(
+          new protos.google.protobuf.Empty()
+        );
+        client.innerApiCalls.deleteDevice = stubSimpleCall(expectedResponse);
+        const [response] = await client.deleteDevice(request);
+        assert.deepStrictEqual(response, expectedResponse);
+        assert(
+          (client.innerApiCalls.deleteDevice as SinonStub)
+            .getCall(0)
+            .calledWith(request, expectedOptions, undefined)
+        );
+      });
 
-    //   it('invokes deleteDevice without error using callback', async () => {
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.initialize();
-    //     const request = generateSampleMessage(
-    //       new protos.google.cloud.iot.v1.DeleteDeviceRequest()
-    //     );
-    //     request.name = '';
-    //     const expectedHeaderRequestParams = 'name=';
-    //     const expectedOptions = {
-    //       otherArgs: {
-    //         headers: {
-    //           'x-goog-request-params': expectedHeaderRequestParams,
-    //         },
-    //       },
-    //     };
-    //     const expectedResponse = generateSampleMessage(
-    //       new protos.google.protobuf.Empty()
-    //     );
-    //     client.innerApiCalls.deleteDevice =
-    //       stubSimpleCallWithCallback(expectedResponse);
-    //     const promise = new Promise((resolve, reject) => {
-    //       client.deleteDevice(
-    //         request,
-    //         (
-    //           err?: Error | null,
-    //           result?: protos.google.protobuf.IEmpty | null
-    //         ) => {
-    //           if (err) {
-    //             reject(err);
-    //           } else {
-    //             resolve(result);
-    //           }
-    //         }
-    //       );
-    //     });
-    //     const response = await promise;
-    //     assert.deepStrictEqual(response, expectedResponse);
-    //     assert(
-    //       (client.innerApiCalls.deleteDevice as SinonStub)
-    //         .getCall(0)
-    //         .calledWith(request, expectedOptions /*, callback defined above */)
-    //     );
-    //   });
+      it('invokes deleteDevice without error using callback', async () => {
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: 'bogus',
+            project: 'bogus',
+            token: 'bogus',
+            url: 'https://bogus.com',
+          },
+        });
+        client.initialize();
+        const request = generateSampleMessage(
+          new protos.google.cloud.iot.v1.DeleteDeviceRequest()
+        );
+        request.name = '';
+        const expectedOptions = {};
+        const expectedResponse = generateSampleMessage(
+          new protos.google.protobuf.Empty()
+        );
+        client.innerApiCalls.deleteDevice =
+          stubSimpleCallWithCallback(expectedResponse);
+        const promise = new Promise((resolve, reject) => {
+          client.deleteDevice(
+            request,
+            (
+              err?: Error | null,
+              result?: protos.google.protobuf.IEmpty | null
+            ) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(result);
+              }
+            }
+          );
+        });
+        const response = await promise;
+        assert.deepStrictEqual(response, expectedResponse);
+        assert(
+          (client.innerApiCalls.deleteDevice as SinonStub)
+            .getCall(0)
+            .calledWith(request, expectedOptions /*, callback defined above */)
+        );
+      });
 
-    //   it('invokes deleteDevice with error', async () => {
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.initialize();
-    //     const request = generateSampleMessage(
-    //       new protos.google.cloud.iot.v1.DeleteDeviceRequest()
-    //     );
-    //     request.name = '';
-    //     const expectedHeaderRequestParams = 'name=';
-    //     const expectedOptions = {
-    //       otherArgs: {
-    //         headers: {
-    //           'x-goog-request-params': expectedHeaderRequestParams,
-    //         },
-    //       },
-    //     };
-    //     const expectedError = new Error('expected');
-    //     client.innerApiCalls.deleteDevice = stubSimpleCall(
-    //       undefined,
-    //       expectedError
-    //     );
-    //     await assert.rejects(client.deleteDevice(request), expectedError);
-    //     assert(
-    //       (client.innerApiCalls.deleteDevice as SinonStub)
-    //         .getCall(0)
-    //         .calledWith(request, expectedOptions, undefined)
-    //     );
-    //   });
+      it('invokes deleteDevice with error', async () => {
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: 'bogus',
+            project: 'bogus',
+            token: 'bogus',
+            url: 'https://bogus.com',
+          },
+        });
+        client.initialize();
+        const request = generateSampleMessage(
+          new protos.google.cloud.iot.v1.DeleteDeviceRequest()
+        );
+        request.name = '';
+        const expectedOptions = {};
+        const expectedError = new Error('expected');
+        client.innerApiCalls.deleteDevice = stubSimpleCall(
+          undefined,
+          expectedError
+        );
+        await assert.rejects(client.deleteDevice(request), expectedError);
+        assert(
+          (client.innerApiCalls.deleteDevice as SinonStub)
+            .getCall(0)
+            .calledWith(request, expectedOptions, undefined)
+        );
+      });
 
-    //   it('invokes deleteDevice with closed client', async () => {
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.initialize();
-    //     const request = generateSampleMessage(
-    //       new protos.google.cloud.iot.v1.DeleteDeviceRequest()
-    //     );
-    //     request.name = '';
-    //     const expectedError = new Error('The client has already been closed.');
-    //     client.close();
-    //     await assert.rejects(client.deleteDevice(request), expectedError);
-    //   });
-    // });
+      // it('invokes deleteDevice with closed client', async () => {
+      //   const client = new devicemanagerModule.v1.DeviceManagerClient({
+      //     credentials: {client_email: 'bogus', private_key: 'bogus'},
+      //     projectId: 'bogus',
+      //   });
+      //   client.initialize();
+      //   const request = generateSampleMessage(
+      //     new protos.google.cloud.iot.v1.DeleteDeviceRequest()
+      //   );
+      //   request.name = '';
+      //   const expectedError = new Error('The client has already been closed.');
+      //   client.close();
+      //   await assert.rejects(client.deleteDevice(request), expectedError);
+      // });
+    });
 
     // describe('modifyCloudToDeviceConfig', () => {
     //   it('invokes modifyCloudToDeviceConfig without error', async () => {
