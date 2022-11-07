@@ -59,6 +59,13 @@ function requestFactory<
   };
 }
 
+export interface ServiceAccountCredentials {
+  systemKey: string;
+  token: string;
+  url: string;
+  project: string;
+}
+
 interface GetRegistryCredentialsResponse {
   systemKey: string;
   serviceAccountToken: string;
@@ -95,6 +102,66 @@ function isErrorStatusCode(statusCode: number): boolean {
   return false;
 }
 
+function loadServiceAccountCredentials(
+  opts?: DeviceManagerClientOptions
+): ServiceAccountCredentials {
+  const configFilePath = process.env.CLEARBLADE_CONFIGURATION;
+  if (typeof configFilePath === 'undefined' && typeof opts === 'undefined') {
+    throw new Error(
+      'Must supply service account credentials via constructor or CLEARBLADE_CONFIGURATION environment variable'
+    );
+  }
+
+  if (typeof opts !== 'undefined' && typeof opts.credentials !== 'undefined') {
+    if (!isServiceAccountCredentials(opts.credentials)) {
+      throw new Error('Invalid credentials supplied to constructor options');
+    } else {
+      return opts.credentials;
+    }
+  }
+
+  if (!configFilePath) {
+    throw new Error(
+      'No credentials provided via constructor options or CLEARBLADE_CONFIGURATION environment variable'
+    );
+  }
+  let json: unknown;
+  try {
+    json = require(configFilePath);
+  } catch (e) {
+    console.error(
+      `Failed to load configuration file from ${configFilePath}`,
+      e
+    );
+    throw new Error(`Failed to load configuration file from ${configFilePath}`);
+  }
+  if (!isServiceAccountCredentials(json)) {
+    throw new Error(
+      `File loaded from ${configFilePath} is invalid. Please make sure it is a json file with the properties systemKey, token, url, and project`
+    );
+  } else {
+    return json;
+  }
+}
+
+function isServiceAccountCredentials(
+  maybeCredentials: unknown
+): maybeCredentials is ServiceAccountCredentials {
+  return (
+    typeof maybeCredentials === 'object' &&
+    maybeCredentials !== null &&
+    typeof (maybeCredentials as ServiceAccountCredentials).systemKey ===
+      'string' &&
+    typeof (maybeCredentials as ServiceAccountCredentials).token === 'string' &&
+    typeof (maybeCredentials as ServiceAccountCredentials).url === 'string' &&
+    typeof (maybeCredentials as ServiceAccountCredentials).project === 'string'
+  );
+}
+
+interface DeviceManagerClientOptions {
+  credentials?: ServiceAccountCredentials;
+}
+
 /**
  *  Internet of Things (IoT) service. Securely connect and manage IoT devices.
  * @class
@@ -116,16 +183,12 @@ export class DeviceManagerClient {
   //pathTemplates: {[name: string]: gax.PathTemplate};
   // deviceManagerStub?: Promise<{[name: string]: Function}>;
 
-  constructor() {
-    const clerabladeConfigFile = process.env.CLEARBLADE_CONFIGURATION;
-    if (!clerabladeConfigFile) {
-      throw '[ERROR] : The "CLEARBLADE_CONFIGURATION" environment variable is required.!';
-    }
-    const json = require('' + clerabladeConfigFile);
-    this.ADMIN_SYSTEM_KEY = json.systemKey;
-    this.ADMIN_USER_TOKEN = json.token;
-    this.PROJECT_ID = json.project;
-    this.BASE_URL = json.url.replace(/^https?:\/\//, '');
+  constructor(opts?: DeviceManagerClientOptions) {
+    const serviceAccountCredentials = loadServiceAccountCredentials(opts);
+    this.ADMIN_SYSTEM_KEY = serviceAccountCredentials.systemKey;
+    this.ADMIN_USER_TOKEN = serviceAccountCredentials.token;
+    this.PROJECT_ID = serviceAccountCredentials.project;
+    this.BASE_URL = serviceAccountCredentials.url.replace(/^https?:\/\//, '');
 
     this.innerApiCalls = {
       createDeviceRegistry: this._createDeviceRegistry,

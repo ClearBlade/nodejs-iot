@@ -26,6 +26,8 @@ import * as devicemanagerModule from '../src';
 import {PassThrough} from 'stream';
 
 import {protobuf} from 'google-gax';
+import {ServiceAccountCredentials} from '../src/v1/device_manager_client';
+import path = require('path');
 
 function generateSampleMessage<T extends object>(instance: T) {
   const filledObject = (
@@ -113,6 +115,15 @@ function stubAsyncIterationCall<ResponseType>(
 }
 
 describe('v1.DeviceManagerClient', () => {
+  const env = process.env;
+
+  beforeEach(() => {
+    process.env = {...env};
+  });
+
+  afterEach(() => {
+    process.env = env;
+  });
   describe('Common methods', () => {
     it('has servicePath', () => {
       const servicePath =
@@ -130,11 +141,6 @@ describe('v1.DeviceManagerClient', () => {
       const port = devicemanagerModule.v1.DeviceManagerClient.port;
       assert(port);
       assert(typeof port === 'number');
-    });
-
-    it('should create a client with no option', () => {
-      const client = new devicemanagerModule.v1.DeviceManagerClient();
-      assert(client);
     });
 
     // it('should create a client with gRPC fallback', () => {
@@ -179,11 +185,16 @@ describe('v1.DeviceManagerClient', () => {
 
     it('has getProjectId method', async () => {
       const fakeProjectId = 'fake-project-id';
-      const client = new devicemanagerModule.v1.DeviceManagerClient();
-      client.getProjectId = sinon.stub().resolves(fakeProjectId);
+      const client = new devicemanagerModule.v1.DeviceManagerClient({
+        credentials: {
+          systemKey: 'bogus',
+          token: 'bogus',
+          url: 'https://bogus.com',
+          project: fakeProjectId,
+        },
+      });
       const result = await client.getProjectId();
       assert.strictEqual(result, fakeProjectId);
-      assert((client.getProjectId as SinonStub).calledWithExactly());
     });
 
     it('has getProjectId method with callback', async () => {
@@ -201,6 +212,79 @@ describe('v1.DeviceManagerClient', () => {
       });
       const result = await promise;
       assert.strictEqual(result, fakeProjectId);
+    });
+
+    describe('constructor', () => {
+      it('should throw an error with no credentials option and no env variable', () => {
+        assert.throws(
+          () => new devicemanagerModule.v1.DeviceManagerClient(),
+          err =>
+            (err as Error).message ===
+            'Must supply service account credentials via constructor or CLEARBLADE_CONFIGURATION environment variable'
+        );
+      });
+
+      it('accepts credentials from constructor options', () => {
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: '',
+            token: '',
+            url: '',
+            project: '',
+          },
+        });
+        assert(client);
+      });
+
+      it('throws error on invalid credentials option', () => {
+        assert.throws(
+          () =>
+            new devicemanagerModule.v1.DeviceManagerClient({
+              credentials: {
+                bad: 'credentials',
+              } as unknown as ServiceAccountCredentials,
+            }),
+          err =>
+            (err as Error).message ===
+            'Invalid credentials supplied to constructor options'
+        );
+      });
+
+      it('accepts environment variable for service account credentials', () => {
+        process.env.CLEARBLADE_CONFIGURATION = path.resolve(
+          __dirname,
+          '../../test/service_account_credentials_valid.json'
+        );
+        const client = new devicemanagerModule.v1.DeviceManagerClient();
+        assert(client);
+      });
+
+      it('throws error when service account credentials from environment variable cannot be loaded', () => {
+        process.env.CLEARBLADE_CONFIGURATION = path.resolve(
+          __dirname,
+          '../../test/notthere.json'
+        );
+        assert.throws(
+          () => new devicemanagerModule.v1.DeviceManagerClient(),
+          err =>
+            (err as Error).message.includes('Failed to load configuration file')
+        );
+      });
+
+      it('throws error when service account credentials from environment variable are invalid', () => {
+        process.env.CLEARBLADE_CONFIGURATION = path.resolve(
+          __dirname,
+          '../../test/service_account_credentials_invalid.json'
+        );
+
+        assert.throws(
+          () => new devicemanagerModule.v1.DeviceManagerClient(),
+          err =>
+            (err as Error).message.includes(
+              'Please make sure it is a json file with the properties systemKey, token, url, and project'
+            )
+        );
+      });
     });
 
     describe('createDeviceRegistry', () => {
