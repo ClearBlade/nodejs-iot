@@ -196,6 +196,7 @@ export class DeviceManagerClient {
       updateDeviceRegistry: this._updateDeviceRegistry,
       deleteDeviceRegistry: this._deleteDeviceRegistry,
       createDevice: this._createDevice,
+      getDevice: this._getDevice,
     };
   }
 
@@ -1152,57 +1153,81 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+
+    return this.innerApiCalls.getDevice(request, options, callback);
+  }
+
+  private _getDevice = requestFactory<
+    protos.google.cloud.iot.v1.IGetDeviceRequest,
+    protos.google.cloud.iot.v1.IDevice,
+    protos.google.cloud.iot.v1.IGetDeviceRequest | null | undefined,
+    protos.google.cloud.iot.v1.IDevice
+  >(
+    async request => {
       const registry = this.getRegistryFromDevicePath(request?.name);
       const region = this.getRegionFromDevicePath(request?.name);
       const token_response = await this.getRegistryToken(registry, region);
+      return new Promise((resolve, reject) => {
+        const options = {
+          host: token_response.host,
+          path:
+            '/api/v/4/webhook/execute/' +
+            token_response.systemKey +
+            '/cloudiot_devices?name=' +
+            request?.name,
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': token_response.serviceAccountToken,
+          },
+        };
 
-      const options = {
-        host: token_response.host,
-        path:
-          '/api/v/4/webhook/execute/' +
-          token_response.systemKey +
-          '/cloudiot_devices?name=' +
-          request?.name,
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token_response.serviceAccountToken,
-        },
-      };
-
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          if (typeof res.statusCode === 'undefined') {
-            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-          } else if (isErrorStatusCode(res.statusCode)) {
-            let errorData = '';
-            res.on('data', chunk => (errorData += chunk));
-            res.on('end', () => {
-              reject(IoTCoreError(errorData));
-            });
-          } else {
-            let data = '';
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              const device: protos.google.cloud.iot.v1.IDevice =
-                JSON.parse(data);
-              resolve([device, {}, {}]);
-            });
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk => (data += chunk));
+              res.on('end', () => {
+                const device: protos.google.cloud.iot.v1.IDevice =
+                  JSON.parse(data);
+                resolve(device);
+              });
+            }
           }
-        }
-      );
-      req.on('error', e => {
-        reject(e);
-      });
+        );
+        req.on('error', e => {
+          reject(e);
+        });
 
-      req.end();
-    });
-  }
+        req.end();
+      });
+    },
+    {
+      getNextRequestObject: () => ({}),
+      getResponseObject: response => response,
+    }
+  );
+
   /**
    * Updates a device.
    *
