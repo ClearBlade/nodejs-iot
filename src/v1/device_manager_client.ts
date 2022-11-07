@@ -192,6 +192,7 @@ export class DeviceManagerClient {
 
     this.innerApiCalls = {
       createDeviceRegistry: this._createDeviceRegistry,
+      getDeviceRegistry: this._getDeviceRegistry,
     };
   }
 
@@ -545,25 +546,77 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // request = request || {};
-    // let options: CallOptions;
-    // if (typeof optionsOrCallback === 'function' && callback === undefined) {
-    //   callback = optionsOrCallback;
-    //   options = {};
-    // } else {
-    //   options = optionsOrCallback as CallOptions;
-    // }
-    // options = options || {};
-    // options.otherArgs = options.otherArgs || {};
-    // options.otherArgs.headers = options.otherArgs.headers || {};
-    // options.otherArgs.headers['x-goog-request-params'] =
-    //   this._gaxModule.routingHeader.fromParams({
-    //     name: request.name || '',
-    //   });
-    // this.initialize();
-    // return this.innerApiCalls.getDeviceRegistry(request, options, callback);
-    return undefined;
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+
+    return this.innerApiCalls.getDeviceRegistry(request, options, callback);
   }
+
+  private _getDeviceRegistry = requestFactory<
+    protos.google.cloud.iot.v1.IGetDeviceRegistryRequest,
+    protos.google.cloud.iot.v1.IDeviceRegistry,
+    protos.google.cloud.iot.v1.IGetDeviceRegistryRequest | undefined,
+    protos.google.cloud.iot.v1.IDeviceRegistry
+  >(
+    request => {
+      const registry = this.getRegistryFromRegistryPath(request.name);
+      const region = this.getRegionFromRegistryPath(request.name);
+      return this.getRegistryToken(registry, region).then(token_response => {
+        return new Promise((resolve, reject) => {
+          const options = {
+            host: token_response.host,
+            path: `/api/v/4/webhook/execute/${token_response.systemKey}/cloudiot?name=${request.name}`,
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'ClearBlade-UserToken': token_response.serviceAccountToken,
+            },
+          };
+
+          const req = https.request(
+            {
+              ...options,
+            },
+            res => {
+              if (typeof res.statusCode === 'undefined') {
+                reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              } else if (isErrorStatusCode(res.statusCode)) {
+                let errorData = '';
+                res.on('data', chunk => (errorData += chunk));
+                res.on('end', () => {
+                  reject(IoTCoreError(errorData));
+                });
+              } else {
+                let data = '';
+                res.on('data', chunk => (data += chunk));
+                res.on('end', () => {
+                  const deviceRegistry: protos.google.cloud.iot.v1.IDeviceRegistry =
+                    JSON.parse(data);
+                  resolve(deviceRegistry);
+                });
+              }
+            }
+          );
+          req.on('error', e => {
+            reject(e);
+          });
+          req.end();
+        });
+      });
+    },
+    {
+      getResponseObject: response => response,
+      getNextRequestObject: () => undefined,
+    }
+  );
+
   /**
    * Updates a device registry configuration.
    *
