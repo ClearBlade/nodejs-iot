@@ -193,6 +193,7 @@ export class DeviceManagerClient {
     this.innerApiCalls = {
       createDeviceRegistry: this._createDeviceRegistry,
       getDeviceRegistry: this._getDeviceRegistry,
+      updateDeviceRegistry: this._updateDeviceRegistry,
     };
   }
 
@@ -565,50 +566,49 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IGetDeviceRegistryRequest | undefined,
     protos.google.cloud.iot.v1.IDeviceRegistry
   >(
-    request => {
+    async request => {
       const registry = this.getRegistryFromRegistryPath(request.name);
       const region = this.getRegionFromRegistryPath(request.name);
-      return this.getRegistryToken(registry, region).then(token_response => {
-        return new Promise((resolve, reject) => {
-          const options = {
-            host: token_response.host,
-            path: `/api/v/4/webhook/execute/${token_response.systemKey}/cloudiot?name=${request.name}`,
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'ClearBlade-UserToken': token_response.serviceAccountToken,
-            },
-          };
+      const token_response = await this.getRegistryToken(registry, region);
+      return await new Promise((resolve, reject) => {
+        const options = {
+          host: token_response.host,
+          path: `/api/v/4/webhook/execute/${token_response.systemKey}/cloudiot?name=${request.name}`,
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': token_response.serviceAccountToken,
+          },
+        };
 
-          const req = https.request(
-            {
-              ...options,
-            },
-            res => {
-              if (typeof res.statusCode === 'undefined') {
-                reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-              } else if (isErrorStatusCode(res.statusCode)) {
-                let errorData = '';
-                res.on('data', chunk => (errorData += chunk));
-                res.on('end', () => {
-                  reject(IoTCoreError(errorData));
-                });
-              } else {
-                let data = '';
-                res.on('data', chunk => (data += chunk));
-                res.on('end', () => {
-                  const deviceRegistry: protos.google.cloud.iot.v1.IDeviceRegistry =
-                    JSON.parse(data);
-                  resolve(deviceRegistry);
-                });
-              }
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk_1 => (data += chunk_1));
+              res.on('end', () => {
+                const deviceRegistry: protos.google.cloud.iot.v1.IDeviceRegistry =
+                  JSON.parse(data);
+                resolve(deviceRegistry);
+              });
             }
-          );
-          req.on('error', e => {
-            reject(e);
-          });
-          req.end();
+          }
+        );
+        req.on('error', e => {
+          reject(e);
         });
+        req.end();
       });
     },
     {
@@ -698,8 +698,26 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+
+    return this.innerApiCalls.updateDeviceRegistry(request, options, callback);
+  }
+
+  private _updateDeviceRegistry = requestFactory<
+    protos.google.cloud.iot.v1.IUpdateDeviceRegistryRequest,
+    protos.google.cloud.iot.v1.IDeviceRegistry,
+    protos.google.cloud.iot.v1.IUpdateDeviceRegistryRequest | undefined,
+    protos.google.cloud.iot.v1.IDeviceRegistry
+  >(
+    async request => {
       const registry = this.getRegistryFromRegistryPath(
         request?.deviceRegistry?.name
       );
@@ -707,58 +725,65 @@ export class DeviceManagerClient {
         request?.deviceRegistry?.name
       );
       const token_response = await this.getRegistryToken(registry, region);
-      const payload = JSON.stringify(request?.deviceRegistry);
+      return await new Promise((resolve, reject) => {
+        const payload = JSON.stringify(request?.deviceRegistry);
 
-      const options = {
-        host: token_response.host,
-        path:
-          '/api/v/4/webhook/execute/' +
-          token_response.systemKey +
-          '/cloudiot?name=' +
-          request?.deviceRegistry?.name +
-          '&updateMask=' +
-          request?.updateMask,
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token_response.serviceAccountToken,
-          'Content-Length': payload.length,
-        },
-      };
+        const options = {
+          host: token_response.host,
+          path:
+            '/api/v/4/webhook/execute/' +
+            token_response.systemKey +
+            '/cloudiot?name=' +
+            request?.deviceRegistry?.name +
+            '&updateMask=' +
+            request?.updateMask,
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': token_response.serviceAccountToken,
+            'Content-Length': payload.length,
+          },
+        };
 
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          if (typeof res.statusCode === 'undefined') {
-            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-          } else if (isErrorStatusCode(res.statusCode)) {
-            let errorData = '';
-            res.on('data', chunk => (errorData += chunk));
-            res.on('end', () => {
-              reject(IoTCoreError(errorData));
-            });
-          } else {
-            let data = '';
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              const deviceRegistry: protos.google.cloud.iot.v1.IDeviceRegistry =
-                JSON.parse(data);
-              resolve([deviceRegistry, {}, {}]);
-            });
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk_1 => (data += chunk_1));
+              res.on('end', () => {
+                const deviceRegistry: protos.google.cloud.iot.v1.IDeviceRegistry =
+                  JSON.parse(data);
+                resolve(deviceRegistry);
+              });
+            }
           }
+        );
+        req.on('error', e => {
+          reject(e);
+        });
+        if (payload) {
+          req.write(payload);
         }
-      );
-      req.on('error', e => {
-        reject(e);
+        req.end();
       });
-      if (payload) {
-        req.write(payload);
-      }
-      req.end();
-    });
-  }
+    },
+    {
+      getNextRequestObject: () => undefined,
+      getResponseObject: response => response,
+    }
+  );
+
   /**
    * Deletes a device registry configuration.
    *
