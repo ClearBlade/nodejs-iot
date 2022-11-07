@@ -26,7 +26,7 @@ async function main() {
     /**
      * Get list device registry
      */
-    const projectId = {tempProjectId};
+    const projectId = await client.getProjectId();
     const parent = client.locationPath(projectId, cloudRegion);
     const [resources] = await client.listDeviceRegistries({parent});
     //console.log('parent', parent);
