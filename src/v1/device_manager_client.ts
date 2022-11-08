@@ -202,6 +202,7 @@ export class DeviceManagerClient {
       modifyCloudToDeviceConfig: this._modifyCloudToDeviceConfig,
       listDeviceConfigVersions: this._listDeviceConfigVersions,
       listDeviceStates: this._listDeviceStates,
+      sendCommandToDevice: this._sendCommandToDevice,
     };
   }
 
@@ -2394,81 +2395,86 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+
+    return this.innerApiCalls.sendCommandToDevice(request, options, callback);
+  }
+
+  private _sendCommandToDevice = requestFactory<
+    protos.google.cloud.iot.v1.ISendCommandToDeviceRequest,
+    protos.google.cloud.iot.v1.ISendCommandToDeviceResponse,
+    protos.google.cloud.iot.v1.ISendCommandToDeviceRequest | null | undefined,
+    protos.google.cloud.iot.v1.ISendCommandToDeviceResponse
+  >(
+    async request => {
       const registry = this.getRegistryFromDevicePath(request?.name);
       const region = this.getRegionFromDevicePath(request?.name);
-      const deviceName = this.getDeviceNameFromDevicePath(request?.name);
 
       const token_response = await this.getRegistryToken(registry, region);
+      return new Promise((resolve, reject) => {
+        const deviceName = this.getDeviceNameFromDevicePath(request?.name);
 
-      const payload = JSON.stringify({
-        binaryData: request?.binaryData,
-        subfolder: request?.subfolder,
-      });
-      const options = {
-        host: token_response.host,
-        port: '443',
-        path: `/api/v/4/webhook/execute/${token_response.systemKey}/cloudiot_devices?method=sendCommandToDevice&name=${deviceName}`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token_response.serviceAccountToken,
-          'Content-Length': payload.length,
-        },
-      };
+        const payload = JSON.stringify({
+          binaryData: request?.binaryData,
+          subfolder: request?.subfolder,
+        });
+        const options = {
+          host: token_response.host,
+          port: '443',
+          path: `/api/v/4/webhook/execute/${token_response.systemKey}/cloudiot_devices?method=sendCommandToDevice&name=${deviceName}`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': token_response.serviceAccountToken,
+            'Content-Length': payload.length,
+          },
+        };
 
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          if (typeof res.statusCode === 'undefined') {
-            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-          } else if (isErrorStatusCode(res.statusCode)) {
-            let errorData = '';
-            res.on('data', chunk => (errorData += chunk));
-            res.on('end', () => {
-              reject(IoTCoreError(errorData));
-            });
-          } else {
-            let data = '';
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              let array: [
-                protos.google.cloud.iot.v1.ISendCommandToDeviceResponse,
-                (
-                  | protos.google.cloud.iot.v1.ISendCommandToDeviceRequest
-                  | undefined
-                ),
-                {} | undefined
-              ];
-
-              const isendcommandtodevicerequest:
-                | protos.google.cloud.iot.v1.ISendCommandToDeviceRequest
-                | undefined = {};
-              const isendcommandtodeviceresponse: protos.google.cloud.iot.v1.ISendCommandToDeviceResponse =
-                {};
-              // eslint-disable-next-line prefer-const
-              array = [
-                isendcommandtodevicerequest,
-                isendcommandtodeviceresponse,
-                {},
-              ];
-              resolve(array);
-            });
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk => (data += chunk));
+              res.on('end', () => {
+                resolve({});
+              });
+            }
           }
+        );
+        req.on('error', e => {
+          reject(e);
+        });
+        if (payload) {
+          req.write(payload);
         }
-      );
-      req.on('error', e => {
-        reject(e);
+        req.end();
       });
-      if (payload) {
-        req.write(payload);
-      }
-      req.end();
-    });
-  }
+    },
+    {
+      getNextRequestObject: () => ({}),
+      getResponseObject: response => response,
+    }
+  );
+
   /**
    * Associates the device with the gateway.
    *

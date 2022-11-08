@@ -2001,132 +2001,126 @@ describe('v1.DeviceManagerClient', () => {
     //   });
     // });
 
-    // describe('sendCommandToDevice', () => {
-    //   it('invokes sendCommandToDevice without error', async () => {
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.initialize();
-    //     const request = generateSampleMessage(
-    //       new protos.google.cloud.iot.v1.SendCommandToDeviceRequest()
-    //     );
-    //     request.name = '';
-    //     const expectedHeaderRequestParams = 'name=';
-    //     const expectedOptions = {
-    //       otherArgs: {
-    //         headers: {
-    //           'x-goog-request-params': expectedHeaderRequestParams,
-    //         },
-    //       },
-    //     };
-    //     const expectedResponse = generateSampleMessage(
-    //       new protos.google.cloud.iot.v1.SendCommandToDeviceResponse()
-    //     );
-    //     client.innerApiCalls.sendCommandToDevice =
-    //       stubSimpleCall(expectedResponse);
-    //     const [response] = await client.sendCommandToDevice(request);
-    //     assert.deepStrictEqual(response, expectedResponse);
-    //     assert(
-    //       (client.innerApiCalls.sendCommandToDevice as SinonStub)
-    //         .getCall(0)
-    //         .calledWith(request, expectedOptions, undefined)
-    //     );
-    //   });
+    describe('sendCommandToDevice', () => {
+      it('invokes sendCommandToDevice without error', async () => {
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: 'bogus',
+            project: 'bogus',
+            token: 'bogus',
+            url: 'https://bogus.com',
+          },
+        });
+        client.initialize();
+        const request = generateSampleMessage(
+          new protos.google.cloud.iot.v1.SendCommandToDeviceRequest()
+        );
+        request.name = '';
+        const expectedOptions = {};
+        const expectedResponse = generateSampleMessage(
+          new protos.google.cloud.iot.v1.SendCommandToDeviceResponse()
+        );
+        client.innerApiCalls.sendCommandToDevice =
+          stubSimpleCall(expectedResponse);
+        const [response] = await client.sendCommandToDevice(request);
+        assert.deepStrictEqual(response, expectedResponse);
+        assert(
+          (client.innerApiCalls.sendCommandToDevice as SinonStub)
+            .getCall(0)
+            .calledWith(request, expectedOptions, undefined)
+        );
+      });
 
-    //   it('invokes sendCommandToDevice without error using callback', async () => {
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.initialize();
-    //     const request = generateSampleMessage(
-    //       new protos.google.cloud.iot.v1.SendCommandToDeviceRequest()
-    //     );
-    //     request.name = '';
-    //     const expectedHeaderRequestParams = 'name=';
-    //     const expectedOptions = {
-    //       otherArgs: {
-    //         headers: {
-    //           'x-goog-request-params': expectedHeaderRequestParams,
-    //         },
-    //       },
-    //     };
-    //     const expectedResponse = generateSampleMessage(
-    //       new protos.google.cloud.iot.v1.SendCommandToDeviceResponse()
-    //     );
-    //     client.innerApiCalls.sendCommandToDevice =
-    //       stubSimpleCallWithCallback(expectedResponse);
-    //     const promise = new Promise((resolve, reject) => {
-    //       client.sendCommandToDevice(
-    //         request,
-    //         (
-    //           err?: Error | null,
-    //           result?: protos.google.cloud.iot.v1.ISendCommandToDeviceResponse | null
-    //         ) => {
-    //           if (err) {
-    //             reject(err);
-    //           } else {
-    //             resolve(result);
-    //           }
-    //         }
-    //       );
-    //     });
-    //     const response = await promise;
-    //     assert.deepStrictEqual(response, expectedResponse);
-    //     assert(
-    //       (client.innerApiCalls.sendCommandToDevice as SinonStub)
-    //         .getCall(0)
-    //         .calledWith(request, expectedOptions /*, callback defined above */)
-    //     );
-    //   });
+      it('invokes sendCommandToDevice without error using callback', async () => {
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: 'bogus',
+            project: 'bogus',
+            token: 'bogus',
+            url: 'https://bogus.com',
+          },
+        });
+        client.initialize();
+        const request = generateSampleMessage(
+          new protos.google.cloud.iot.v1.SendCommandToDeviceRequest()
+        );
+        request.name = '';
+        const expectedOptions = {};
+        const expectedResponse = generateSampleMessage(
+          new protos.google.cloud.iot.v1.SendCommandToDeviceResponse()
+        );
+        client.innerApiCalls.sendCommandToDevice =
+          stubSimpleCallWithCallback(expectedResponse);
+        const promise = new Promise((resolve, reject) => {
+          client.sendCommandToDevice(
+            request,
+            (
+              err?: Error | null,
+              result?: protos.google.cloud.iot.v1.ISendCommandToDeviceResponse | null
+            ) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(result);
+              }
+            }
+          );
+        });
+        const response = await promise;
+        assert.deepStrictEqual(response, expectedResponse);
+        assert(
+          (client.innerApiCalls.sendCommandToDevice as SinonStub)
+            .getCall(0)
+            .calledWith(request, expectedOptions /*, callback defined above */)
+        );
+      });
 
-    //   it('invokes sendCommandToDevice with error', async () => {
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.initialize();
-    //     const request = generateSampleMessage(
-    //       new protos.google.cloud.iot.v1.SendCommandToDeviceRequest()
-    //     );
-    //     request.name = '';
-    //     const expectedHeaderRequestParams = 'name=';
-    //     const expectedOptions = {
-    //       otherArgs: {
-    //         headers: {
-    //           'x-goog-request-params': expectedHeaderRequestParams,
-    //         },
-    //       },
-    //     };
-    //     const expectedError = new Error('expected');
-    //     client.innerApiCalls.sendCommandToDevice = stubSimpleCall(
-    //       undefined,
-    //       expectedError
-    //     );
-    //     await assert.rejects(client.sendCommandToDevice(request), expectedError);
-    //     assert(
-    //       (client.innerApiCalls.sendCommandToDevice as SinonStub)
-    //         .getCall(0)
-    //         .calledWith(request, expectedOptions, undefined)
-    //     );
-    //   });
+      it('invokes sendCommandToDevice with error', async () => {
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: 'bogus',
+            project: 'bogus',
+            token: 'bogus',
+            url: 'https://bogus.com',
+          },
+        });
+        client.initialize();
+        const request = generateSampleMessage(
+          new protos.google.cloud.iot.v1.SendCommandToDeviceRequest()
+        );
+        request.name = '';
+        const expectedOptions = {};
+        const expectedError = new Error('expected');
+        client.innerApiCalls.sendCommandToDevice = stubSimpleCall(
+          undefined,
+          expectedError
+        );
+        await assert.rejects(
+          client.sendCommandToDevice(request),
+          expectedError
+        );
+        assert(
+          (client.innerApiCalls.sendCommandToDevice as SinonStub)
+            .getCall(0)
+            .calledWith(request, expectedOptions, undefined)
+        );
+      });
 
-    //   it('invokes sendCommandToDevice with closed client', async () => {
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.initialize();
-    //     const request = generateSampleMessage(
-    //       new protos.google.cloud.iot.v1.SendCommandToDeviceRequest()
-    //     );
-    //     request.name = '';
-    //     const expectedError = new Error('The client has already been closed.');
-    //     client.close();
-    //     await assert.rejects(client.sendCommandToDevice(request), expectedError);
-    //   });
-    // });
+      // it('invokes sendCommandToDevice with closed client', async () => {
+      //   const client = new devicemanagerModule.v1.DeviceManagerClient({
+      //     credentials: {client_email: 'bogus', private_key: 'bogus'},
+      //     projectId: 'bogus',
+      //   });
+      //   client.initialize();
+      //   const request = generateSampleMessage(
+      //     new protos.google.cloud.iot.v1.SendCommandToDeviceRequest()
+      //   );
+      //   request.name = '';
+      //   const expectedError = new Error('The client has already been closed.');
+      //   client.close();
+      //   await assert.rejects(client.sendCommandToDevice(request), expectedError);
+      // });
+    });
 
     // describe('bindDeviceToGateway', () => {
     //   it('invokes bindDeviceToGateway without error', async () => {
