@@ -964,6 +964,7 @@ export class DeviceManagerClient {
                 reject(IoTCoreError(errorData));
               });
             } else {
+              res.on('data', () => {});
               res.on('end', () => {
                 resolve({});
               });
