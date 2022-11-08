@@ -19,7 +19,7 @@ const cp = require('child_process');
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
-const iot = require('@google-cloud/iot');
+const iot = require('@clearblade/iot');
 const {PubSub} = require('@google-cloud/pubsub');
 const uuid = require('uuid');
 

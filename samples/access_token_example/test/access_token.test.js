@@ -18,7 +18,8 @@ const assert = require('assert');
 const {createJwt} = require('../common');
 const mqtt = require('mqtt');
 const {readFileSync} = require('fs');
-const iot = require('@google-cloud/iot');
+
+const iot = require('@clearblade/iot');
 const path = require('path');
 const {PubSub} = require('@google-cloud/pubsub');
 const uuid = require('uuid');

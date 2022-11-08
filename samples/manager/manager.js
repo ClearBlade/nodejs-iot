@@ -80,7 +80,7 @@ const lookupRegistry = async (registryId, projectId, cloudRegion) => {
   // const cloudRegion = 'us-central1';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -114,7 +114,7 @@ const createRegistry = async (
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
   // function errCb = lookupRegistry; // Lookup registry if already exists.
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   // Lookup the pubsub topic
   const topicPath = `projects/${projectId}/topics/${pubsubTopicId}`;
@@ -163,7 +163,7 @@ const createDevice = async (
   // const deviceId = 'my-device';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -210,7 +210,7 @@ const createUnauthDevice = async (
   // const deviceId = 'my-unauth-device';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -246,7 +246,7 @@ const createRsaDevice = async (
   // const deviceId = 'my-rsa-device';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -293,7 +293,7 @@ const createEsDevice = async (
   // const deviceId = 'my-es-device';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -339,7 +339,7 @@ const patchRsa256ForAuth = async (
   // const deviceId = 'my-rsa-device';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });
@@ -391,7 +391,7 @@ const patchEs256ForAuth = async (
   // const deviceId = 'my-es-device';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });
@@ -436,7 +436,7 @@ const listDevices = async (registryId, projectId, cloudRegion) => {
   // const cloudRegion = 'us-central1';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });
@@ -500,7 +500,7 @@ const listRegistries = async (projectId, cloudRegion) => {
   // [START iot_list_registries]
   // const cloudRegion = 'us-central1';
   // const projectId = 'adjective-noun-123';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const newClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -528,7 +528,7 @@ const deleteDevice = async (deviceId, registryId, projectId, cloudRegion) => {
   // const cloudRegion = 'us-central1';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -553,7 +553,7 @@ const deleteDevice = async (deviceId, registryId, projectId, cloudRegion) => {
 
 // Clear the given registry by removing all devices and deleting the registry.
 const clearRegistry = async (registryId, projectId, cloudRegion) => {
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient();
 
   let devices;
@@ -601,7 +601,7 @@ const deleteRegistry = async (registryId, projectId, cloudRegion) => {
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
 
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -633,7 +633,7 @@ const getDevice = async (deviceId, registryId, projectId, cloudRegion) => {
   // const deviceId = 'my-device';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });
@@ -691,7 +691,7 @@ const getDeviceState = async (deviceId, registryId, projectId, cloudRegion) => {
   // const deviceId = 'my-device';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });
@@ -739,7 +739,7 @@ const getDeviceConfigs = async (
   // const deviceId = 'my-device';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });
@@ -795,7 +795,7 @@ const setDeviceConfig = async (
   // const registryId = 'my-registry';
   // const data = 'test-data';
   // const version = 0;
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });
@@ -838,7 +838,7 @@ const sendCommand = async (
   // const commandMessage = 'message for device';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });
@@ -874,7 +874,7 @@ const getRegistry = async (registryId, projectId, cloudRegion) => {
   // const cloudRegion = 'us-central1';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -904,7 +904,7 @@ const getIamPolicy = async (registryId, projectId, cloudRegion) => {
   // const cloudRegion = 'us-central1';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -956,7 +956,7 @@ const setIamPolicy = async (
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
 
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -1020,7 +1020,7 @@ const createGateway = async (
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
   // const gatewayAuthMethod = 'ASSOCIATION_ONLY';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -1082,7 +1082,7 @@ const bindDeviceToGateway = async (
   // const gatewayId = 'my-gateway';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
 
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
@@ -1126,7 +1126,7 @@ const unbindDeviceFromGateway = async (
 
   console.log(`Unbinding device: ${deviceId}`);
 
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });
@@ -1156,7 +1156,7 @@ const unbindDeviceFromAllGateways = async (
   registryId,
   deviceId
 ) => {
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({});
 
   let device;
@@ -1212,7 +1212,7 @@ const unbindDeviceFromAllGateways = async (
 };
 
 const unbindAllDevices = async (projectId, cloudRegion, registryId) => {
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });
@@ -1253,7 +1253,7 @@ const listGateways = async (projectId, cloudRegion, registryId) => {
   // const cloudRegion = 'us-central1';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });
@@ -1299,7 +1299,7 @@ const listDevicesForGateway = async (
   // const gatewayId = 'my-gateway';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });
@@ -1345,7 +1345,7 @@ const listGatewaysForDevice = async (
   // const deviceId = 'my-device';
   // const projectId = 'adjective-noun-123';
   // const registryId = 'my-registry';
-  const iot = require('@google-cloud/iot');
+  const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient({
     // optional auth parameters.
   });

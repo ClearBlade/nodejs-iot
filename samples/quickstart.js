@@ -32,7 +32,7 @@ async function main() {
     //console.log('parent', parent);
     //console.log(`${resources.length}resource(s) found.`);
     for (const resource of resources) {
-      //console.log(resource);
+      console.log(resource);
     }
 
     /**

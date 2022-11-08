@@ -15,7 +15,7 @@
 'use strict';
 
 const assert = require('assert');
-const iot = require('@google-cloud/iot');
+const iot = require('@clearblade/iot');
 const path = require('path');
 const {PubSub} = require('@google-cloud/pubsub');
 const uuid = require('uuid');
