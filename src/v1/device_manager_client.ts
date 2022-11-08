@@ -2965,7 +2965,7 @@ export class DeviceManagerClient {
     }
   );
 
-  async getRegistryToken(
+  private async getRegistryToken(
     registry: string,
     region: string
   ): Promise<GetRegistryCredentialsResponse & {host: string}> {
