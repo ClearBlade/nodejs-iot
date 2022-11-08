@@ -19,7 +19,7 @@ import {SinonStub} from 'sinon';
 import {describe, it} from 'mocha';
 import * as devicemanagerModule from '../src';
 
-import {PassThrough} from 'stream';
+// import {PassThrough} from 'stream';
 
 import {protobuf} from 'google-gax';
 import {ServiceAccountCredentials} from '../src/v1/device_manager_client';
@@ -49,66 +49,66 @@ function stubSimpleCallWithCallback<ResponseType>(
     : sinon.stub().callsArgWith(2, null, response);
 }
 
-function stubPageStreamingCall<ResponseType>(
-  responses?: ResponseType[],
-  error?: Error
-) {
-  const pagingStub = sinon.stub();
-  if (responses) {
-    for (let i = 0; i < responses.length; ++i) {
-      pagingStub.onCall(i).callsArgWith(2, null, responses[i]);
-    }
-  }
-  const transformStub = error
-    ? sinon.stub().callsArgWith(2, error)
-    : pagingStub;
-  const mockStream = new PassThrough({
-    objectMode: true,
-    transform: transformStub,
-  });
-  // trigger as many responses as needed
-  if (responses) {
-    for (let i = 0; i < responses.length; ++i) {
-      setImmediate(() => {
-        mockStream.write({});
-      });
-    }
-    setImmediate(() => {
-      mockStream.end();
-    });
-  } else {
-    setImmediate(() => {
-      mockStream.write({});
-    });
-    setImmediate(() => {
-      mockStream.end();
-    });
-  }
-  return sinon.stub().returns(mockStream);
-}
+// function stubPageStreamingCall<ResponseType>(
+//   responses?: ResponseType[],
+//   error?: Error
+// ) {
+//   const pagingStub = sinon.stub();
+//   if (responses) {
+//     for (let i = 0; i < responses.length; ++i) {
+//       pagingStub.onCall(i).callsArgWith(2, null, responses[i]);
+//     }
+//   }
+//   const transformStub = error
+//     ? sinon.stub().callsArgWith(2, error)
+//     : pagingStub;
+//   const mockStream = new PassThrough({
+//     objectMode: true,
+//     transform: transformStub,
+//   });
+//   // trigger as many responses as needed
+//   if (responses) {
+//     for (let i = 0; i < responses.length; ++i) {
+//       setImmediate(() => {
+//         mockStream.write({});
+//       });
+//     }
+//     setImmediate(() => {
+//       mockStream.end();
+//     });
+//   } else {
+//     setImmediate(() => {
+//       mockStream.write({});
+//     });
+//     setImmediate(() => {
+//       mockStream.end();
+//     });
+//   }
+//   return sinon.stub().returns(mockStream);
+// }
 
-function stubAsyncIterationCall<ResponseType>(
-  responses?: ResponseType[],
-  error?: Error
-) {
-  let counter = 0;
-  const asyncIterable = {
-    [Symbol.asyncIterator]() {
-      return {
-        async next() {
-          if (error) {
-            return Promise.reject(error);
-          }
-          if (counter >= responses!.length) {
-            return Promise.resolve({done: true, value: undefined});
-          }
-          return Promise.resolve({done: false, value: responses![counter++]});
-        },
-      };
-    },
-  };
-  return sinon.stub().returns(asyncIterable);
-}
+// function stubAsyncIterationCall<ResponseType>(
+//   responses?: ResponseType[],
+//   error?: Error
+// ) {
+//   let counter = 0;
+//   const asyncIterable = {
+//     [Symbol.asyncIterator]() {
+//       return {
+//         async next() {
+//           if (error) {
+//             return Promise.reject(error);
+//           }
+//           if (counter >= responses!.length) {
+//             return Promise.resolve({done: true, value: undefined});
+//           }
+//           return Promise.resolve({done: false, value: responses![counter++]});
+//         },
+//       };
+//     },
+//   };
+//   return sinon.stub().returns(asyncIterable);
+// }
 
 describe('v1.DeviceManagerClient', () => {
   const env = process.env;
