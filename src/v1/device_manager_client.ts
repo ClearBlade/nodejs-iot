@@ -95,10 +95,6 @@ function isErrorStatusCode(statusCode: number): boolean {
   return false;
 }
 
-export interface IHash {
-  [details: string]: string;
-}
-
 /**
  *  Internet of Things (IoT) service. Securely connect and manage IoT devices.
  * @class
@@ -109,7 +105,10 @@ export class DeviceManagerClient {
   private BASE_URL: string;
   private ADMIN_SYSTEM_KEY: string;
   private ADMIN_USER_TOKEN: string;
-  private CACHED_CLIENT_INFO: IHash;
+  private CACHED_CLIENT_INFO: Record<
+    string,
+    GetRegistryCredentialsResponse & {host: string}
+  >;
   // descriptors: Descriptors = {
   //   page: {},
   //   stream: {},
@@ -2740,13 +2739,8 @@ export class DeviceManagerClient {
     return new Promise<GetRegistryCredentialsResponse & {host: string}>(
       (resolve, reject) => {
         if (typeof this.CACHED_CLIENT_INFO[cacheKey] !== 'undefined') {
-          let data = this.CACHED_CLIENT_INFO[cacheKey];
-          const parsed = JSON.parse(data);
-          const regionalURL = new URL(parsed.url);
-          return resolve({
-            ...parsed,
-            host: regionalURL.host,
-          });
+          const data = this.CACHED_CLIENT_INFO[cacheKey];
+          return resolve(data);
         } else {
           const options = {
             host: this.BASE_URL,
@@ -2771,13 +2765,13 @@ export class DeviceManagerClient {
                     )
                   );
                 } else {
-                  console.log('called API cached response..');
-                  this.CACHED_CLIENT_INFO[cacheKey] = data;
                   const regionalURL = new URL(parsed.url);
-                  resolve({
+                  const cacheData = {
                     ...parsed,
                     host: regionalURL.host,
-                  });
+                  };
+                  this.CACHED_CLIENT_INFO[cacheKey] = cacheData;
+                  resolve(cacheData);
                 }
               } catch (e) {
                 reject(
