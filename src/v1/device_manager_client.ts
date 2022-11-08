@@ -200,6 +200,7 @@ export class DeviceManagerClient {
       updateDevice: this._updateDevice,
       deleteDevice: this._deleteDevice,
       modifyCloudToDeviceConfig: this._modifyCloudToDeviceConfig,
+      listDeviceConfigVersions: this._listDeviceConfigVersions,
     };
   }
 
@@ -1790,102 +1791,91 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+
+    return this.innerApiCalls.listDeviceConfigVersions(
+      request,
+      options,
+      callback
+    );
+  }
+
+  private _listDeviceConfigVersions = requestFactory<
+    protos.google.cloud.iot.v1.IListDeviceConfigVersionsRequest,
+    protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse,
+    | protos.google.cloud.iot.v1.IListDeviceConfigVersionsRequest
+    | null
+    | undefined,
+    protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse
+  >(
+    async request => {
       const registry = this.getRegistryFromDevicePath(request?.name);
       const region = this.getRegionFromDevicePath(request?.name);
-      const deviceName = this.getDeviceNameFromDevicePath(request?.name);
+
       const token_response = await this.getRegistryToken(registry, region);
+      return new Promise((resolve, reject) => {
+        const deviceName = this.getDeviceNameFromDevicePath(request?.name);
 
-      const options = {
-        host: token_response.host,
-        path:
-          '/api/v/4/webhook/execute/' +
-          token_response.systemKey +
-          '/cloudiot_devices_configVersions?name=' +
-          deviceName +
-          '&numVersions=' +
-          request?.numVersions,
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token_response.serviceAccountToken,
-        },
-      };
+        const options = {
+          host: token_response.host,
+          path:
+            '/api/v/4/webhook/execute/' +
+            token_response.systemKey +
+            '/cloudiot_devices_configVersions?name=' +
+            deviceName +
+            '&numVersions=' +
+            request?.numVersions,
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': token_response.serviceAccountToken,
+          },
+        };
 
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          if (typeof res.statusCode === 'undefined') {
-            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-          } else if (isErrorStatusCode(res.statusCode)) {
-            let errorData = '';
-            res.on('data', chunk => (errorData += chunk));
-            res.on('end', () => {
-              reject(IoTCoreError(errorData));
-            });
-          } else {
-            let data = '';
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              if (!this.isJsonString(data)) {
-                reject(data);
-                return;
-              }
-              let array: [
-                protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse,
-                (
-                  | protos.google.cloud.iot.v1.IListDeviceConfigVersionsRequest
-                  | undefined
-                ),
-                {} | undefined
-              ];
-
-              const ilistdeviceconfigversionsresponse: protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse =
-                {};
-
-              const ideviceconfigarray:
-                | protos.google.cloud.iot.v1.IDeviceConfig[]
-                | null = [];
-
-              const configList = JSON.parse(data);
-              //for loop fetching JSON
-              for (const index in configList.deviceConfigs) {
-                const config: protos.google.cloud.iot.v1.IDeviceConfig = {};
-                config.version = configList.deviceConfigs[index].version;
-                config.deviceAckTime =
-                  configList.deviceConfigs[index].deviceAckTime;
-                config.binaryData = configList.deviceConfigs[index].binaryData;
-                config.cloudUpdateTime =
-                  configList.deviceConfigs[index].cloudUpdateTime;
-                ideviceconfigarray.push(config);
-              }
-
-              const ilistDeviceconfigversionsrequest: protos.google.cloud.iot.v1.IListDeviceConfigVersionsRequest =
-                {};
-
-              ilistdeviceconfigversionsresponse.deviceConfigs =
-                ideviceconfigarray;
-
-              // eslint-disable-next-line prefer-const
-              array = [
-                ilistdeviceconfigversionsresponse,
-                ilistDeviceconfigversionsrequest,
-                {},
-              ];
-              resolve(array);
-            });
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk => (data += chunk));
+              res.on('end', () => {
+                const response: protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse =
+                  JSON.parse(data);
+                resolve(response);
+              });
+            }
           }
-        }
-      );
-      req.on('error', e => {
-        reject(e);
+        );
+        req.on('error', e => {
+          reject(e);
+        });
+        req.end();
       });
-      req.end();
-    });
-  }
+    },
+    {
+      getNextRequestObject: () => ({}),
+      getResponseObject: response => response,
+    }
+  );
+
   /**
    * Lists the last few versions of the device state in descending order (i.e.:
    * newest first).
