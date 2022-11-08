@@ -2057,73 +2057,73 @@ export class DeviceManagerClient {
    * @example <caption>include:samples/generated/v1/device_manager.set_iam_policy.js</caption>
    * region_tag:cloudiot_v1_generated_DeviceManager_SetIamPolicy_async
    */
-  setIamPolicy(
-    request?: protos.google.iam.v1.ISetIamPolicyRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.iam.v1.IPolicy,
-      protos.google.iam.v1.ISetIamPolicyRequest | undefined,
-      {} | undefined
-    ]
-  >;
-  setIamPolicy(
-    request: protos.google.iam.v1.ISetIamPolicyRequest,
-    options: CallOptions,
-    callback: Callback<
-      protos.google.iam.v1.IPolicy,
-      protos.google.iam.v1.ISetIamPolicyRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  setIamPolicy(
-    request: protos.google.iam.v1.ISetIamPolicyRequest,
-    callback: Callback<
-      protos.google.iam.v1.IPolicy,
-      protos.google.iam.v1.ISetIamPolicyRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  setIamPolicy(
-    request?: protos.google.iam.v1.ISetIamPolicyRequest,
-    optionsOrCallback?:
-      | CallOptions
-      | Callback<
-          protos.google.iam.v1.IPolicy,
-          protos.google.iam.v1.ISetIamPolicyRequest | null | undefined,
-          {} | null | undefined
-        >,
-    callback?: Callback<
-      protos.google.iam.v1.IPolicy,
-      protos.google.iam.v1.ISetIamPolicyRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): Promise<
-    [
-      protos.google.iam.v1.IPolicy,
-      protos.google.iam.v1.ISetIamPolicyRequest | undefined,
-      {} | undefined
-    ]
-  > | void {
-    // request = request || {};
-    // let options: CallOptions;
-    // if (typeof optionsOrCallback === 'function' && callback === undefined) {
-    //   callback = optionsOrCallback;
-    //   options = {};
-    // } else {
-    //   options = optionsOrCallback as CallOptions;
-    // }
-    // options = options || {};
-    // options.otherArgs = options.otherArgs || {};
-    // options.otherArgs.headers = options.otherArgs.headers || {};
-    // options.otherArgs.headers['x-goog-request-params'] =
-    //   this._gaxModule.routingHeader.fromParams({
-    //     resource: request.resource || '',
-    //   });
-    // this.initialize();
-    // return this.innerApiCalls.setIamPolicy(request, options, callback);
-    return undefined;
-  }
+  // setIamPolicy(
+  //   request?: protos.google.iam.v1.ISetIamPolicyRequest,
+  //   options?: CallOptions
+  // ): Promise<
+  //   [
+  //     protos.google.iam.v1.IPolicy,
+  //     protos.google.iam.v1.ISetIamPolicyRequest | undefined,
+  //     {} | undefined
+  //   ]
+  // >;
+  // setIamPolicy(
+  //   request: protos.google.iam.v1.ISetIamPolicyRequest,
+  //   options: CallOptions,
+  //   callback: Callback<
+  //     protos.google.iam.v1.IPolicy,
+  //     protos.google.iam.v1.ISetIamPolicyRequest | null | undefined,
+  //     {} | null | undefined
+  //   >
+  // ): void;
+  // setIamPolicy(
+  //   request: protos.google.iam.v1.ISetIamPolicyRequest,
+  //   callback: Callback<
+  //     protos.google.iam.v1.IPolicy,
+  //     protos.google.iam.v1.ISetIamPolicyRequest | null | undefined,
+  //     {} | null | undefined
+  //   >
+  // ): void;
+  // setIamPolicy(
+  //   request?: protos.google.iam.v1.ISetIamPolicyRequest,
+  //   optionsOrCallback?:
+  //     | CallOptions
+  //     | Callback<
+  //         protos.google.iam.v1.IPolicy,
+  //         protos.google.iam.v1.ISetIamPolicyRequest | null | undefined,
+  //         {} | null | undefined
+  //       >,
+  //   callback?: Callback<
+  //     protos.google.iam.v1.IPolicy,
+  //     protos.google.iam.v1.ISetIamPolicyRequest | null | undefined,
+  //     {} | null | undefined
+  //   >
+  // ): Promise<
+  //   [
+  //     protos.google.iam.v1.IPolicy,
+  //     protos.google.iam.v1.ISetIamPolicyRequest | undefined,
+  //     {} | undefined
+  //   ]
+  // > | void {
+  //   // request = request || {};
+  //   // let options: CallOptions;
+  //   // if (typeof optionsOrCallback === 'function' && callback === undefined) {
+  //   //   callback = optionsOrCallback;
+  //   //   options = {};
+  //   // } else {
+  //   //   options = optionsOrCallback as CallOptions;
+  //   // }
+  //   // options = options || {};
+  //   // options.otherArgs = options.otherArgs || {};
+  //   // options.otherArgs.headers = options.otherArgs.headers || {};
+  //   // options.otherArgs.headers['x-goog-request-params'] =
+  //   //   this._gaxModule.routingHeader.fromParams({
+  //   //     resource: request.resource || '',
+  //   //   });
+  //   // this.initialize();
+  //   // return this.innerApiCalls.setIamPolicy(request, options, callback);
+  //   return undefined;
+  // }
   /**
    * Gets the access control policy for a resource.
    * Returns an empty policy if the resource exists and does not have a policy
@@ -2147,73 +2147,73 @@ export class DeviceManagerClient {
    * @example <caption>include:samples/generated/v1/device_manager.get_iam_policy.js</caption>
    * region_tag:cloudiot_v1_generated_DeviceManager_GetIamPolicy_async
    */
-  getIamPolicy(
-    request?: protos.google.iam.v1.IGetIamPolicyRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.iam.v1.IPolicy,
-      protos.google.iam.v1.IGetIamPolicyRequest | undefined,
-      {} | undefined
-    ]
-  >;
-  getIamPolicy(
-    request: protos.google.iam.v1.IGetIamPolicyRequest,
-    options: CallOptions,
-    callback: Callback<
-      protos.google.iam.v1.IPolicy,
-      protos.google.iam.v1.IGetIamPolicyRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  getIamPolicy(
-    request: protos.google.iam.v1.IGetIamPolicyRequest,
-    callback: Callback<
-      protos.google.iam.v1.IPolicy,
-      protos.google.iam.v1.IGetIamPolicyRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  getIamPolicy(
-    request?: protos.google.iam.v1.IGetIamPolicyRequest,
-    optionsOrCallback?:
-      | CallOptions
-      | Callback<
-          protos.google.iam.v1.IPolicy,
-          protos.google.iam.v1.IGetIamPolicyRequest | null | undefined,
-          {} | null | undefined
-        >,
-    callback?: Callback<
-      protos.google.iam.v1.IPolicy,
-      protos.google.iam.v1.IGetIamPolicyRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): Promise<
-    [
-      protos.google.iam.v1.IPolicy,
-      protos.google.iam.v1.IGetIamPolicyRequest | undefined,
-      {} | undefined
-    ]
-  > | void {
-    // request = request || {};
-    // let options: CallOptions;
-    // if (typeof optionsOrCallback === 'function' && callback === undefined) {
-    //   callback = optionsOrCallback;
-    //   options = {};
-    // } else {
-    //   options = optionsOrCallback as CallOptions;
-    // }
-    // options = options || {};
-    // options.otherArgs = options.otherArgs || {};
-    // options.otherArgs.headers = options.otherArgs.headers || {};
-    // options.otherArgs.headers['x-goog-request-params'] =
-    //   this._gaxModule.routingHeader.fromParams({
-    //     resource: request.resource || '',
-    //   });
-    // this.initialize();
-    // return this.innerApiCalls.getIamPolicy(request, options, callback);
-    return undefined;
-  }
+  // getIamPolicy(
+  //   request?: protos.google.iam.v1.IGetIamPolicyRequest,
+  //   options?: CallOptions
+  // ): Promise<
+  //   [
+  //     protos.google.iam.v1.IPolicy,
+  //     protos.google.iam.v1.IGetIamPolicyRequest | undefined,
+  //     {} | undefined
+  //   ]
+  // >;
+  // getIamPolicy(
+  //   request: protos.google.iam.v1.IGetIamPolicyRequest,
+  //   options: CallOptions,
+  //   callback: Callback<
+  //     protos.google.iam.v1.IPolicy,
+  //     protos.google.iam.v1.IGetIamPolicyRequest | null | undefined,
+  //     {} | null | undefined
+  //   >
+  // ): void;
+  // getIamPolicy(
+  //   request: protos.google.iam.v1.IGetIamPolicyRequest,
+  //   callback: Callback<
+  //     protos.google.iam.v1.IPolicy,
+  //     protos.google.iam.v1.IGetIamPolicyRequest | null | undefined,
+  //     {} | null | undefined
+  //   >
+  // ): void;
+  // getIamPolicy(
+  //   request?: protos.google.iam.v1.IGetIamPolicyRequest,
+  //   optionsOrCallback?:
+  //     | CallOptions
+  //     | Callback<
+  //         protos.google.iam.v1.IPolicy,
+  //         protos.google.iam.v1.IGetIamPolicyRequest | null | undefined,
+  //         {} | null | undefined
+  //       >,
+  //   callback?: Callback<
+  //     protos.google.iam.v1.IPolicy,
+  //     protos.google.iam.v1.IGetIamPolicyRequest | null | undefined,
+  //     {} | null | undefined
+  //   >
+  // ): Promise<
+  //   [
+  //     protos.google.iam.v1.IPolicy,
+  //     protos.google.iam.v1.IGetIamPolicyRequest | undefined,
+  //     {} | undefined
+  //   ]
+  // > | void {
+  //   // request = request || {};
+  //   // let options: CallOptions;
+  //   // if (typeof optionsOrCallback === 'function' && callback === undefined) {
+  //   //   callback = optionsOrCallback;
+  //   //   options = {};
+  //   // } else {
+  //   //   options = optionsOrCallback as CallOptions;
+  //   // }
+  //   // options = options || {};
+  //   // options.otherArgs = options.otherArgs || {};
+  //   // options.otherArgs.headers = options.otherArgs.headers || {};
+  //   // options.otherArgs.headers['x-goog-request-params'] =
+  //   //   this._gaxModule.routingHeader.fromParams({
+  //   //     resource: request.resource || '',
+  //   //   });
+  //   // this.initialize();
+  //   // return this.innerApiCalls.getIamPolicy(request, options, callback);
+  //   return undefined;
+  // }
   /**
    * Returns permissions that a caller has on the specified resource.
    * If the resource does not exist, this will return an empty set of
@@ -2239,73 +2239,73 @@ export class DeviceManagerClient {
    * @example <caption>include:samples/generated/v1/device_manager.test_iam_permissions.js</caption>
    * region_tag:cloudiot_v1_generated_DeviceManager_TestIamPermissions_async
    */
-  testIamPermissions(
-    request?: protos.google.iam.v1.ITestIamPermissionsRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.iam.v1.ITestIamPermissionsResponse,
-      protos.google.iam.v1.ITestIamPermissionsRequest | undefined,
-      {} | undefined
-    ]
-  >;
-  testIamPermissions(
-    request: protos.google.iam.v1.ITestIamPermissionsRequest,
-    options: CallOptions,
-    callback: Callback<
-      protos.google.iam.v1.ITestIamPermissionsResponse,
-      protos.google.iam.v1.ITestIamPermissionsRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  testIamPermissions(
-    request: protos.google.iam.v1.ITestIamPermissionsRequest,
-    callback: Callback<
-      protos.google.iam.v1.ITestIamPermissionsResponse,
-      protos.google.iam.v1.ITestIamPermissionsRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  testIamPermissions(
-    request?: protos.google.iam.v1.ITestIamPermissionsRequest,
-    optionsOrCallback?:
-      | CallOptions
-      | Callback<
-          protos.google.iam.v1.ITestIamPermissionsResponse,
-          protos.google.iam.v1.ITestIamPermissionsRequest | null | undefined,
-          {} | null | undefined
-        >,
-    callback?: Callback<
-      protos.google.iam.v1.ITestIamPermissionsResponse,
-      protos.google.iam.v1.ITestIamPermissionsRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): Promise<
-    [
-      protos.google.iam.v1.ITestIamPermissionsResponse,
-      protos.google.iam.v1.ITestIamPermissionsRequest | undefined,
-      {} | undefined
-    ]
-  > | void {
-    // request = request || {};
-    // let options: CallOptions;
-    // if (typeof optionsOrCallback === 'function' && callback === undefined) {
-    //   callback = optionsOrCallback;
-    //   options = {};
-    // } else {
-    //   options = optionsOrCallback as CallOptions;
-    // }
-    // options = options || {};
-    // options.otherArgs = options.otherArgs || {};
-    // options.otherArgs.headers = options.otherArgs.headers || {};
-    // options.otherArgs.headers['x-goog-request-params'] =
-    //   this._gaxModule.routingHeader.fromParams({
-    //     resource: request.resource || '',
-    //   });
-    // this.initialize();
-    // return this.innerApiCalls.testIamPermissions(request, options, callback);
-    return undefined;
-  }
+  // testIamPermissions(
+  //   request?: protos.google.iam.v1.ITestIamPermissionsRequest,
+  //   options?: CallOptions
+  // ): Promise<
+  //   [
+  //     protos.google.iam.v1.ITestIamPermissionsResponse,
+  //     protos.google.iam.v1.ITestIamPermissionsRequest | undefined,
+  //     {} | undefined
+  //   ]
+  // >;
+  // testIamPermissions(
+  //   request: protos.google.iam.v1.ITestIamPermissionsRequest,
+  //   options: CallOptions,
+  //   callback: Callback<
+  //     protos.google.iam.v1.ITestIamPermissionsResponse,
+  //     protos.google.iam.v1.ITestIamPermissionsRequest | null | undefined,
+  //     {} | null | undefined
+  //   >
+  // ): void;
+  // testIamPermissions(
+  //   request: protos.google.iam.v1.ITestIamPermissionsRequest,
+  //   callback: Callback<
+  //     protos.google.iam.v1.ITestIamPermissionsResponse,
+  //     protos.google.iam.v1.ITestIamPermissionsRequest | null | undefined,
+  //     {} | null | undefined
+  //   >
+  // ): void;
+  // testIamPermissions(
+  //   request?: protos.google.iam.v1.ITestIamPermissionsRequest,
+  //   optionsOrCallback?:
+  //     | CallOptions
+  //     | Callback<
+  //         protos.google.iam.v1.ITestIamPermissionsResponse,
+  //         protos.google.iam.v1.ITestIamPermissionsRequest | null | undefined,
+  //         {} | null | undefined
+  //       >,
+  //   callback?: Callback<
+  //     protos.google.iam.v1.ITestIamPermissionsResponse,
+  //     protos.google.iam.v1.ITestIamPermissionsRequest | null | undefined,
+  //     {} | null | undefined
+  //   >
+  // ): Promise<
+  //   [
+  //     protos.google.iam.v1.ITestIamPermissionsResponse,
+  //     protos.google.iam.v1.ITestIamPermissionsRequest | undefined,
+  //     {} | undefined
+  //   ]
+  // > | void {
+  //   // request = request || {};
+  //   // let options: CallOptions;
+  //   // if (typeof optionsOrCallback === 'function' && callback === undefined) {
+  //   //   callback = optionsOrCallback;
+  //   //   options = {};
+  //   // } else {
+  //   //   options = optionsOrCallback as CallOptions;
+  //   // }
+  //   // options = options || {};
+  //   // options.otherArgs = options.otherArgs || {};
+  //   // options.otherArgs.headers = options.otherArgs.headers || {};
+  //   // options.otherArgs.headers['x-goog-request-params'] =
+  //   //   this._gaxModule.routingHeader.fromParams({
+  //   //     resource: request.resource || '',
+  //   //   });
+  //   // this.initialize();
+  //   // return this.innerApiCalls.testIamPermissions(request, options, callback);
+  //   return undefined;
+  // }
   /**
    * Sends a command to the specified device. In order for a device to be able
    * to receive commands, it must:
