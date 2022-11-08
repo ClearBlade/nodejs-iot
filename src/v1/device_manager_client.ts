@@ -203,6 +203,7 @@ export class DeviceManagerClient {
       listDeviceConfigVersions: this._listDeviceConfigVersions,
       listDeviceStates: this._listDeviceStates,
       sendCommandToDevice: this._sendCommandToDevice,
+      bindDeviceToGateway: this._bindDeviceToGateway,
     };
   }
 
@@ -2550,87 +2551,86 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+
+    return this.innerApiCalls.bindDeviceToGateway(request, options, callback);
+  }
+
+  private _bindDeviceToGateway = requestFactory<
+    protos.google.cloud.iot.v1.IBindDeviceToGatewayRequest,
+    protos.google.cloud.iot.v1.IBindDeviceToGatewayResponse,
+    protos.google.cloud.iot.v1.IBindDeviceToGatewayRequest | null | undefined,
+    protos.google.cloud.iot.v1.IBindDeviceToGatewayResponse
+  >(
+    async request => {
       const registry = this.getRegistryFromRegistryPath(request?.parent);
       const region = this.getRegionFromRegistryPath(request?.parent);
       const token_response = await this.getRegistryToken(registry, region);
+      return new Promise((resolve, reject) => {
+        const payload = JSON.stringify({
+          gatewayId: request?.gatewayId,
+          deviceId: request?.deviceId,
+        });
+        const options = {
+          host: token_response.host,
+          path:
+            '/api/v/4/webhook/execute/' +
+            token_response.systemKey +
+            '/cloudiot?method=bindDeviceToGateway',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': token_response.serviceAccountToken,
+            'Content-Length': payload.length,
+          },
+        };
 
-      const payload = JSON.stringify({
-        gatewayId: request?.gatewayId,
-        deviceId: request?.deviceId,
-      });
-      const options = {
-        host: token_response.host,
-        path:
-          '/api/v/4/webhook/execute/' +
-          token_response.systemKey +
-          '/cloudiot?method=bindDeviceToGateway',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token_response.serviceAccountToken,
-          'Content-Length': payload.length,
-        },
-      };
-
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          if (typeof res.statusCode === 'undefined') {
-            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-          } else if (isErrorStatusCode(res.statusCode)) {
-            let errorData = '';
-            res.on('data', chunk => (errorData += chunk));
-            res.on('end', () => {
-              reject(IoTCoreError(errorData));
-            });
-          } else {
-            let data = '';
-            const chunks: any[] = [];
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              // eslint-disable-next-line eqeqeq
-              if (data != '' && !this.isJsonString(data)) {
-                reject(data);
-                return;
-              }
-              let array: [
-                protos.google.cloud.iot.v1.IBindDeviceToGatewayResponse,
-                (
-                  | protos.google.cloud.iot.v1.IBindDeviceToGatewayRequest
-                  | undefined
-                ),
-                {} | undefined
-              ];
-              const imodifycloudtodeviceconfigrequest:
-                | protos.google.cloud.iot.v1.IBindDeviceToGatewayRequest
-                | undefined = {};
-              const ibinddevicetogatewayresponse: protos.google.cloud.iot.v1.IBindDeviceToGatewayResponse =
-                {};
-              // eslint-disable-next-line prefer-const
-              array = [
-                ibinddevicetogatewayresponse,
-                imodifycloudtodeviceconfigrequest,
-                {},
-              ];
-              resolve(array);
-            });
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk => (data += chunk));
+              res.on('end', () => {
+                resolve({});
+              });
+            }
           }
+        );
+        req.on('error', e => {
+          console.log('error: ', e);
+          reject(e);
+        });
+        if (payload) {
+          req.write(payload);
         }
-      );
-      req.on('error', e => {
-        console.log('error: ', e);
-        reject(e);
+        req.end();
       });
-      if (payload) {
-        req.write(payload);
-      }
-      req.end();
-    });
-  }
+    },
+    {
+      getNextRequestObject: () => ({}),
+      getResponseObject: response => response,
+    }
+  );
+
   /**
    * Deletes the association between the device and the gateway.
    *
