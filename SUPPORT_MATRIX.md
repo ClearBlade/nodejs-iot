@@ -1,4 +1,4 @@
-- [ ] getDeviceRegistry
+- [x] getDeviceRegistry
 - [x] createDeviceRegistry
 - [x] updateDeviceRegistry
 - [x] deleteDeviceRegistry
@@ -17,6 +17,15 @@
 - [x] locationPath
 - [x] registryPath
 - [x] getProjectId
+- [x] matchProjectFromDeviceName
+- [x] matchLocationFromDeviceName
+- [x] matchRegistryFromDeviceName
+- [x] matchDeviceFromDeviceName
+- [x] matchProjectFromLocationName
+- [x] matchLocationFromLocationName
+- [x] matchProjectFromRegistryName
+- [x] matchLocationFromRegistryName
+- [x] matchRegistryFromRegistryName
 - [ ] listDevicesStream
 - [ ] listDevicesAsync
 - [ ] listDeviceRegistriesStream
@@ -24,12 +33,3 @@
 - [ ] setIamPolicy
 - [ ] getIamPolicy
 - [ ] testIamPermissions
-- [ ] matchProjectFromDeviceName
-- [ ] matchLocationFromDeviceName
-- [ ] matchRegistryFromDeviceName
-- [ ] matchDeviceFromDeviceName
-- [ ] matchProjectFromLocationName
-- [ ] matchLocationFromLocationName
-- [ ] matchProjectFromRegistryName
-- [ ] matchLocationFromRegistryName
-- [ ] matchRegistryFromRegistryName
