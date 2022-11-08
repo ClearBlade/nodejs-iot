@@ -111,7 +111,7 @@ async function main() {
     );
     const unbindRequest = {
       parent: registryPath,
-      deviceId: '{tempDeviceId}',
+      deviceId: deviceId,
       gatewayId: '{tempGatewayId}',
     };
     const [responseUnBindGateway] = await client.unbindDeviceFromGateway(
