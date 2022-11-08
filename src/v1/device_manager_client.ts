@@ -35,7 +35,10 @@ function requestFactory<
     getNextRequestObject,
   }: {
     getResponseObject: (rawResponseObject: RawResponseObject) => ResponseObject;
-    getNextRequestObject: () => NextRequestObject;
+    getNextRequestObject: (
+      request: RequestObject,
+      rawResponseObject: RawResponseObject
+    ) => NextRequestObject;
   }
 ) {
   return function makeRequest(
@@ -46,14 +49,23 @@ function requestFactory<
     if (callback) {
       fetcher(request)
         .then(data => {
-          callback(null, getResponseObject(data), getNextRequestObject(), data);
+          callback(
+            null,
+            getResponseObject(data),
+            getNextRequestObject(request, data),
+            data
+          );
         })
         .catch(e => {
           callback(new Error(e));
         });
     } else {
       return fetcher(request).then(data => {
-        return [getResponseObject(data), getNextRequestObject(), data];
+        return [
+          getResponseObject(data),
+          getNextRequestObject(request, data),
+          data,
+        ];
       });
     }
   };
@@ -205,6 +217,7 @@ export class DeviceManagerClient {
       sendCommandToDevice: this._sendCommandToDevice,
       bindDeviceToGateway: this._bindDeviceToGateway,
       unbindDeviceFromGateway: this._unbindDeviceFromGateway,
+      listDeviceRegistries: this._listDeviceRegistries,
     };
   }
 
@@ -2877,58 +2890,80 @@ export class DeviceManagerClient {
       protos.google.cloud.iot.v1.IListDeviceRegistriesResponse
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
-      const options = {
-        host: this.BASE_URL,
-        path:
-          '/api/v/4/webhook/execute/' +
-          this.ADMIN_SYSTEM_KEY +
-          '/cloudiot?parent=' +
-          request?.parent,
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
-        },
-      };
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
 
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          if (typeof res.statusCode === 'undefined') {
-            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-          } else if (isErrorStatusCode(res.statusCode)) {
-            let errorData = '';
-            res.on('data', chunk => (errorData += chunk));
-            res.on('end', () => {
-              reject(IoTCoreError(errorData));
-            });
-          } else {
-            let data = '';
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              const deviceRegistries: protos.google.cloud.iot.v1.IDeviceRegistry[] =
-                JSON.parse(data).deviceRegistries;
-              const nextPageToken: string =
-                JSON.parse(data).nextPageToken || '0';
-              resolve([
-                deviceRegistries,
-                null,
-                {deviceRegistries, nextPageToken},
-              ]);
-            });
-          }
-        }
-      );
-      req.on('error', e => {
-        reject(e);
-      });
-      req.end();
-    });
+    return this.innerApiCalls.listDeviceRegistries(request, options, callback);
   }
+
+  private _listDeviceRegistries = requestFactory<
+    protos.google.cloud.iot.v1.IListDeviceRegistriesRequest,
+    protos.google.cloud.iot.v1.IDeviceRegistry[],
+    protos.google.cloud.iot.v1.IListDeviceRegistriesRequest | null | undefined,
+    protos.google.cloud.iot.v1.IListDeviceRegistriesResponse
+  >(
+    request => {
+      return new Promise((resolve, reject) => {
+        const options = {
+          host: this.BASE_URL,
+          path:
+            '/api/v/4/webhook/execute/' +
+            this.ADMIN_SYSTEM_KEY +
+            '/cloudiot?parent=' +
+            request?.parent,
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
+          },
+        };
+
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk => (data += chunk));
+              res.on('end', () => {
+                const resp: protos.google.cloud.iot.v1.IListDeviceRegistriesResponse =
+                  JSON.parse(data);
+                resolve(resp);
+              });
+            }
+          }
+        );
+        req.on('error', e => {
+          reject(e);
+        });
+        req.end();
+      });
+    },
+    {
+      getNextRequestObject: (request, response) => ({
+        pageToken: response.nextPageToken,
+        parent: request.parent,
+        pageSize: request.pageSize,
+      }),
+      getResponseObject: response => response.deviceRegistries ?? [],
+    }
+  );
 
   async getRegistryToken(
     registry: string,
