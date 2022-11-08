@@ -189,6 +189,10 @@ export class DeviceManagerClient {
   private BASE_URL: string;
   private ADMIN_SYSTEM_KEY: string;
   private ADMIN_USER_TOKEN: string;
+  private CACHED_CLIENT_INFO: Record<
+    string,
+    GetRegistryCredentialsResponse & {host: string}
+  >;
   // descriptors: Descriptors = {
   //   page: {},
   //   stream: {},
@@ -205,6 +209,7 @@ export class DeviceManagerClient {
   // deviceManagerStub?: Promise<{[name: string]: Function}>;
 
   constructor(opts?: DeviceManagerClientOptions) {
+    this.CACHED_CLIENT_INFO = {};
     const serviceAccountCredentials = loadServiceAccountCredentials(opts);
     this.ADMIN_SYSTEM_KEY = serviceAccountCredentials.systemKey;
     this.ADMIN_USER_TOKEN = serviceAccountCredentials.token;
@@ -3005,52 +3010,60 @@ export class DeviceManagerClient {
       registry: registry,
       project: this.PROJECT_ID,
     });
+    const cacheKey = `${region}-${registry}`;
     return new Promise<GetRegistryCredentialsResponse & {host: string}>(
       (resolve, reject) => {
-        const options = {
-          host: this.BASE_URL,
-          path: `/api/v/1/code/${this.ADMIN_SYSTEM_KEY}/getRegistryCredentials`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
-            'Content-Length': payload.length,
-          },
-        };
-        const req = https.request(options, res => {
-          let data = '';
-          res.on('data', chunk => (data += chunk));
-          res.on('end', () => {
-            try {
-              const parsed = JSON.parse(data);
-              if (!isGetRegistryCredentialsResponse(parsed)) {
+        if (typeof this.CACHED_CLIENT_INFO[cacheKey] !== 'undefined') {
+          const data = this.CACHED_CLIENT_INFO[cacheKey];
+          return resolve(data);
+        } else {
+          const options = {
+            host: this.BASE_URL,
+            path: `/api/v/1/code/${this.ADMIN_SYSTEM_KEY}/getRegistryCredentials`,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
+              'Content-Length': payload.length,
+            },
+          };
+          const req = https.request(options, res => {
+            let data = '';
+            res.on('data', chunk => (data += chunk));
+            res.on('end', () => {
+              try {
+                const parsed = JSON.parse(data);
+                if (!isGetRegistryCredentialsResponse(parsed)) {
+                  reject(
+                    IoTCoreError(
+                      'Invalid response from getRegistryCredentials:' + data
+                    )
+                  );
+                } else {
+                  const regionalURL = new URL(parsed.url);
+                  const cacheData = {
+                    ...parsed,
+                    host: regionalURL.host,
+                  };
+                  this.CACHED_CLIENT_INFO[cacheKey] = cacheData;
+                  resolve(cacheData);
+                }
+              } catch (e) {
                 reject(
                   IoTCoreError(
-                    'Invalid response from getRegistryCredentials:' + data
+                    'Caught error while parsing response from getRegistryCredentials: ' +
+                      e
                   )
                 );
-              } else {
-                const regionalURL = new URL(parsed.url);
-                resolve({
-                  ...parsed,
-                  host: regionalURL.host,
-                });
               }
-            } catch (e) {
-              reject(
-                IoTCoreError(
-                  'Caught error while parsing response from getRegistryCredentials: ' +
-                    e
-                )
-              );
-            }
+            });
           });
-        });
-        req.on('error', e => {
-          reject(e);
-        });
-        req.write(payload);
-        req.end();
+          req.on('error', e => {
+            reject(e);
+          });
+          req.write(payload);
+          req.end();
+        }
       }
     );
   }
