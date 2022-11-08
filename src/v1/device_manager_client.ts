@@ -2771,6 +2771,7 @@ export class DeviceManagerClient {
                     )
                   );
                 } else {
+                  console.log('called API cached response..');
                   this.CACHED_CLIENT_INFO[cacheKey] = data;
                   const regionalURL = new URL(parsed.url);
                   resolve({
