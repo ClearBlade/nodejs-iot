@@ -17,9 +17,9 @@
 async function main() {
   // [START iot_quickstart]
   const iot = require('@clearblade/iot');
-  const cloudRegion = 'us-central1';
-  const registryId = 'ingressRegistry';
-  const deviceId = 'device_ingress';
+  const cloudRegion = '{tempCloudRegion}';
+  const registryId = '{tempRegistryId}';
+  const deviceId = '{tempDeviceId}';
   const client = new iot.v1.DeviceManagerClient();
 
   async function quickstart() {
@@ -27,7 +27,7 @@ async function main() {
      * Get list device registry
      */
     const projectId = await client.getProjectId();
-    const parent = client.locationPath(projectId, 'us-central1');
+    const parent = client.locationPath(projectId, cloudRegion);
     const [resources] = await client.listDeviceRegistries({parent});
     //console.log('parent', parent);
     //console.log(`${resources.length}resource(s) found.`);
@@ -59,8 +59,8 @@ async function main() {
      */
     // const parentName = client.registryPath(
     //   projectId,
-    //   'us-central1',
-    //   'ingressRegistry'
+    //   cloudRegion,
+    //   registryId
     // );
     // const [responseListDevices] = await client.listDevices({
     //   parent: parentName,
@@ -111,8 +111,8 @@ async function main() {
     );
     const unbindRequest = {
       parent: registryPath,
-      deviceId: 'ingress_device_node',
-      gatewayId: 'gateway_ingress',
+      deviceId: deviceId,
+      gatewayId: '{tempGatewayId}',
     };
     const [responseUnBindGateway] = await client.unbindDeviceFromGateway(
       unbindRequest
@@ -128,8 +128,8 @@ async function main() {
     // );
     const requestBindGateway = {
       parent: registryPath,
-      deviceId: 'ingress_device_node',
-      gatewayId: 'gateway_ingress',
+      deviceId: deviceId,
+      gatewayId: '{tempGatewayId}',
     };
     const [responseBindGateway] = await client.bindDeviceToGateway(
       requestBindGateway
@@ -211,7 +211,7 @@ async function main() {
      * Delete Registry
      */
     // const req = {
-    //   name: 'projects/ingressdevelopmentenv/locations/us-central1/registries/Test12',
+    //   name: 'projects/{tempProjectId}/locations/{tempCloudRegion}/registries/Test12',
     // };
     // const [response] = await client.deleteDeviceRegistry(req);
     // console.log('Delete State: ', response);
@@ -219,7 +219,7 @@ async function main() {
      * List Registry - Admin
      */
     // const req = {
-    //   parent: 'projects/ingressdevelopmentenv/locations/us-central1',
+    //   parent: 'projects/{tempProjectId}/locations/{tempCloudRegion}',
     // };
     // const [response] = await client.listDeviceRegistries(req);
     // console.log('List State: ', response);
@@ -227,7 +227,7 @@ async function main() {
     Device Registry Create
     */
     // const projectId = await client.getProjectId();
-    // const parent = client.locationPath(projectId, 'us-central1');
+    // const parent = client.locationPath(projectId, cloudRegion);
 
     // const request = {
     //   deviceRegistry: {
@@ -310,8 +310,8 @@ async function main() {
     // console.log('Sent command: ', response);
 
     /**
-    * Delete device - Device Path - name
-    */
+     * Delete device - Device Path - name
+     */
     // const devicePath = client.devicePath(
     //   projectId,
     //   cloudRegion,
