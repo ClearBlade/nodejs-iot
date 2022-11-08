@@ -1,0 +1,35 @@
+- [ ] getDeviceRegistry
+- [x] createDeviceRegistry
+- [x] updateDeviceRegistry
+- [x] deleteDeviceRegistry
+- [x] createDevice
+- [x] getDevice
+- [x] updateDevice
+- [x] deleteDevice
+- [x] modifyCloudToDeviceConfig
+- [x] listDeviceConfigVersions
+- [x] listDeviceStates
+- [x] sendCommandToDevice
+- [x] bindDeviceToGateway
+- [x] unbindDeviceFromGateway
+- [x] listDeviceRegistries
+- [x] listDevices
+- [x] locationPath
+- [x] registryPath
+- [x] getProjectId
+- [ ] listDevicesStream
+- [ ] listDevicesAsync
+- [ ] listDeviceRegistriesStream
+- [ ] listDeviceRegistriesAsync
+- [ ] setIamPolicy
+- [ ] getIamPolicy
+- [ ] testIamPermissions
+- [ ] matchProjectFromDeviceName
+- [ ] matchLocationFromDeviceName
+- [ ] matchRegistryFromDeviceName
+- [ ] matchDeviceFromDeviceName
+- [ ] matchProjectFromLocationName
+- [ ] matchLocationFromLocationName
+- [ ] matchProjectFromRegistryName
+- [ ] matchLocationFromRegistryName
+- [ ] matchRegistryFromRegistryName
