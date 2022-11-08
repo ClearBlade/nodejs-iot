@@ -218,6 +218,7 @@ export class DeviceManagerClient {
       bindDeviceToGateway: this._bindDeviceToGateway,
       unbindDeviceFromGateway: this._unbindDeviceFromGateway,
       listDeviceRegistries: this._listDeviceRegistries,
+      listDevices: this._listDevices,
     };
   }
 
@@ -3217,94 +3218,90 @@ export class DeviceManagerClient {
       protos.google.cloud.iot.v1.IListDevicesResponse
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+
+    return this.innerApiCalls.listDevices(request, options, callback);
+  }
+
+  private _listDevices = requestFactory<
+    protos.google.cloud.iot.v1.IListDevicesRequest,
+    protos.google.cloud.iot.v1.IDevice[],
+    protos.google.cloud.iot.v1.IListDevicesRequest | null | undefined,
+    protos.google.cloud.iot.v1.IListDevicesResponse
+  >(
+    async request => {
       const registry = this.getRegistryFromRegistryPath(request?.parent);
       const region = this.getRegionFromRegistryPath(request?.parent);
       const token_response = await this.getRegistryToken(registry, region);
+      return new Promise((resolve, reject) => {
+        const payload = JSON.stringify({
+          parent: request?.parent,
+        });
 
-      const payload = JSON.stringify({
-        parent: request?.parent,
-      });
+        const options = {
+          host: token_response.host,
+          path:
+            '/api/v/4/webhook/execute/' +
+            token_response.systemKey +
+            '/cloudiot_devices?parent=' +
+            request?.parent,
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': token_response.serviceAccountToken,
+            'Content-Length': payload.length,
+          },
+        };
 
-      const options = {
-        host: token_response.host,
-        path:
-          '/api/v/4/webhook/execute/' +
-          token_response.systemKey +
-          '/cloudiot_devices?parent=' +
-          request?.parent,
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token_response.serviceAccountToken,
-          'Content-Length': payload.length,
-        },
-      };
-
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          if (typeof res.statusCode === 'undefined') {
-            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-          } else if (isErrorStatusCode(res.statusCode)) {
-            let errorData = '';
-            res.on('data', chunk => (errorData += chunk));
-            res.on('end', () => {
-              reject(IoTCoreError(errorData));
-            });
-          } else {
-            let data = '';
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              const response: protos.google.cloud.iot.v1.IListDevicesResponse =
-                {};
-              const request: protos.google.cloud.iot.v1.ListDevicesRequest | null =
-                null;
-              const deviceListResponse = JSON.parse(data);
-              const devicesArray: protos.google.cloud.iot.v1.IDevice[] = [];
-
-              for (const index in deviceListResponse.devices) {
-                const device: protos.google.cloud.iot.v1.IDevice = {};
-                device.id = deviceListResponse.devices[index].id;
-                device.name = deviceListResponse.devices[index].name;
-                device.numId = deviceListResponse.devices[index].numId;
-                device.credentials =
-                  deviceListResponse.devices[index].credentials;
-                device.lastHeartbeatTime =
-                  deviceListResponse.devices[index].lastHeartbeatTime;
-                device.lastEventTime =
-                  deviceListResponse.devices[index].lastEventTime;
-                device.lastStateTime =
-                  deviceListResponse.devices[index].lastStateTime;
-                device.lastConfigAckTime =
-                  deviceListResponse.devices[index].lastConfigAckTime;
-                device.lastConfigSendTime =
-                  deviceListResponse.devices[index].lastConfigSendTime;
-                device.blocked = deviceListResponse.devices[index].blocked;
-                device.lastErrorTime =
-                  deviceListResponse.devices[index].lastErrorTime;
-                device.lastErrorStatus =
-                  deviceListResponse.devices[index].lastErrorStatus;
-                devicesArray.push(device);
-              }
-              response.devices = devicesArray;
-              resolve([devicesArray, request, response]);
-            });
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk => (data += chunk));
+              res.on('end', () => {
+                const deviceListResponse: protos.google.cloud.iot.v1.IListDevicesResponse =
+                  JSON.parse(data);
+                resolve(deviceListResponse);
+              });
+            }
           }
+        );
+        req.on('error', e => {
+          reject(e);
+        });
+        if (payload) {
+          req.write(payload);
         }
-      );
-      req.on('error', e => {
-        reject(e);
+        req.end();
       });
-      if (payload) {
-        req.write(payload);
-      }
-      req.end();
-    });
-  }
+    },
+    {
+      getNextRequestObject: (request, response) => ({
+        pageToken: response.nextPageToken,
+        parent: request.parent,
+      }),
+      getResponseObject: response => response.devices ?? [],
+    }
+  );
 
   /**
    * Equivalent to `method.name.toCamelCase()`, but returns a NodeJS Stream object.
