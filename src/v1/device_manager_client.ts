@@ -204,6 +204,7 @@ export class DeviceManagerClient {
       listDeviceStates: this._listDeviceStates,
       sendCommandToDevice: this._sendCommandToDevice,
       bindDeviceToGateway: this._bindDeviceToGateway,
+      unbindDeviceFromGateway: this._unbindDeviceFromGateway,
     };
   }
 
@@ -1706,14 +1707,6 @@ export class DeviceManagerClient {
     }
   );
 
-  isJsonString(str: string) {
-    try {
-      JSON.parse(str);
-    } catch (e) {
-      return false;
-    }
-    return true;
-  }
   /**
    * Lists the last few versions of the device configuration in descending
    * order (i.e.: newest first).
@@ -2712,78 +2705,91 @@ export class DeviceManagerClient {
       {} | undefined
     ]
   > | void {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+
+    return this.innerApiCalls.unbindDeviceFromGateway(
+      request,
+      options,
+      callback
+    );
+  }
+
+  private _unbindDeviceFromGateway = requestFactory<
+    protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayRequest,
+    protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayResponse,
+    | protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayRequest
+    | null
+    | undefined,
+    protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayResponse
+  >(
+    async request => {
       const registry = this.getRegistryFromRegistryPath(request?.parent);
       const region = this.getRegionFromRegistryPath(request?.parent);
       const token_response = await this.getRegistryToken(registry, region);
+      return new Promise((resolve, reject) => {
+        const payload = JSON.stringify({
+          gatewayId: request?.gatewayId,
+          deviceId: request?.deviceId,
+        });
+        const options = {
+          host: token_response.host,
+          path:
+            '/api/v/4/webhook/execute/' +
+            token_response.systemKey +
+            '/cloudiot?method=unbindDeviceFromGateway',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'ClearBlade-UserToken': token_response.serviceAccountToken,
+            'Content-Length': payload.length,
+          },
+        };
 
-      const payload = JSON.stringify({
-        gatewayId: request?.gatewayId,
-        deviceId: request?.deviceId,
-      });
-      const options = {
-        host: token_response.host,
-        path:
-          '/api/v/4/webhook/execute/' +
-          token_response.systemKey +
-          '/cloudiot?method=unbindDeviceFromGateway',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'ClearBlade-UserToken': token_response.serviceAccountToken,
-          'Content-Length': payload.length,
-        },
-      };
-
-      const req = https.request(
-        {
-          ...options,
-        },
-        res => {
-          if (typeof res.statusCode === 'undefined') {
-            reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
-          } else if (isErrorStatusCode(res.statusCode)) {
-            let errorData = '';
-            res.on('data', chunk => (errorData += chunk));
-            res.on('end', () => {
-              reject(IoTCoreError(errorData));
-            });
-          } else {
-            let data = '';
-            const chunks: any[] = [];
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              let array: [
-                protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayResponse,
-                (
-                  | protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayRequest
-                  | undefined
-                ),
-                {} | undefined
-              ];
-              const request:
-                | protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayRequest
-                | undefined = {};
-              const response: protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayResponse =
-                {};
-              // eslint-disable-next-line prefer-const
-              array = [response, request, {}];
-              resolve(array);
-            });
+        const req = https.request(
+          {
+            ...options,
+          },
+          res => {
+            if (typeof res.statusCode === 'undefined') {
+              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk => (data += chunk));
+              res.on('end', () => {
+                resolve({});
+              });
+            }
           }
+        );
+        req.on('error', e => {
+          console.log('error: ', e);
+          reject(e);
+        });
+        if (payload) {
+          req.write(payload);
         }
-      );
-      req.on('error', e => {
-        console.log('error: ', e);
-        reject(e);
+        req.end();
       });
-      if (payload) {
-        req.write(payload);
-      }
-      req.end();
-    });
-  }
+    },
+    {
+      getNextRequestObject: () => ({}),
+      getResponseObject: response => response,
+    }
+  );
 
   /**
    * Lists device registries.
