@@ -2928,194 +2928,135 @@ describe('v1.DeviceManagerClient', () => {
       // });
     });
 
-    // describe('Path templates', () => {
-    //   describe('device', () => {
-    //     const fakePath = '/rendered/path/device';
-    //     const expectedParameters = {
-    //       project: 'projectValue',
-    //       location: 'locationValue',
-    //       registry: 'registryValue',
-    //       device: 'deviceValue',
-    //     };
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.initialize();
-    //     client.pathTemplates.devicePathTemplate.render = sinon
-    //       .stub()
-    //       .returns(fakePath);
-    //     client.pathTemplates.devicePathTemplate.match = sinon
-    //       .stub()
-    //       .returns(expectedParameters);
+    describe('Path templates', () => {
+      describe('device', () => {
+        const expectedParameters = {
+          project: 'projectValue',
+          location: 'locationValue',
+          registry: 'registryValue',
+          device: 'deviceValue',
+        };
+        const fakePath = `projects/${expectedParameters.project}/locations/${expectedParameters.location}/registries/${expectedParameters.registry}/devices/${expectedParameters.device}`;
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: 'bogus',
+            project: 'bogus',
+            token: 'bogus',
+            url: 'https://bogus.com',
+          },
+        });
+        client.initialize();
 
-    //     it('devicePath', () => {
-    //       const result = client.devicePath(
-    //         'projectValue',
-    //         'locationValue',
-    //         'registryValue',
-    //         'deviceValue'
-    //       );
-    //       assert.strictEqual(result, fakePath);
-    //       assert(
-    //         (client.pathTemplates.devicePathTemplate.render as SinonStub)
-    //           .getCall(-1)
-    //           .calledWith(expectedParameters)
-    //       );
-    //     });
+        it('devicePath', () => {
+          const result = client.devicePath(
+            'projectValue',
+            'locationValue',
+            'registryValue',
+            'deviceValue'
+          );
+          assert.strictEqual(
+            result,
+            'projects/projectValue/locations/locationValue/registries/registryValue/devices/deviceValue'
+          );
+        });
 
-    //     it('matchProjectFromDeviceName', () => {
-    //       const result = client.matchProjectFromDeviceName(fakePath);
-    //       assert.strictEqual(result, 'projectValue');
-    //       assert(
-    //         (client.pathTemplates.devicePathTemplate.match as SinonStub)
-    //           .getCall(-1)
-    //           .calledWith(fakePath)
-    //       );
-    //     });
+        it('matchProjectFromDeviceName', () => {
+          const result = client.matchProjectFromDeviceName(fakePath);
+          assert.strictEqual(result, expectedParameters.project);
+        });
 
-    //     it('matchLocationFromDeviceName', () => {
-    //       const result = client.matchLocationFromDeviceName(fakePath);
-    //       assert.strictEqual(result, 'locationValue');
-    //       assert(
-    //         (client.pathTemplates.devicePathTemplate.match as SinonStub)
-    //           .getCall(-1)
-    //           .calledWith(fakePath)
-    //       );
-    //     });
+        it('matchLocationFromDeviceName', () => {
+          const result = client.matchLocationFromDeviceName(fakePath);
+          assert.strictEqual(result, expectedParameters.location);
+        });
 
-    //     it('matchRegistryFromDeviceName', () => {
-    //       const result = client.matchRegistryFromDeviceName(fakePath);
-    //       assert.strictEqual(result, 'registryValue');
-    //       assert(
-    //         (client.pathTemplates.devicePathTemplate.match as SinonStub)
-    //           .getCall(-1)
-    //           .calledWith(fakePath)
-    //       );
-    //     });
+        it('matchRegistryFromDeviceName', () => {
+          const result = client.matchRegistryFromDeviceName(fakePath);
+          assert.strictEqual(result, expectedParameters.registry);
+        });
 
-    //     it('matchDeviceFromDeviceName', () => {
-    //       const result = client.matchDeviceFromDeviceName(fakePath);
-    //       assert.strictEqual(result, 'deviceValue');
-    //       assert(
-    //         (client.pathTemplates.devicePathTemplate.match as SinonStub)
-    //           .getCall(-1)
-    //           .calledWith(fakePath)
-    //       );
-    //     });
-    //   });
+        it('matchDeviceFromDeviceName', () => {
+          const result = client.matchDeviceFromDeviceName(fakePath);
+          assert.strictEqual(result, expectedParameters.device);
+        });
+      });
 
-    //   describe('location', () => {
-    //     const fakePath = '/rendered/path/location';
-    //     const expectedParameters = {
-    //       project: 'projectValue',
-    //       location: 'locationValue',
-    //     };
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.initialize();
-    //     client.pathTemplates.locationPathTemplate.render = sinon
-    //       .stub()
-    //       .returns(fakePath);
-    //     client.pathTemplates.locationPathTemplate.match = sinon
-    //       .stub()
-    //       .returns(expectedParameters);
+      describe('location', () => {
+        const expectedParameters = {
+          project: 'projectValue',
+          location: 'locationValue',
+        };
+        const fakePath = `projects/${expectedParameters.project}/locations/${expectedParameters.location}`;
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: 'bogus',
+            project: 'bogus',
+            token: 'bogus',
+            url: 'https://bogus.com',
+          },
+        });
+        client.initialize();
 
-    //     it('locationPath', () => {
-    //       const result = client.locationPath('projectValue', 'locationValue');
-    //       assert.strictEqual(result, fakePath);
-    //       assert(
-    //         (client.pathTemplates.locationPathTemplate.render as SinonStub)
-    //           .getCall(-1)
-    //           .calledWith(expectedParameters)
-    //       );
-    //     });
+        it('locationPath', () => {
+          const result = client.locationPath(
+            expectedParameters.project,
+            expectedParameters.location
+          );
+          assert.strictEqual(result, fakePath);
+        });
 
-    //     it('matchProjectFromLocationName', () => {
-    //       const result = client.matchProjectFromLocationName(fakePath);
-    //       assert.strictEqual(result, 'projectValue');
-    //       assert(
-    //         (client.pathTemplates.locationPathTemplate.match as SinonStub)
-    //           .getCall(-1)
-    //           .calledWith(fakePath)
-    //       );
-    //     });
+        it('matchProjectFromLocationName', () => {
+          const result = client.matchProjectFromLocationName(fakePath);
+          assert.strictEqual(result, expectedParameters.project);
+        });
 
-    //     it('matchLocationFromLocationName', () => {
-    //       const result = client.matchLocationFromLocationName(fakePath);
-    //       assert.strictEqual(result, 'locationValue');
-    //       assert(
-    //         (client.pathTemplates.locationPathTemplate.match as SinonStub)
-    //           .getCall(-1)
-    //           .calledWith(fakePath)
-    //       );
-    //     });
-    //   });
+        it('matchLocationFromLocationName', () => {
+          const result = client.matchLocationFromLocationName(fakePath);
+          assert.strictEqual(result, expectedParameters.location);
+        });
+      });
 
-    //   describe('registry', () => {
-    //     const fakePath = '/rendered/path/registry';
-    //     const expectedParameters = {
-    //       project: 'projectValue',
-    //       location: 'locationValue',
-    //       registry: 'registryValue',
-    //     };
-    //     const client = new devicemanagerModule.v1.DeviceManagerClient({
-    //       credentials: {client_email: 'bogus', private_key: 'bogus'},
-    //       projectId: 'bogus',
-    //     });
-    //     client.initialize();
-    //     client.pathTemplates.registryPathTemplate.render = sinon
-    //       .stub()
-    //       .returns(fakePath);
-    //     client.pathTemplates.registryPathTemplate.match = sinon
-    //       .stub()
-    //       .returns(expectedParameters);
+      describe('registry', () => {
+        const expectedParameters = {
+          project: 'projectValue',
+          location: 'locationValue',
+          registry: 'registryValue',
+        };
+        const fakePath = `projects/${expectedParameters.project}/locations/${expectedParameters.location}/registries/${expectedParameters.registry}`;
+        const client = new devicemanagerModule.v1.DeviceManagerClient({
+          credentials: {
+            systemKey: 'bogus',
+            project: 'bogus',
+            token: 'bogus',
+            url: 'https://bogus.com',
+          },
+        });
+        client.initialize();
 
-    //     it('registryPath', () => {
-    //       const result = client.registryPath(
-    //         'projectValue',
-    //         'locationValue',
-    //         'registryValue'
-    //       );
-    //       assert.strictEqual(result, fakePath);
-    //       assert(
-    //         (client.pathTemplates.registryPathTemplate.render as SinonStub)
-    //           .getCall(-1)
-    //           .calledWith(expectedParameters)
-    //       );
-    //     });
+        it('registryPath', () => {
+          const result = client.registryPath(
+            expectedParameters.project,
+            expectedParameters.location,
+            expectedParameters.registry
+          );
+          assert.strictEqual(result, fakePath);
+        });
 
-    //     it('matchProjectFromRegistryName', () => {
-    //       const result = client.matchProjectFromRegistryName(fakePath);
-    //       assert.strictEqual(result, 'projectValue');
-    //       assert(
-    //         (client.pathTemplates.registryPathTemplate.match as SinonStub)
-    //           .getCall(-1)
-    //           .calledWith(fakePath)
-    //       );
-    //     });
+        it('matchProjectFromRegistryName', () => {
+          const result = client.matchProjectFromRegistryName(fakePath);
+          assert.strictEqual(result, expectedParameters.project);
+        });
 
-    //     it('matchLocationFromRegistryName', () => {
-    //       const result = client.matchLocationFromRegistryName(fakePath);
-    //       assert.strictEqual(result, 'locationValue');
-    //       assert(
-    //         (client.pathTemplates.registryPathTemplate.match as SinonStub)
-    //           .getCall(-1)
-    //           .calledWith(fakePath)
-    //       );
-    //     });
+        it('matchLocationFromRegistryName', () => {
+          const result = client.matchLocationFromRegistryName(fakePath);
+          assert.strictEqual(result, expectedParameters.location);
+        });
 
-    //     it('matchRegistryFromRegistryName', () => {
-    //       const result = client.matchRegistryFromRegistryName(fakePath);
-    //       assert.strictEqual(result, 'registryValue');
-    //       assert(
-    //         (client.pathTemplates.registryPathTemplate.match as SinonStub)
-    //           .getCall(-1)
-    //           .calledWith(fakePath)
-    //       );
-    //     });
-    //  });
+        it('matchRegistryFromRegistryName', () => {
+          const result = client.matchRegistryFromRegistryName(fakePath);
+          assert.strictEqual(result, expectedParameters.registry);
+        });
+      });
+    });
   });
 });

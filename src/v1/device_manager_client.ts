@@ -17,7 +17,13 @@
 // ** All changes to this file may be overwritten. **
 
 /* global window */
-import type {Callback, CallOptions, PaginationCallback} from 'google-gax';
+import type {
+  Callback,
+  CallOptions,
+  PaginationCallback,
+  PathTemplate as IPathTemplate,
+} from 'google-gax';
+import {PathTemplate} from 'google-gax';
 //import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import * as https from 'https';
@@ -192,7 +198,11 @@ export class DeviceManagerClient {
   // };
   // warn: (code: string, message: string, warnType?: string) => void;
   innerApiCalls: {[name: string]: Function};
-  //pathTemplates: {[name: string]: gax.PathTemplate};
+  pathTemplates: {
+    devicePathTemplate: IPathTemplate;
+    locationPathTemplate: IPathTemplate;
+    registryPathTemplate: IPathTemplate;
+  };
   // deviceManagerStub?: Promise<{[name: string]: Function}>;
 
   constructor(opts?: DeviceManagerClientOptions) {
@@ -201,6 +211,21 @@ export class DeviceManagerClient {
     this.ADMIN_USER_TOKEN = serviceAccountCredentials.token;
     this.PROJECT_ID = serviceAccountCredentials.project;
     this.BASE_URL = serviceAccountCredentials.url.replace(/^https?:\/\//, '');
+
+    // This API contains "path templates"; forward-slash-separated
+    // identifiers to uniquely identify resources within the API.
+    // Create useful helper objects for these.
+    this.pathTemplates = {
+      devicePathTemplate: new PathTemplate(
+        'projects/{project}/locations/{location}/registries/{registry}/devices/{device}'
+      ),
+      locationPathTemplate: new PathTemplate(
+        'projects/{project}/locations/{location}'
+      ),
+      registryPathTemplate: new PathTemplate(
+        'projects/{project}/locations/{location}/registries/{registry}'
+      ),
+    };
 
     this.innerApiCalls = {
       createDeviceRegistry: this._createDeviceRegistry,
@@ -592,8 +617,8 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IDeviceRegistry
   >(
     async request => {
-      const registry = this.getRegistryFromRegistryPath(request.name);
-      const region = this.getRegionFromRegistryPath(request.name);
+      const registry = this.matchRegistryFromRegistryName(request.name ?? '');
+      const region = this.matchLocationFromRegistryName(request.name ?? '');
       const token_response = await this.getRegistryToken(registry, region);
       return await new Promise((resolve, reject) => {
         const options = {
@@ -743,11 +768,11 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IDeviceRegistry
   >(
     async request => {
-      const registry = this.getRegistryFromRegistryPath(
-        request?.deviceRegistry?.name
+      const registry = this.matchRegistryFromRegistryName(
+        request?.deviceRegistry?.name ?? ''
       );
-      const region = this.getRegionFromRegistryPath(
-        request?.deviceRegistry?.name
+      const region = this.matchLocationFromRegistryName(
+        request?.deviceRegistry?.name ?? ''
       );
       const token_response = await this.getRegistryToken(registry, region);
       return await new Promise((resolve, reject) => {
@@ -1047,8 +1072,10 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IDevice
   >(
     async request => {
-      const registry = this.getRegistryFromRegistryPath(request?.parent);
-      const region = this.getRegionFromRegistryPath(request?.parent);
+      const registry = this.matchRegistryFromRegistryName(
+        request?.parent ?? ''
+      );
+      const region = this.matchLocationFromRegistryName(request?.parent ?? '');
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
         const payload = JSON.stringify(request?.device);
@@ -1195,8 +1222,8 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IDevice
   >(
     async request => {
-      const registry = this.getRegistryFromDevicePath(request?.name);
-      const region = this.getRegionFromDevicePath(request?.name);
+      const registry = this.matchRegistryFromDeviceName(request?.name ?? '');
+      const region = this.matchLocationFromDeviceName(request?.name ?? '');
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
         const options = {
@@ -1343,13 +1370,17 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IDevice
   >(
     async request => {
-      const registry = this.getRegistryFromDevicePath(request?.device?.name);
-      const region = this.getRegionFromDevicePath(request?.device?.name);
+      const registry = this.matchRegistryFromDeviceName(
+        request?.device?.name ?? ''
+      );
+      const region = this.matchLocationFromDeviceName(
+        request?.device?.name ?? ''
+      );
 
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
-        const deviceName = this.getDeviceNameFromDevicePath(
-          request?.device?.name
+        const deviceName = this.matchDeviceFromDeviceName(
+          request?.device?.name ?? ''
         );
         const payload = JSON.stringify(request?.device);
 
@@ -1496,8 +1527,8 @@ export class DeviceManagerClient {
     protos.google.protobuf.IEmpty
   >(
     async request => {
-      const registry = this.getRegistryFromDevicePath(request?.name);
-      const region = this.getRegionFromDevicePath(request?.name);
+      const registry = this.matchRegistryFromDeviceName(request?.name ?? '');
+      const region = this.matchLocationFromDeviceName(request?.name ?? '');
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
         const options = {
@@ -1659,12 +1690,12 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IDeviceConfig
   >(
     async request => {
-      const registry = this.getRegistryFromDevicePath(request?.name);
-      const region = this.getRegionFromDevicePath(request?.name);
+      const registry = this.matchRegistryFromDeviceName(request?.name ?? '');
+      const region = this.matchLocationFromDeviceName(request?.name ?? '');
 
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
-        const deviceName = this.getDeviceNameFromDevicePath(request?.name);
+        const deviceName = this.matchDeviceFromDeviceName(request?.name ?? '');
 
         const payload = JSON.stringify({
           binaryData: request?.binaryData,
@@ -1827,12 +1858,12 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse
   >(
     async request => {
-      const registry = this.getRegistryFromDevicePath(request?.name);
-      const region = this.getRegionFromDevicePath(request?.name);
+      const registry = this.matchRegistryFromDeviceName(request?.name ?? '');
+      const region = this.matchLocationFromDeviceName(request?.name ?? '');
 
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
-        const deviceName = this.getDeviceNameFromDevicePath(request?.name);
+        const deviceName = this.matchDeviceFromDeviceName(request?.name ?? '');
 
         const options = {
           host: token_response.host,
@@ -1980,12 +2011,12 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IListDeviceStatesResponse
   >(
     async request => {
-      const registry = this.getRegistryFromDevicePath(request?.name);
-      const region = this.getRegionFromDevicePath(request?.name);
+      const registry = this.matchRegistryFromDeviceName(request?.name ?? '');
+      const region = this.matchLocationFromDeviceName(request?.name ?? '');
 
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
-        const deviceName = this.getDeviceNameFromDevicePath(request?.name);
+        const deviceName = this.matchDeviceFromDeviceName(request?.name ?? '');
 
         const options = {
           host: token_response.host,
@@ -2423,12 +2454,12 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.ISendCommandToDeviceResponse
   >(
     async request => {
-      const registry = this.getRegistryFromDevicePath(request?.name);
-      const region = this.getRegionFromDevicePath(request?.name);
+      const registry = this.matchRegistryFromDeviceName(request.name ?? '');
+      const region = this.matchLocationFromDeviceName(request.name ?? '');
 
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
-        const deviceName = this.getDeviceNameFromDevicePath(request?.name);
+        const deviceName = this.matchDeviceFromDeviceName(request.name ?? '');
 
         const payload = JSON.stringify({
           binaryData: request?.binaryData,
@@ -2578,8 +2609,8 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IBindDeviceToGatewayResponse
   >(
     async request => {
-      const registry = this.getRegistryFromRegistryPath(request?.parent);
-      const region = this.getRegionFromRegistryPath(request?.parent);
+      const registry = this.matchRegistryFromRegistryName(request.parent ?? '');
+      const region = this.matchLocationFromRegistryName(request.parent ?? '');
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
         const payload = JSON.stringify({
@@ -2745,8 +2776,8 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IUnbindDeviceFromGatewayResponse
   >(
     async request => {
-      const registry = this.getRegistryFromRegistryPath(request?.parent);
-      const region = this.getRegionFromRegistryPath(request?.parent);
+      const registry = this.matchRegistryFromRegistryName(request.parent ?? '');
+      const region = this.matchLocationFromRegistryName(request.parent ?? '');
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
         const payload = JSON.stringify({
@@ -3238,8 +3269,8 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IListDevicesResponse
   >(
     async request => {
-      const registry = this.getRegistryFromRegistryPath(request?.parent);
-      const region = this.getRegionFromRegistryPath(request?.parent);
+      const registry = this.matchRegistryFromRegistryName(request.parent ?? '');
+      const region = this.matchLocationFromRegistryName(request.parent ?? '');
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
         const payload = JSON.stringify({
@@ -3450,16 +3481,12 @@ export class DeviceManagerClient {
     registry: string,
     device: string
   ) {
-    return (
-      'projects/' +
-      project +
-      '/locations/' +
-      location +
-      '/registries/' +
-      registry +
-      '/devices/' +
-      device
-    );
+    return this.pathTemplates.devicePathTemplate.render({
+      project,
+      location,
+      registry,
+      device,
+    });
   }
 
   /**
@@ -3470,7 +3497,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the project.
    */
   matchProjectFromDeviceName(deviceName: string) {
-    //return this.pathTemplates.devicePathTemplate.match(deviceName).project;
+    return this.pathTemplates.devicePathTemplate.match(deviceName).project;
   }
 
   /**
@@ -3480,8 +3507,9 @@ export class DeviceManagerClient {
    *   A fully-qualified path representing Device resource.
    * @returns {string} A string representing the location.
    */
-  matchLocationFromDeviceName(deviceName: string) {
-    //return this.pathTemplates.devicePathTemplate.match(deviceName).location;
+  matchLocationFromDeviceName(deviceName: string): string {
+    return this.pathTemplates.devicePathTemplate.match(deviceName)
+      .location as string;
   }
 
   /**
@@ -3491,8 +3519,9 @@ export class DeviceManagerClient {
    *   A fully-qualified path representing Device resource.
    * @returns {string} A string representing the registry.
    */
-  matchRegistryFromDeviceName(deviceName: string) {
-    //return this.pathTemplates.devicePathTemplate.match(deviceName).registry;
+  matchRegistryFromDeviceName(deviceName: string): string {
+    return this.pathTemplates.devicePathTemplate.match(deviceName)
+      .registry as string;
   }
 
   /**
@@ -3503,7 +3532,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the device.
    */
   matchDeviceFromDeviceName(deviceName: string) {
-    //return this.pathTemplates.devicePathTemplate.match(deviceName).device;
+    return this.pathTemplates.devicePathTemplate.match(deviceName).device;
   }
 
   /**
@@ -3514,7 +3543,10 @@ export class DeviceManagerClient {
    * @returns {string} Resource name string.
    */
   locationPath(project: string, location: string) {
-    return 'projects/' + project + '/locations/' + location;
+    return this.pathTemplates.locationPathTemplate.render({
+      project,
+      location,
+    });
   }
 
   /**
@@ -3525,7 +3557,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the project.
    */
   matchProjectFromLocationName(locationName: string) {
-    //return this.pathTemplates.locationPathTemplate.match(locationName).project;
+    return this.pathTemplates.locationPathTemplate.match(locationName).project;
   }
 
   /**
@@ -3536,7 +3568,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the location.
    */
   matchLocationFromLocationName(locationName: string) {
-    //return this.pathTemplates.locationPathTemplate.match(locationName).location;
+    return this.pathTemplates.locationPathTemplate.match(locationName).location;
   }
 
   /**
@@ -3548,14 +3580,11 @@ export class DeviceManagerClient {
    * @returns {string} Resource name string.
    */
   registryPath(project: string, location: string, registry: string) {
-    return (
-      'projects/' +
-      project +
-      '/locations/' +
-      location +
-      '/registries/' +
-      registry
-    );
+    return this.pathTemplates.registryPathTemplate.render({
+      project,
+      location,
+      registry,
+    });
   }
 
   /**
@@ -3566,7 +3595,7 @@ export class DeviceManagerClient {
    * @returns {string} A string representing the project.
    */
   matchProjectFromRegistryName(registryName: string) {
-    //return this.pathTemplates.registryPathTemplate.match(registryName).project;
+    return this.pathTemplates.registryPathTemplate.match(registryName).project;
   }
 
   /**
@@ -3576,8 +3605,9 @@ export class DeviceManagerClient {
    *   A fully-qualified path representing Registry resource.
    * @returns {string} A string representing the location.
    */
-  matchLocationFromRegistryName(registryName: string) {
-    //return this.pathTemplates.registryPathTemplate.match(registryName).location;
+  matchLocationFromRegistryName(registryName: string): string {
+    return this.pathTemplates.registryPathTemplate.match(registryName)
+      .location as string;
   }
 
   /**
@@ -3587,58 +3617,9 @@ export class DeviceManagerClient {
    *   A fully-qualified path representing Registry resource.
    * @returns {string} A string representing the registry.
    */
-  matchRegistryFromRegistryName(registryName: string) {
-    //return this.pathTemplates.registryPathTemplate.match(registryName).registry;
-  }
-
-  getRegistryFromRegistryPath(registryPath: string | null | undefined) {
-    if (registryPath === null || typeof registryPath === 'undefined') {
-      throw 'registryPath is empty';
-    }
-    return registryPath.substring(
-      registryPath.indexOf('/registries/') + 12,
-      registryPath.length
-    );
-  }
-
-  getRegionFromRegistryPath(registryPath: string | null | undefined) {
-    if (registryPath === null || typeof registryPath === 'undefined') {
-      throw 'registryPath is empty';
-    }
-    return registryPath.substring(
-      registryPath.indexOf('/locations/') + 11,
-      registryPath.lastIndexOf('/registries')
-    );
-  }
-
-  getRegistryFromDevicePath(devicePath: string | null | undefined) {
-    if (devicePath === null || typeof devicePath === 'undefined') {
-      throw 'devicePath is empty';
-    }
-    return devicePath.substring(
-      devicePath.indexOf('/registries/') + 12,
-      devicePath.lastIndexOf('/devices')
-    );
-  }
-
-  getRegionFromDevicePath(devicePath: string | null | undefined) {
-    if (devicePath === null || typeof devicePath === 'undefined') {
-      throw 'devicePath is empty';
-    }
-    return devicePath.substring(
-      devicePath.indexOf('/locations/') + 11,
-      devicePath.lastIndexOf('/registries')
-    );
-  }
-
-  getDeviceNameFromDevicePath(devicePath: string | null | undefined) {
-    if (devicePath === null || typeof devicePath === 'undefined') {
-      throw 'devicePath is empty';
-    }
-    return devicePath.substring(
-      devicePath.indexOf('/devices/') + 9,
-      devicePath.length
-    );
+  matchRegistryFromRegistryName(registryName: string): string {
+    return this.pathTemplates.registryPathTemplate.match(registryName)
+      .registry as string;
   }
 
   /**
