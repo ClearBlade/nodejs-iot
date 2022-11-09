@@ -219,7 +219,7 @@ const mqttDeviceDemo = (
   // Subscribe to the /devices/{device-id}/config topic to receive config updates.
   // Config updates are recommended to use QoS 1 (at least once delivery)
   client.subscribe(`/devices/${deviceId}/config`, {qos: 1});
-
+  
   // Subscribe to the /devices/{device-id}/commands/# topic to receive all
   // commands or to the /devices/{device-id}/commands/<subfolder> to just receive
   // messages published to a specific commands folder; we recommend you use
@@ -231,7 +231,7 @@ const mqttDeviceDemo = (
   // publish state and 'events' to publish telemetry. Note that this is not the
   // same as the device registry's Cloud Pub/Sub topic.
   const mqttTopic = `/devices/${deviceId}/${messageType}`;
-
+  
   client.on('connect', success => {
     console.log('connect');
     if (!success) {
@@ -718,13 +718,13 @@ const {argv} = require('yargs')
       type: 'number',
     },
     mqttBridgeHostname: {
-      default: 'mqtt.googleapis.com',
+      default: 'iot-sandbox.clearblade.com',
       description: 'MQTT bridge hostname.',
       requiresArg: true,
       type: 'string',
     },
     mqttBridgePort: {
-      default: 8883,
+      default: 1884,
       description: 'MQTT bridge port.',
       requiresArg: true,
       type: 'number',
