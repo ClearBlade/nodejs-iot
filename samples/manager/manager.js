@@ -556,26 +556,6 @@ const clearRegistry = async (registryId, projectId, cloudRegion) => {
   const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient();
 
-  let devices;
-  try {
-    [devices] = await iotClient.listDeviceRegistries({
-      parent: iotClient.locationPath(projectId, cloudRegion),
-    });
-  } catch (err) {
-    console.error('Could not list devices', err);
-    return;
-  }
-
-  // Delete devices in registry
-  console.log('Current devices in registry:', devices);
-  if (devices) {
-    const promises = devices.map((device, index) => {
-      console.log(`${device.id} [${index}/${devices.length}] removed`);
-      return deleteDevice(device.id, registryId, projectId, cloudRegion);
-    });
-    await Promise.all(promises);
-  }
-
   async function deleteRegistry() {
     const registryName = iotClient.registryPath(
       projectId,
