@@ -27,6 +27,7 @@ import {PathTemplate} from 'google-gax';
 import * as protos from '../../protos/protos';
 import * as https from 'https';
 import {URL} from 'url';
+import {stringify} from 'querystring';
 
 function requestFactory<
   RequestObject,
@@ -1233,11 +1234,14 @@ export class DeviceManagerClient {
       return new Promise((resolve, reject) => {
         const options = {
           host: token_response.host,
-          path:
-            '/api/v/4/webhook/execute/' +
-            token_response.systemKey +
-            '/cloudiot_devices?name=' +
-            request?.name,
+          path: `/api/v/4/webhook/execute/${
+            token_response.systemKey
+          }/cloudiot_devices?${stringify({
+            name: request.name,
+            fieldMask: request.fieldMask
+              ? request.fieldMask.paths?.join(',')
+              : undefined,
+          })}`,
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
