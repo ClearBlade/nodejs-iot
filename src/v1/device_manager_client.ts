@@ -790,7 +790,7 @@ export class DeviceManagerClient {
             '/cloudiot?name=' +
             request?.deviceRegistry?.name +
             '&updateMask=' +
-            request?.updateMask,
+            request?.updateMask?.paths?.join(','),
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
