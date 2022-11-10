@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/clearblade/nodejs-iot/compare/v1.0.3..v1.0.4) (2022-11-10)
+
+- fix binaryData Buffer not encoded for sendCommandToDevice and modifyCloudToDeviceConfig
+- add error handling for HTTP requests
+- fix fieldMasks not encoded for multiple methods
+- Miscellaneous bug fixes
+
 ## [1.0.3](https://github.com/clearblade/nodejs-iot/compare/v1.0.2..v1.0.3) (2022-11-04)
 
 - Bug fix for regional URLs
