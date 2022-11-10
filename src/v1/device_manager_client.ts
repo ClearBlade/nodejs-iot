@@ -1703,7 +1703,9 @@ export class DeviceManagerClient {
         const deviceName = this.matchDeviceFromDeviceName(request?.name ?? '');
 
         const payload = JSON.stringify({
-          binaryData: request?.binaryData,
+          binaryData: Buffer.isBuffer(request.binaryData)
+            ? request.binaryData.toString('base64')
+            : request?.binaryData,
           versionToUpdate: request?.versionToUpdate,
         });
         const options = {
@@ -2467,7 +2469,9 @@ export class DeviceManagerClient {
         const deviceName = this.matchDeviceFromDeviceName(request.name ?? '');
 
         const payload = JSON.stringify({
-          binaryData: request?.binaryData,
+          binaryData: Buffer.isBuffer(request.binaryData)
+            ? request.binaryData.toString('base64')
+            : request?.binaryData,
           subfolder: request?.subfolder,
         });
         const options = {
