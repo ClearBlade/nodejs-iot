@@ -790,7 +790,7 @@ export class DeviceManagerClient {
             '/cloudiot?name=' +
             request?.deviceRegistry?.name +
             '&updateMask=' +
-            request?.updateMask,
+            request?.updateMask?.paths?.join(','),
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -1233,11 +1233,16 @@ export class DeviceManagerClient {
       return new Promise((resolve, reject) => {
         const options = {
           host: token_response.host,
-          path:
-            '/api/v/4/webhook/execute/' +
-            token_response.systemKey +
-            '/cloudiot_devices?name=' +
-            request?.name,
+          path: `/api/v/4/webhook/execute/${
+            token_response.systemKey
+          }/cloudiot_devices?name=${request.name}${
+            typeof request.fieldMask !== 'undefined' &&
+            request.fieldMask !== null &&
+            typeof request.fieldMask.paths !== 'undefined' &&
+            request.fieldMask.paths !== null
+              ? `&fieldMask=${request.fieldMask.paths.join(',')}`
+              : ''
+          }`,
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -1397,7 +1402,7 @@ export class DeviceManagerClient {
             '/cloudiot_devices?name=' +
             deviceName +
             '&updateMask=' +
-            request?.updateMask,
+            request?.updateMask?.paths?.join(','),
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
