@@ -1401,7 +1401,7 @@ export class DeviceManagerClient {
             '/cloudiot_devices?name=' +
             deviceName +
             '&updateMask=' +
-            request?.updateMask,
+            request?.updateMask?.paths?.join(','),
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
