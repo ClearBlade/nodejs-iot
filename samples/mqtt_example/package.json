@@ -19,7 +19,7 @@
     "test": "mocha --timeout=600000"
   },
   "dependencies": {
-    "@clearblade/iot": "^3.0.0",
+    "@clearblade/iot": "file:../..",
     "@google-cloud/pubsub": "^3.0.0",
     "jsonwebtoken": "^8.5.0",
     "mqtt": "^4.0.0",

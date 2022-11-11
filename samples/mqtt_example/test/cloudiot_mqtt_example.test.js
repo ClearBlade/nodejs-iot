@@ -50,8 +50,8 @@ before(async () => {
     'Must set GOOGLE_CLOUD_PROJECT or GCLOUD_PROJECT environment variable!'
   );
   assert(
-    process.env.GOOGLE_APPLICATION_CREDENTIALS,
-    'Must set GOOGLE_APPLICATION_CREDENTIALS environment variable!'
+    process.env.CLEARBLADE_CONFIGURATION,
+    'Must set CLEARBLADE_CONFIGURATION environment variable!'
   );
   // Create a unique topic to be used for testing.
   const [topic] = await pubSubClient.createTopic(topicName);
