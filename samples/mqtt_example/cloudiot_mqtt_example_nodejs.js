@@ -43,7 +43,7 @@ console.log('Google Cloud IoT Core MQTT example.');
 const createJwt = (projectId, privateKeyFile, algorithm) => {
   // Create a JWT to authenticate this device. The device will be disconnected
   // after the token expires, and will have to reconnect with a new token. The
-  // audience field should always be set to the GCP project id.
+  // audience field should always be set to the ClearBlade project id.
   const token = {
     iat: parseInt(Date.now() / 1000),
     exp: parseInt(Date.now() / 1000) + 20 * 60, // 20 minutes
@@ -53,6 +53,15 @@ const createJwt = (projectId, privateKeyFile, algorithm) => {
   return jwt.sign(token, privateKey, {algorithm: algorithm});
 };
 // [END iot_mqtt_jwt]
+
+//iot-sandbox.clearblade.com
+const hostFormatted = hostRegion => {
+  if (hostRegion == 'us-central1') return 'us-central1-mqtt.clearblade.com';
+  else if (hostRegion == 'europe-west1')
+    return 'europe-west1-mqtt.clearblade.com';
+  else if (hostRegion == 'asia-east1') return 'asia-east1-mqtt.clearblade.com';
+  else return '';
+};
 
 // Publish numMessages messages asynchronously, starting from message
 // messagesSent.
@@ -219,7 +228,7 @@ const mqttDeviceDemo = (
   // Subscribe to the /devices/{device-id}/config topic to receive config updates.
   // Config updates are recommended to use QoS 1 (at least once delivery)
   client.subscribe(`/devices/${deviceId}/config`, {qos: 1});
-  
+
   // Subscribe to the /devices/{device-id}/commands/# topic to receive all
   // commands or to the /devices/{device-id}/commands/<subfolder> to just receive
   // messages published to a specific commands folder; we recommend you use
@@ -231,7 +240,7 @@ const mqttDeviceDemo = (
   // publish state and 'events' to publish telemetry. Note that this is not the
   // same as the device registry's Cloud Pub/Sub topic.
   const mqttTopic = `/devices/${deviceId}/${messageType}`;
-  
+
   client.on('connect', success => {
     console.log('connect');
     if (!success) {
@@ -676,7 +685,7 @@ const {argv} = require('yargs')
     },
     cloudRegion: {
       default: 'us-central1',
-      description: 'GCP cloud region.',
+      description: 'ClearBlade cloud region.',
       requiresArg: true,
       type: 'string',
     },
@@ -718,13 +727,13 @@ const {argv} = require('yargs')
       type: 'number',
     },
     mqttBridgeHostname: {
-      default: 'iot-sandbox.clearblade.com',
+      default: '',
       description: 'MQTT bridge hostname.',
       requiresArg: true,
       type: 'string',
     },
     mqttBridgePort: {
-      default: 1884,
+      default: 443,
       description: 'MQTT bridge port.',
       requiresArg: true,
       type: 'number',
@@ -757,7 +766,7 @@ const {argv} = require('yargs')
         opts.algorithm,
         opts.privateKeyFile,
         opts.serverCertFile,
-        opts.mqttBridgeHostname,
+        hostFormatted(opts.cloudRegion),
         opts.mqttBridgePort,
         opts.messageType,
         opts.numMessages
@@ -791,7 +800,7 @@ const {argv} = require('yargs')
         opts.algorithm,
         opts.privateKeyFile,
         opts.serverCertFile,
-        opts.mqttBridgeHostname,
+        hostFormatted(opts.cloudRegion),
         opts.mqttBridgePort,
         opts.numMessages,
         opts.tokenExpMins
@@ -825,7 +834,7 @@ const {argv} = require('yargs')
         opts.algorithm,
         opts.privateKeyFile,
         opts.serverCertFile,
-        opts.mqttBridgeHostname,
+        hostFormatted(opts.cloudRegion),
         opts.mqttBridgePort,
         opts.clientDuration
       );
@@ -858,7 +867,7 @@ const {argv} = require('yargs')
         opts.algorithm,
         opts.privateKeyFile,
         opts.serverCertFile,
-        opts.mqttBridgeHostname,
+        hostFormatted(opts.cloudRegion),
         opts.mqttBridgePort,
         opts.clientDuration
       );
