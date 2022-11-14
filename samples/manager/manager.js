@@ -556,26 +556,6 @@ const clearRegistry = async (registryId, projectId, cloudRegion) => {
   const iot = require('@clearblade/iot');
   const iotClient = new iot.v1.DeviceManagerClient();
 
-  let devices;
-  try {
-    [devices] = await iotClient.listDeviceRegistries({
-      parent: iotClient.locationPath(projectId, cloudRegion),
-    });
-  } catch (err) {
-    console.error('Could not list devices', err);
-    return;
-  }
-
-  // Delete devices in registry
-  console.log('Current devices in registry:', devices);
-  if (devices) {
-    const promises = devices.map((device, index) => {
-      console.log(`${device.id} [${index}/${devices.length}] removed`);
-      return deleteDevice(device.id, registryId, projectId, cloudRegion);
-    });
-    await Promise.all(promises);
-  }
-
   async function deleteRegistry() {
     const registryName = iotClient.registryPath(
       projectId,
@@ -649,31 +629,32 @@ const getDevice = async (deviceId, registryId, projectId, cloudRegion) => {
 
     // See full list of device fields: https://cloud.google.com/iot/docs/reference/cloudiot/rest/v1/projects.locations.registries.devices
     // Warning! Use snake_case field names.
-    const fieldMask = {
-      paths: [
-        'id',
-        'name',
-        'num_id',
-        'credentials',
-        'last_heartbeat_time',
-        'last_event_time',
-        'last_state_time',
-        'last_config_ack_time',
-        'last_config_send_time',
-        'blocked',
-        'last_error_time',
-        'last_error_status',
-        'config',
-        'state',
-        'log_level',
-        'metadata',
-        'gateway_config',
-      ],
-    };
+    // const fieldMask = {
+    //   paths: [
+    //     'id',
+    //     'name',
+    //     'num_id',
+    //     'credentials',
+    //     'last_heartbeat_time',
+    //     'last_event_time',
+    //     'last_state_time',
+    //     'last_config_ack_time',
+    //     'last_config_send_time',
+    //     'blocked',
+    //     'last_error_time',
+    //     'last_error_status',
+    //     'config',
+    //     'state',
+    //     'log_level',
+    //     'metadata',
+    //     'gateway_config',
+    //   ],
+    // };
 
     const [response] = await iotClient.getDevice({
       name: devicePath,
-      fieldMask,
+      // todo: bring this back once it's fixed in system
+      // fieldMask,
     });
     const data = response;
 
@@ -766,12 +747,7 @@ const getDeviceConfigs = async (
 
     for (let i = 0; i < configs.length; i++) {
       const config = configs[i];
-      console.log(
-        'Config:',
-        config,
-        '\nData:\n',
-        config.binaryData.toString('utf8')
-      );
+      console.log('Config:', config);
     }
   }
 
@@ -898,110 +874,112 @@ const getRegistry = async (registryId, projectId, cloudRegion) => {
   // [END iot_get_registry]
 };
 
+// Note: IAM not currently supported by ClearBlade IoT Core
 // Retrieves the IAM policy for a given registry.
-const getIamPolicy = async (registryId, projectId, cloudRegion) => {
-  // [START iot_get_iam_policy]
-  // const cloudRegion = 'us-central1';
-  // const projectId = 'adjective-noun-123';
-  // const registryId = 'my-registry';
-  const iot = require('@clearblade/iot');
+// const getIamPolicy = async (registryId, projectId, cloudRegion) => {
+//   // [START iot_get_iam_policy]
+//   // const cloudRegion = 'us-central1';
+//   // const projectId = 'adjective-noun-123';
+//   // const registryId = 'my-registry';
+//   const iot = require('@clearblade/iot');
 
-  const iotClient = new iot.v1.DeviceManagerClient({
-    // optional auth parameters.
-  });
+//   const iotClient = new iot.v1.DeviceManagerClient({
+//     // optional auth parameters.
+//   });
 
-  async function getIamPolicy() {
-    // Construct request
-    const formattedResource = iotClient.registryPath(
-      projectId,
-      cloudRegion,
-      registryId
-    );
+//   async function getIamPolicy() {
+//     // Construct request
+//     const formattedResource = iotClient.registryPath(
+//       projectId,
+//       cloudRegion,
+//       registryId
+//     );
 
-    let bindings;
-    const [response] = await iotClient.getIamPolicy({
-      resource: formattedResource,
-    });
+//     let bindings;
+//     const [response] = await iotClient.getIamPolicy({
+//       resource: formattedResource,
+//     });
 
-    bindings = response.bindings;
-    const etag = response.etag;
+//     bindings = response.bindings;
+//     const etag = response.etag;
 
-    console.log('ETAG:', etag);
-    bindings = bindings || [];
+//     console.log('ETAG:', etag);
+//     bindings = bindings || [];
 
-    bindings.forEach(_binding => {
-      console.log(`Role: ${_binding.role}`);
-      _binding.members || (_binding.members = []);
-      _binding.members.forEach(_member => {
-        console.log(`\t${_member}`);
-      });
-    });
-  }
+//     bindings.forEach(_binding => {
+//       console.log(`Role: ${_binding.role}`);
+//       _binding.members || (_binding.members = []);
+//       _binding.members.forEach(_member => {
+//         console.log(`\t${_member}`);
+//       });
+//     });
+//   }
 
-  getIamPolicy();
+//   getIamPolicy();
 
-  // [END iot_get_iam_policy]
-};
+//   // [END iot_get_iam_policy]
+// };
 
+// Note: IAM not currently supported by ClearBlade IoT Core
 // Sets the IAM permissions for a given registry to a single member / role.
-const setIamPolicy = async (
-  registryId,
-  projectId,
-  cloudRegion,
-  member,
-  role
-) => {
-  // [START iot_set_iam_policy]
-  // const cloudRegion = 'us-central1';
-  // const projectId = 'adjective-noun-123';
-  // const registryId = 'my-registry';
+// const setIamPolicy = async (
+//   registryId,
+//   projectId,
+//   cloudRegion,
+//   member,
+//   role
+// ) => {
+//   // [START iot_set_iam_policy]
+//   // const cloudRegion = 'us-central1';
+//   // const projectId = 'adjective-noun-123';
+//   // const registryId = 'my-registry';
 
-  const iot = require('@clearblade/iot');
+//   const iot = require('@clearblade/iot');
 
-  const iotClient = new iot.v1.DeviceManagerClient({
-    // optional auth parameters.
-  });
+//   const iotClient = new iot.v1.DeviceManagerClient({
+//     // optional auth parameters.
+//   });
 
-  async function setIamPolicy() {
-    // Construct request
-    const resource = iotClient.registryPath(projectId, cloudRegion, registryId);
+//   async function setIamPolicy() {
+//     // Construct request
+//     const resource = iotClient.registryPath(projectId, cloudRegion, registryId);
 
-    const policy = {
-      bindings: [
-        {
-          members: [member],
-          role: role,
-        },
-      ],
-    };
+//     const policy = {
+//       bindings: [
+//         {
+//           members: [member],
+//           role: role,
+//         },
+//       ],
+//     };
 
-    const request = {
-      resource: resource,
-      policy: policy,
-    };
+//     const request = {
+//       resource: resource,
+//       policy: policy,
+//     };
 
-    let bindings;
+//     let bindings;
 
-    const [response] = await iotClient.setIamPolicy(request);
+//     const [response] = await iotClient.setIamPolicy(request);
 
-    bindings = response.bindings;
-    const etag = response.etag;
+//     bindings = response.bindings;
+//     const etag = response.etag;
 
-    console.log('ETAG:', etag);
-    bindings = bindings || [];
+//     console.log('ETAG:', etag);
+//     bindings = bindings || [];
 
-    bindings.forEach(_binding => {
-      console.log(`Role: ${_binding.role}`);
-      _binding.members || (_binding.members = []);
-      _binding.members.forEach(_member => {
-        console.log(`\t${_member}`);
-      });
-    });
-  }
+//     bindings.forEach(_binding => {
+//       console.log(`Role: ${_binding.role}`);
+//       _binding.members || (_binding.members = []);
+//       _binding.members.forEach(_member => {
+//         console.log(`\t${_member}`);
+//       });
+//     });
+//   }
 
-  setIamPolicy();
-  // [END iot_set_iam_policy]
-};
+//   setIamPolicy();
+//   // [END iot_set_iam_policy]
+// };
 
 // Creates a gateway.
 const createGateway = async (
@@ -1657,28 +1635,28 @@ require(`yargs`) // eslint-disable-line
       );
     }
   )
-  .command(
-    'getIamPolicy <registryId>',
-    'Gets the IAM permissions for a given registry',
-    {},
-    async opts => {
-      await getIamPolicy(opts.registryId, opts.projectId, opts.cloudRegion);
-    }
-  )
-  .command(
-    'setIamPolicy <registryId> <member> <role>',
-    'Gets the IAM permissions for a given registry',
-    {},
-    async opts => {
-      await setIamPolicy(
-        opts.registryId,
-        opts.projectId,
-        opts.cloudRegion,
-        opts.member,
-        opts.role
-      );
-    }
-  )
+  // .command(
+  //   'getIamPolicy <registryId>',
+  //   'Gets the IAM permissions for a given registry',
+  //   {},
+  //   async opts => {
+  //     await getIamPolicy(opts.registryId, opts.projectId, opts.cloudRegion);
+  //   }
+  // )
+  // .command(
+  //   'setIamPolicy <registryId> <member> <role>',
+  //   'Gets the IAM permissions for a given registry',
+  //   {},
+  //   async opts => {
+  //     await setIamPolicy(
+  //       opts.registryId,
+  //       opts.projectId,
+  //       opts.cloudRegion,
+  //       opts.member,
+  //       opts.role
+  //     );
+  //   }
+  // )
   .command(
     'createGateway',
     'Creates a gateway',
@@ -1839,7 +1817,7 @@ require(`yargs`) // eslint-disable-line
   .example('node $0 deleteRegistry my-device my-registry')
   .example('node $0 getDevice my-device my-registry')
   .example('node $0 getDeviceState my-device my-registry')
-  .example('node $0 getIamPolicy my-registry')
+  // .example('node $0 getIamPolicy my-registry')
   .example('node $0 getRegistry my-registry')
   .example(
     'node $0 listDevices -s path/svc.json -p your-project-id -c asia-east1 my-registry'
@@ -1851,9 +1829,9 @@ require(`yargs`) // eslint-disable-line
   .example('node $0 patchEs256 my-device my-registry ../ec_public.pem')
   .example('node $0 setConfig my-device my-registry "test" 0')
   .example('node $0 sendCommand my-device my-registry test')
-  .example(
-    'node $0 setIamPolicy my-registry user:example@example.com roles/viewer'
-  )
+  // .example(
+  //   'node $0 setIamPolicy my-registry user:example@example.com roles/viewer'
+  // )
   .example(
     'node $0 setupTopic my-iot-topic --serviceAccount=$HOME/creds_iot.json --projectId=my-project-id'
   )

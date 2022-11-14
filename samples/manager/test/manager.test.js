@@ -76,8 +76,6 @@ after(async () => {
   await pubSubClient.topic(topicName).delete();
   console.log(`Topic ${topicName} deleted.`);
 
-  // Cleans up the registry by removing all associations and deleting all devices.
-  execSync(`${cmd} unbindAllDevices ${registryName}`, cwd);
   execSync(`${cmd} clearRegistry ${registryName}`, cwd);
 
   console.log('Deleted test registry.');
@@ -212,7 +210,6 @@ it('should create and list devices', async () => {
 
 it('should create and get a device', async () => {
   const localDevice = 'test-device-get';
-
   let output = await execSync(
     `${cmd} createUnauthDevice ${localDevice} ${registryName}`,
     cwd
@@ -229,7 +226,7 @@ it('should create and get a device', async () => {
   );
 });
 
-it('should create and get an iam policy', async () => {
+xit('should create and get an iam policy', async () => {
   const localMember = 'group:dpebot@google.com';
   const localRole = 'roles/viewer';
 
