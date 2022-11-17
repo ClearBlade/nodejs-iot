@@ -53,6 +53,10 @@ before(async () => {
     process.env.GOOGLE_APPLICATION_CREDENTIALS,
     'Must set GOOGLE_APPLICATION_CREDENTIALS environment variable!'
   );
+  assert(
+    process.env.CLEARBLADE_CONFIGURATION,
+    'Must set CLEARBLADE_CONFIGURATION environment variable!'
+  );
   // Create a unique topic to be used for testing.
   const [topic] = await pubSubClient.createTopic(topicName);
 
