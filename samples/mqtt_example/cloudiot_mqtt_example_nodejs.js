@@ -1,5 +1,3 @@
-// Copyright 2020 Google LLC
-//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -35,7 +33,7 @@ let backoffTime = 1;
 // Whether an asynchronous publish chain is in progress.
 let publishChainInProgress = false;
 
-console.log('Google Cloud IoT Core MQTT example.');
+console.log('ClearBlade Cloud IoT Core MQTT example.');
 
 // Create a Cloud IoT Core JWT for the given project id, signed with the given
 // private key.
@@ -43,7 +41,7 @@ console.log('Google Cloud IoT Core MQTT example.');
 const createJwt = (projectId, privateKeyFile, algorithm) => {
   // Create a JWT to authenticate this device. The device will be disconnected
   // after the token expires, and will have to reconnect with a new token. The
-  // audience field should always be set to the GCP project id.
+  // audience field should always be set to the ClearBlade project id.
   const token = {
     iat: parseInt(Date.now() / 1000),
     exp: parseInt(Date.now() / 1000) + 20 * 60, // 20 minutes
@@ -188,16 +186,16 @@ const mqttDeviceDemo = (
   // const algorithm = `RS256`;
   // const privateKeyFile = `./rsa_private.pem`;
   // const serverCertFile = `./roots.pem`;
-  // const mqttBridgeHostname = `mqtt.googleapis.com`;
+  // const mqttBridgeHostname = `mqtt.clearblade.com`;
   // const mqttBridgePort = 8883;
   // const messageType = `events`;
   // const numMessages = 5;
 
-  // The mqttClientId is a unique string that identifies this device. For Google
+  // The mqttClientId is a unique string that identifies this device. For ClearBlade
   // Cloud IoT Core, it must be in the format below.
   const mqttClientId = `projects/${projectId}/locations/${region}/registries/${registryId}/devices/${deviceId}`;
 
-  // With Google Cloud IoT Core, the username field is ignored, however it must be
+  // With ClearBlade Cloud IoT Core, the username field is ignored, however it must be
   // non-empty. The password field is used to transmit a JWT to authorize the
   // device. The "mqtts" protocol causes the library to connect using SSL, which
   // is required for Cloud IoT Core.
@@ -212,7 +210,7 @@ const mqttDeviceDemo = (
     ca: [readFileSync(serverCertFile)],
   };
 
-  // Create a client, and connect to the Google MQTT bridge.
+  // Create a client, and connect to the ClearBlade MQTT bridge.
   const iatTime = parseInt(Date.now() / 1000);
   const client = mqtt.connect(connectionArgs);
 
@@ -266,7 +264,7 @@ const mqttDeviceDemo = (
     // Note: logging packet send is very verbose
   });
 
-  // Once all of the messages have been published, the connection to Google Cloud
+  // Once all of the messages have been published, the connection to ClearBlade Cloud
   // IoT will be closed and the process will exit. See the publishAsync method.
   // [END iot_mqtt_run]
 };
@@ -422,7 +420,7 @@ const sendDataFromBoundDevice = (
   // const algorithm = `RS256`;
   // const privateKeyFile = `./rsa_private.pem`;
   // const serverCertFile = `./roots.pem`;
-  // const mqttBridgeHostname = `mqtt.googleapis.com`;
+  // const mqttBridgeHostname = `mqtt.clearblade.com`;
   // const mqttBridgePort = 8883;
   // const numMessages = 5;
   // const tokenExpMins = 60;
@@ -441,7 +439,7 @@ const sendDataFromBoundDevice = (
     ca: [readFileSync(serverCertFile)],
   };
 
-  // Create a client, and connect to the Google MQTT bridge.
+  // Create a client, and connect to the ClearBlade MQTT bridge.
   const iatTime = parseInt(Date.now() / 1000);
   const client = mqtt.connect(connectionArgs);
 
@@ -515,7 +513,7 @@ const listenForConfigMessages = (
   // const algorithm = `RS256`;
   // const privateKeyFile = `./rsa_private.pem`;
   // const serverCertFile = `./roots.pem`;
-  // const mqttBridgeHostname = `mqtt.googleapis.com`;
+  // const mqttBridgeHostname = `mqtt.clearblade.com`;
   // const mqttBridgePort = 8883;
   // const clientDuration = 60000;
 
@@ -533,7 +531,7 @@ const listenForConfigMessages = (
     ca: [readFileSync(serverCertFile)],
   };
 
-  // Create a client, and connect to the Google MQTT bridge.
+  // Create a client, and connect to the ClearBlade MQTT bridge.
   const client = mqtt.connect(connectionArgs);
 
   client.on('connect', success => {
@@ -605,7 +603,7 @@ const listenForErrorMessages = (
   // const algorithm = `RS256`;
   // const privateKeyFile = `./rsa_private.pem`;
   // const serverCertFile = `./roots.pem`;
-  // const mqttBridgeHostname = `mqtt.googleapis.com`;
+  // const mqttBridgeHostname = `mqtt.clearblade.com`;
   // const mqttBridgePort = 8883;
   // const clientDuration = 60000;
 
@@ -623,7 +621,7 @@ const listenForErrorMessages = (
     ca: [readFileSync(serverCertFile)],
   };
 
-  // Create a client, and connect to the Google MQTT bridge.
+  // Create a client, and connect to the ClearBlade MQTT bridge.
   const client = mqtt.connect(connectionArgs);
 
   client.on('connect', success => {
@@ -676,7 +674,7 @@ const {argv} = require('yargs')
     },
     cloudRegion: {
       default: 'us-central1',
-      description: 'GCP cloud region.',
+      description: 'ClearBlade cloud region.',
       requiresArg: true,
       type: 'string',
     },
@@ -718,13 +716,13 @@ const {argv} = require('yargs')
       type: 'number',
     },
     mqttBridgeHostname: {
-      default: 'mqtt.googleapis.com',
+      default: '',
       description: 'MQTT bridge hostname.',
       requiresArg: true,
       type: 'string',
     },
     mqttBridgePort: {
-      default: 8883,
+      default: 443,
       description: 'MQTT bridge port.',
       requiresArg: true,
       type: 'number',
@@ -878,6 +876,8 @@ const {argv} = require('yargs')
   )
   .wrap(120)
   .recommendCommands()
-  .epilogue('For more information, see https://cloud.google.com/iot-core/docs')
+  .epilogue(
+    'For more information, see https://clearblade.atlassian.net/wiki/spaces/IC/pages/2210299905/Re-targetting+Devices'
+  )
   .help()
   .strict();

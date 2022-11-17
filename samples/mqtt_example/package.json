@@ -1,7 +1,7 @@
 {
-  "author": "Google Inc.",
+  "author": "ClearBlade Inc.",
   "version": "0.0.1",
-  "description": "MQTT Example for Google Cloud IoT Core using NodeJS.",
+  "description": "MQTT Example for ClearBlade Cloud IoT Core using NodeJS.",
   "license": "Apache-2.0",
   "main": "cloudiot_mqtt_example_nodejs.js",
   "name": "nodejs-docs-samples-iot-mqtt-example",
@@ -10,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/googleapis/nodejs-iot.git"
+    "url": "https://github.com/ClearBlade/nodejs-iot.git"
   },
   "engines": {
     "node": ">=10.0.0"
@@ -19,7 +19,7 @@
     "test": "mocha --timeout=600000"
   },
   "dependencies": {
-    "@clearblade/iot": "^3.0.0",
+    "@clearblade/iot": "^1.0.4",
     "@google-cloud/pubsub": "^3.0.0",
     "jsonwebtoken": "^8.5.0",
     "mqtt": "^4.0.0",
