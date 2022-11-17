@@ -52,15 +52,6 @@ const createJwt = (projectId, privateKeyFile, algorithm) => {
 };
 // [END iot_mqtt_jwt]
 
-//iot-sandbox.clearblade.com
-const hostFormatted = hostRegion => {
-  if (hostRegion === 'us-central1') return 'us-central1-mqtt.clearblade.com';
-  else if (hostRegion === 'europe-west1')
-    return 'europe-west1-mqtt.clearblade.com';
-  else if (hostRegion === 'asia-east1') return 'asia-east1-mqtt.clearblade.com';
-  else return '';
-};
-
 // Publish numMessages messages asynchronously, starting from message
 // messagesSent.
 // [START iot_mqtt_publish]
@@ -764,7 +755,7 @@ const {argv} = require('yargs')
         opts.algorithm,
         opts.privateKeyFile,
         opts.serverCertFile,
-        hostFormatted(opts.cloudRegion),
+        opts.mqttBridgeHostname,
         opts.mqttBridgePort,
         opts.messageType,
         opts.numMessages
@@ -798,7 +789,7 @@ const {argv} = require('yargs')
         opts.algorithm,
         opts.privateKeyFile,
         opts.serverCertFile,
-        hostFormatted(opts.cloudRegion),
+        opts.mqttBridgeHostname,
         opts.mqttBridgePort,
         opts.numMessages,
         opts.tokenExpMins
@@ -832,7 +823,7 @@ const {argv} = require('yargs')
         opts.algorithm,
         opts.privateKeyFile,
         opts.serverCertFile,
-        hostFormatted(opts.cloudRegion),
+        opts.mqttBridgeHostname,
         opts.mqttBridgePort,
         opts.clientDuration
       );
@@ -865,7 +856,7 @@ const {argv} = require('yargs')
         opts.algorithm,
         opts.privateKeyFile,
         opts.serverCertFile,
-        hostFormatted(opts.cloudRegion),
+        opts.mqttBridgeHostname,
         opts.mqttBridgePort,
         opts.clientDuration
       );
