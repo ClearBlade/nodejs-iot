@@ -50,6 +50,10 @@ before(async () => {
     'Must set GOOGLE_CLOUD_PROJECT or GCLOUD_PROJECT environment variable!'
   );
   assert(
+    process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    'Must set GOOGLE_APPLICATION_CREDENTIALS environment variable!'
+  );
+  assert(
     process.env.CLEARBLADE_CONFIGURATION,
     'Must set CLEARBLADE_CONFIGURATION environment variable!'
   );
