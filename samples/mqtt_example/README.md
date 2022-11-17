@@ -1,13 +1,13 @@
-<img src="https://avatars2.githubusercontent.com/u/2810941?v=3&s=96" alt="Google Cloud Platform logo" title="Google Cloud Platform" align="right" height="96" width="96"/>
+<img src="https://avatars.githubusercontent.com/u/2822779?s=200&v=4" alt="ClearBlade logo" title="ClearBlade" align="right" height="96" width="96"/>
 
-# Google Cloud IoT Core NodeJS MQTT example
+# ClearBlade IoT Core NodeJS MQTT example
 
 This sample app publishes data to Cloud Pub/Sub using the MQTT bridge provided
-as part of Google Cloud IoT Core.
+as part of ClearBlade IoT Core.
 
 Note that before you can run this sample, you must register a device as
 described in the parent README. For the gateway samples, you must register and bind
-a device as described in the [Cloud IoT gateway docs](https://cloud.google.com/iot/docs/how-tos/gateways/#setup).
+a device as described in the [ClearBlade IoT gateway docs](https://clearblade.atlassian.net/wiki/spaces/IC/pages/2202664978/Creating+gateways).
 
 # Setup
 
@@ -15,7 +15,7 @@ Run the following command to install the library dependencies for NodeJS:
 
     npm install
 
-Download server certificate as described in the [Cloud IoT MQTT guides](https://cloud.google.com/iot/docs/how-tos/mqtt-bridge#downloading_mqtt_server_certificates).
+Download server certificate as described in the [ClearBlade docs](https://clearblade.atlassian.net/wiki/spaces/IC/pages/2210299905/Re-targetting+Devices).
 
 # Running the sample
 
@@ -24,15 +24,14 @@ The following command summarizes the sample usage:
     Usage: cloudiot_mqtt_example_nodejs [command] [options]
 
     Commands:
-        mqttDeviceDemo              Example Google Cloud IoT Core MQTT device connection demo.
+        mqttDeviceDemo              Example ClearBlade IoT Core MQTT device connection demo.
         sendDataFromBoundDevice     Demonstrates sending data from a gateway on behalf of a bound device.
         listenForConfigMessages     Demonstrates listening for config messages on a gateway client of a bound device.
         listenForErrorMessages      Demonstrates listening for error messages on a gateway.
 
     Options:
 
-        --projectId           The Project ID to use. Defaults to the value of the GCLOUD_PROJECT or GOOGLE_CLOUD_PROJECT
-                            environment variables.
+        --projectId           The Project ID to use.
         --cloudRegion         GCP cloud region.
         --registryId          Cloud IoT registry ID.
         --deviceId            Cloud IoT device ID.
@@ -83,19 +82,17 @@ run the following examples:
 
 # Sending a configuration update
 
-For `listenForConfigMessages` example, try sending a config update to the device while the client is running. This can be done via the Google Cloud IoT Core UI or through the command line with the following command.
-
-    gcloud iot devices configs update --region=us-central1 --registry=my-registry --device=my-device --config-data="testing"
+For `listenForConfigMessages` example, try sending a config update to the device while the client is running. This can be done via the ClearBlade IoT Core UI.
 
 # Reading the messages written by the sample client
 
-1. Create a subscription to your topic.
+1.  Create a subscription to your topic.
 
         gcloud pubsub subscriptions create \
             projects/your-project-id/subscriptions/my-subscription \
             --topic device-events
 
-2. Read messages published to the topic
+2.  Read messages published to the topic
 
         gcloud pubsub subscriptions pull --auto-ack \
             projects/my-iot-project/subscriptions/my-subscription
