@@ -45,10 +45,7 @@ The following command summarizes the sample usage:
         --messageType         Message type to publish.
         --help                Show help
 
-For example, if your project ID is `blue-jet-123`, your service account
-credentials are stored in your home folder in creds.json and you have generated
-your credentials using the shell script provided in the parent folder, you can
-run the following examples:
+Examples:
 
     node cloudiot_mqtt_example_nodejs.js mqttDeviceDemo \
         --mqttBridgeHostname=us-central1-mqtt.clearblade.com \
@@ -56,8 +53,8 @@ run the following examples:
         --cloudRegion=us-central1 \
         --registryId=my-registry \
         --deviceId=my-device \
-        --privateKeyFile=../rsa_private.pem \
-        --serverCertFile=../roots.pem \
+        --privateKeyFile=/path/to/rsa_private.pem \
+        --serverCertFile=/path/to/root.pem \
         --algorithm=RS256
 
     node cloudiot_mqtt_example_nodejs.js sendDataFromBoundDevice \
@@ -67,8 +64,8 @@ run the following examples:
         --registryId=my-registry \
         --gatewayId=my-gateway \
         --deviceId=my-device \
-        --privateKeyFile=../rsa_private.pem \
-        --serverCertFile=../roots.pem \
+        --privateKeyFile=/path/to/rsa_private.pem \
+        --serverCertFile=/path/to/root.pem \
         --algorithm=RS256
 
     node cloudiot_mqtt_example_nodejs.js listenForConfigMessages \
@@ -78,8 +75,8 @@ run the following examples:
         --registryId=my-registry \
         --gatewayid=my-gateway \
         --deviceId=my-device \
-        --privateKeyFile=../rsa_private.pem \
-        --serverCertFile=../roots.pem \
+        --privateKeyFile=/path/to/rsa_private.pem \
+        --serverCertFile=/path/to/root.pem \
         --algorithm=RS256
         --clientDuration=60000
 

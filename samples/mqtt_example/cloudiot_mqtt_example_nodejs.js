@@ -863,16 +863,16 @@ const {argv} = require('yargs')
     }
   )
   .example(
-    'node $0 mqttDeviceDemo --mqttBridgeHostname=us-central1-mqtt.clearblade.com \\\n\t--projectId=blue-jet-123 \\\n\t--registryId=my-registry --deviceId=my-node-device \\\n\t--privateKeyFile=../rsa_private.pem \\\n\t--serverCertFile=../roots.pem --algorithm=RS256 \\\n\t--cloudRegion=us-central1 --numMessages=10 \\\n'
+    'node $0 mqttDeviceDemo --mqttBridgeHostname=us-central1-mqtt.clearblade.com \\\n\t--projectId=blue-jet-123 \\\n\t--registryId=my-registry --deviceId=my-node-device \\\n\t--privateKeyFile=/path/to/rsa_private.pem \\\n\t--serverCertFile=/path/to/root.pem --algorithm=RS256 \\\n\t--cloudRegion=us-central1 --numMessages=10 \\\n'
   )
   .example(
-    'node $0 sendDataFromBoundDevice --mqttBridgeHostname=us-central1-mqtt.clearblade.com \\\n\t--projectId=blue-jet-123 \\\n\t--registryId=my-registry --deviceId=my-node-device \\\n\t--privateKeyFile=../rsa_private.pem \\\n\t--serverCertFile=../roots.pem --algorithm=RS256 \\\n\t--cloudRegion=us-central1 --gatewayId=my-node-gateway \\\n'
+    'node $0 sendDataFromBoundDevice --mqttBridgeHostname=us-central1-mqtt.clearblade.com \\\n\t--projectId=blue-jet-123 \\\n\t--registryId=my-registry --deviceId=my-node-device \\\n\t--privateKeyFile=/path/to/rsa_private.pem \\\n\t--serverCertFile=/path/to/root.pem --algorithm=RS256 \\\n\t--cloudRegion=us-central1 --gatewayId=my-node-gateway \\\n'
   )
   .example(
-    'node $0 listenForConfigMessages --mqttBridgeHostname=us-central1-mqtt.clearblade.com \\\n\t--projectId=blue-jet-123 \\\n\t--registryId=my-registry --deviceId=my-node-device \\\n\t--privateKeyFile=../rsa_private.pem \\\n\t--serverCertFile=../roots.pem --algorithm=RS256 \\\n\t--cloudRegion=us-central1 --gatewayId=my-node-gateway \\\n\t--clientDuration=300000 \\\n'
+    'node $0 listenForConfigMessages --mqttBridgeHostname=us-central1-mqtt.clearblade.com \\\n\t--projectId=blue-jet-123 \\\n\t--registryId=my-registry --deviceId=my-node-device \\\n\t--privateKeyFile=/path/to/rsa_private.pem \\\n\t--serverCertFile=/path/to/root.pem --algorithm=RS256 \\\n\t--cloudRegion=us-central1 --gatewayId=my-node-gateway \\\n\t--clientDuration=300000 \\\n'
   )
   .example(
-    'node $0 listenForErrorMessages --mqttBridgeHostname=us-central1-mqtt.clearblade.com \\\n\t--projectId=blue-jet-123 \\\n\t--registryId=my-registry --deviceId=my-node-device \\\n\t--privateKeyFile=../rsa_private.pem \\\n\t--serverCertFile=../roots.pem --algorithm=RS256 \\\n\t--cloudRegion=us-central1 --gatewayId=my-node-gateway \\\n\t--clientDuration=300000 \\\n'
+    'node $0 listenForErrorMessages --mqttBridgeHostname=us-central1-mqtt.clearblade.com \\\n\t--projectId=blue-jet-123 \\\n\t--registryId=my-registry --deviceId=my-node-device \\\n\t--privateKeyFile=/path/to/rsa_private.pem \\\n\t--serverCertFile=/path/to/root.pem --algorithm=RS256 \\\n\t--cloudRegion=us-central1 --gatewayId=my-node-gateway \\\n\t--clientDuration=300000 \\\n'
   )
   .wrap(120)
   .recommendCommands()
