@@ -51,6 +51,7 @@ your credentials using the shell script provided in the parent folder, you can
 run the following examples:
 
     node cloudiot_mqtt_example_nodejs.js mqttDeviceDemo \
+        --mqttBridgeHostname=us-central1-mqtt.clearblade.com \
         --projectId=blue-jet-123 \
         --cloudRegion=us-central1 \
         --registryId=my-registry \
@@ -60,6 +61,7 @@ run the following examples:
         --algorithm=RS256
 
     node cloudiot_mqtt_example_nodejs.js sendDataFromBoundDevice \
+        --mqttBridgeHostname=us-central1-mqtt.clearblade.com \
         --projectId=blue-jet-123 \
         --cloudRegion=us-central1 \
         --registryId=my-registry \
@@ -70,6 +72,7 @@ run the following examples:
         --algorithm=RS256
 
     node cloudiot_mqtt_example_nodejs.js listenForConfigMessages \
+        --mqttBridgeHostname=us-central1-mqtt.clearblade.com \
         --projectId=blue-jet-123 \
         --cloudRegion=us-central1 \
         --registryId=my-registry \
