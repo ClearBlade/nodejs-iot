@@ -3299,13 +3299,78 @@ export class DeviceManagerClient {
           parent: request?.parent,
         });
 
+        const searchParams = new URLSearchParams();
+
+        if (request.parent) {
+          searchParams.set('parent', request.parent);
+        }
+
+        if (request.deviceIds) {
+          searchParams.set('deviceIds', request.deviceIds.join(','));
+        }
+
+        if (request.deviceNumIds) {
+          searchParams.set('deviceNumIds', request.deviceNumIds.join(','));
+        }
+
+        if (request.fieldMask && request.fieldMask.paths) {
+          searchParams.set('fieldMask', request.fieldMask.paths?.join(','));
+        }
+
+        if (request.gatewayListOptions?.associationsDeviceId) {
+          searchParams.set(
+            'gatewayListOptions.associationsDeviceId',
+            request.gatewayListOptions.associationsDeviceId
+          );
+        }
+
+        if (request.gatewayListOptions?.associationsGatewayId) {
+          searchParams.set(
+            'gatewayListOptions.associationsGatewayId',
+            request.gatewayListOptions.associationsGatewayId
+          );
+        }
+
+        if (request.gatewayListOptions?.gatewayType) {
+          searchParams.set(
+            'gatewayListOptions.gatewayType',
+            getGatewayType(request.gatewayListOptions.gatewayType)
+          );
+        }
+
+        if (request.pageSize) {
+          searchParams.set('pageSize', request.pageSize + '');
+        }
+
+        if (request.pageToken) {
+          searchParams.set('pageToken', request.pageToken);
+        }
+
+        function getGatewayType(
+          requestGatewayType:
+            | protos.google.cloud.iot.v1.GatewayType
+            | keyof typeof protos.google.cloud.iot.v1.GatewayType
+        ): keyof typeof protos.google.cloud.iot.v1.GatewayType {
+          if (typeof requestGatewayType === 'string') {
+            return requestGatewayType;
+          }
+
+          switch (requestGatewayType) {
+            case 1:
+              return 'GATEWAY';
+            case 2:
+              return 'NON_GATEWAY';
+            case 0:
+            default:
+              return 'GATEWAY_TYPE_UNSPECIFIED';
+          }
+        }
+
         const options = {
           host: token_response.host,
-          path:
-            '/api/v/4/webhook/execute/' +
-            token_response.systemKey +
-            '/cloudiot_devices?parent=' +
-            request?.parent,
+          path: `/api/v/4/webhook/execute/${
+            token_response.systemKey
+          }/cloudiot_devices?${searchParams.toString()}`,
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
