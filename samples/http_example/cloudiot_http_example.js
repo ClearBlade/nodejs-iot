@@ -124,7 +124,8 @@ const publishAsync = async (
   const payload = `${argv.registryId}/${argv.deviceId}-payload-${messageCount}`;
   console.log('Publishing message:', payload);
   const binaryData = Buffer.from(payload).toString('base64');
-  const postData = {binaryData};
+  const postData =
+    argv.messageType === 'events' ? {binaryData} : {state: {binaryData}};
 
   const options = {
     url,
