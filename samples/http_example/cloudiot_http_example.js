@@ -89,7 +89,6 @@ const getRegistryCredentials = async iotCredsObj => {
   };
   try {
     const res = await request(options);
-    console.log('Received registry credentials: ', res.data);
     return res.data;
   } catch (err) {
     console.error('Received error: ', err);
@@ -198,8 +197,6 @@ const getConfig = async (urlBase, serviceAccountToken, localVersion) => {
 
 // [START Get Registry Credentials from IoT Credentials JSON file]
 getRegistryCredentials(iotCredsObj).then(registryCredsObj => {
-  console.log(`registryCreds: ${JSON.stringify(registryCredsObj)}`);
-
   const urlBase = `${registryCredsObj.url}/api/v/4/webhook/execute/${registryCredsObj.systemKey}/cloudiotdevice_devices?name=${devicePath}`;
   const serviceAccountToken = registryCredsObj.serviceAccountToken;
 
