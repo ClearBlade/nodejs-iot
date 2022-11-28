@@ -103,7 +103,37 @@ function isGetRegistryCredentialsResponse(
   );
 }
 
+interface ServerError {
+  error: {
+    code: number;
+    message: string;
+    status: string;
+  };
+}
+
+function isServerError(value: unknown): value is ServerError {
+  if (
+    value &&
+    typeof value === 'object' &&
+    'error' in value &&
+    (value as ServerError).error &&
+    typeof (value as ServerError).error === 'object' &&
+    'code' in (value as ServerError).error
+  ) {
+    return true;
+  }
+  return false;
+}
+
 function IoTCoreError(msg: string) {
+  try {
+    const parsedError: unknown = JSON.parse(msg);
+    if (isServerError(parsedError)) {
+      return parsedError;
+    }
+  } catch (e) {
+    // ignore error
+  }
   return {
     details: msg,
   };
