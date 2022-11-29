@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2022 ClearBlade, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,36 +14,16 @@
 
 'use strict';
 // [START iot_http_includes]
-const fs = require('fs');
-const jwt = require('jsonwebtoken');
-const {request} = require('gaxios');
+const {request} = require('axios');
 // [END iot_http_includes]
 
-// Create a Cloud IoT Core JWT for the given project ID, signed with the given
-// private key.
-// [START iot_http_jwt]
-const createJwt = (projectId, privateKeyFile, algorithm) => {
-  // Create a JWT to authenticate this device. The device will be disconnected
-  // after the token expires, and will have to reconnect with a new token. The
-  // audience field should always be set to the GCP project ID.
-  const token = {
-    iat: parseInt(Date.now() / 1000),
-    exp: parseInt(Date.now() / 1000) + 20 * 60, // 20 minutes
-    aud: projectId,
-  };
-  const privateKey = fs.readFileSync(privateKeyFile);
-  return jwt.sign(token, privateKey, {algorithm: algorithm});
-};
-// [END iot_http_jwt]
-
-console.log('Google Cloud IoT Core HTTP example.');
+console.log('ClearBlade IoT Core HTTP example.');
 const {argv} = require('yargs')
   .options({
-    projectId: {
-      default: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT,
-      description:
-        'The Project ID to use. Defaults to the value of the GCLOUD_PROJECT or GOOGLE_CLOUD_PROJECT environment variables.',
+    iotCredentials: {
+      description: 'ServiceAccount Credentials JSON file.',
       requiresArg: true,
+      demandOption: true,
       type: 'string',
     },
     cloudRegion: {
@@ -64,36 +44,11 @@ const {argv} = require('yargs')
       demandOption: true,
       type: 'string',
     },
-    privateKeyFile: {
-      description: 'Path to private key file.',
-      requiresArg: true,
-      demandOption: true,
-      type: 'string',
-    },
-    algorithm: {
-      description: 'Encryption algorithm to generate the RSA or EC JWT.',
-      requiresArg: true,
-      demandOption: true,
-      choices: ['RS256', 'ES256'],
-      type: 'string',
-    },
     numMessages: {
       default: 100,
       description: 'Number of messages to publish.',
       requiresArg: true,
       type: 'number',
-    },
-    tokenExpMins: {
-      default: 20,
-      description: 'Minutes to JWT token expiration.',
-      requiresArg: true,
-      type: 'number',
-    },
-    httpBridgeAddress: {
-      default: 'cloudiotdevice.googleapis.com',
-      description: 'HTTP bridge address.',
-      requiresArg: true,
-      type: 'string',
     },
     messageType: {
       default: 'events',
@@ -104,56 +59,78 @@ const {argv} = require('yargs')
     },
   })
   .example(
-    'node $0 cloudiot_http_example.js --projectId=blue-jet-123 --registryId=my-registry --deviceId=my-node-device --privateKeyFile=../rsaPrivate.pem --algorithm=RS256'
+    'node $0 cloudiot_http_example.js --iotCredentials=../../creds.json --registryId=my-registry --deviceId=my-node-device'
   )
   .wrap(120)
   .recommendCommands()
-  .epilogue('For more information, see https://cloud.google.com/iot-core/docs')
+  .epilogue('For more information, see https://clearblade.com/iot-core')
   .help()
   .strict();
 
+// [START read iot credentials - available in downloaded JSON when Project ServiceAccount was created]
+const iotCredsObj = require(argv.iotCredentials);
+// [EMD read opt credentials]
+
+// [START read registry credentials]
+const getRegistryCredentials = async iotCredsObj => {
+  const url = `${iotCredsObj.url}/api/v/1/code/${iotCredsObj.systemKey}/getRegistryCredentials`;
+  const options = {
+    url,
+    headers: {
+      'ClearBlade-UserToken': iotCredsObj.token,
+    },
+    data: {
+      project: iotCredsObj.project,
+      region: argv.cloudRegion,
+      registry: argv.registryId,
+    },
+    method: 'POST',
+    // retry: true,
+  };
+  try {
+    const res = await request(options);
+    return res.data;
+  } catch (err) {
+    console.error('Received error: ', err);
+    if (err.response && err.response.data && err.response.data.error) {
+      console.error(
+        `Received error: ${JSON.stringify(err.response.data.error)}`
+      );
+    }
+    throw err;
+  }
+};
+
 // [START iot_http_variables]
-// A unique string that identifies this device. For Google Cloud IoT Core, it
+// A unique string that identifies this device. For ClearBlade IoT Core, it
 // must be in the format below.
-
+const devicePath = `projects/${iotCredsObj.project}/locations/${argv.cloudRegion}/registries/${argv.registryId}/devices/${argv.deviceId}`;
 let iatTime = parseInt(Date.now() / 1000);
-const authToken = createJwt(
-  argv.projectId,
-  argv.privateKeyFile,
-  argv.algorithm
-);
-const devicePath = `projects/${argv.projectId}/locations/${argv.cloudRegion}/registries/${argv.registryId}/devices/${argv.deviceId}`;
-
-// The request path, set accordingly depending on the message type.
-const pathSuffix =
-  argv.messageType === 'events' ? ':publishEvent' : ':setState';
-const urlBase = `https://${argv.httpBridgeAddress}/v1/${devicePath}`;
-const url = `${urlBase}${pathSuffix}`;
 // [END iot_http_variables]
 
 // Publish numMessages message asynchronously, starting from message
 // messageCount. Telemetry events are published at a rate of 1 per second and
 // states at a rate of 1 every 2 seconds.
 // [START iot_http_publish]
-const publishAsync = async (authToken, messageCount, numMessages) => {
+const publishAsync = async (
+  urlBase,
+  serviceAccountToken,
+  messageCount,
+  numMessages
+) => {
+  // The request path, set accordingly depending on the message type.
+  const method = argv.messageType === 'events' ? 'publishEvent' : 'setState';
+  const url = `${urlBase}&method=${method}`;
   const payload = `${argv.registryId}/${argv.deviceId}-payload-${messageCount}`;
   console.log('Publishing message:', payload);
   const binaryData = Buffer.from(payload).toString('base64');
   const postData =
-    argv.messageType === 'events'
-      ? {
-          binary_data: binaryData,
-        }
-      : {
-          state: {
-            binary_data: binaryData,
-          },
-        };
+    argv.messageType === 'events' ? {binaryData} : {state: {binaryData}};
 
   const options = {
-    url: url,
+    url,
     headers: {
-      authorization: `Bearer ${authToken}`,
+      'ClearBlade-UserToken': serviceAccountToken,
       'content-type': 'application/json',
       'cache-control': 'no-cache',
     },
@@ -164,7 +141,6 @@ const publishAsync = async (authToken, messageCount, numMessages) => {
 
   // Send events for high-frequency updates, update state only occasionally.
   const delayMs = argv.messageType === 'events' ? 1000 : 2000;
-  console.log(JSON.stringify(request));
   try {
     await request(options);
     console.log('Message sent.');
@@ -184,27 +160,23 @@ const publishAsync = async (authToken, messageCount, numMessages) => {
       if (secsFromIssue > argv.tokenExpMins * 60) {
         iatTime = parseInt(Date.now() / 1000);
         console.log(`\tRefreshing token after ${secsFromIssue} seconds.`);
-        authToken = createJwt(
-          argv.projectId,
-          argv.privateKeyFile,
-          argv.algorithm
-        );
       }
 
-      publishAsync(authToken, messageCount + 1, numMessages);
+      publishAsync(urlBase, serviceAccountToken, messageCount + 1, numMessages);
     }, delayMs);
   }
 };
 // [END iot_http_publish]
 
 // [START iot_http_getconfig]
-const getConfig = async (authToken, version) => {
-  console.log(`Getting config from URL: ${urlBase}`);
+const getConfig = async (urlBase, serviceAccountToken, localVersion) => {
+  const url = `${urlBase}&localVersion=${localVersion}`;
+  console.log(`Getting config from URL: ${url}`);
 
   const options = {
-    url: `${urlBase}/config?local_version=${version}`,
+    url,
     headers: {
-      authorization: `Bearer ${authToken}`,
+      'ClearBlade-UserToken': serviceAccountToken,
       'content-type': 'application/json',
       'cache-control': 'no-cache',
     },
@@ -224,11 +196,17 @@ const getConfig = async (authToken, version) => {
 };
 // [END iot_http_getconfig]
 
-// [START iot_run_http]
+// [START Get Registry Credentials from IoT Credentials JSON file]
+getRegistryCredentials(iotCredsObj).then(registryCredsObj => {
+  const urlBase = `${registryCredsObj.url}/api/v/4/webhook/execute/${registryCredsObj.systemKey}/cloudiotdevice_devices?name=${devicePath}`;
+  const serviceAccountToken = registryCredsObj.serviceAccountToken;
 
-// Print latest configuration
-getConfig(authToken, 0);
+  // [START iot_run_http]
+  // Print latest configuration
+  getConfig(urlBase, serviceAccountToken, 0);
 
-// Publish messages.
-publishAsync(authToken, 1, argv.numMessages);
-// [END iot_run_http]
+  // Publish messages.
+  publishAsync(urlBase, serviceAccountToken, 1, argv.numMessages);
+  // [END iot_run_http]
+});
+// [END Get Registry Credentials]
