@@ -97,6 +97,7 @@ const getRegistryCredentials = async iotCredsObj => {
         `Received error: ${JSON.stringify(err.response.data.error)}`
       );
     }
+    throw err;
   }
 };
 
