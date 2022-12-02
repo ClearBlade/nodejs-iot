@@ -1419,9 +1419,6 @@ export class DeviceManagerClient {
 
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
-        const deviceName = this.matchDeviceFromDeviceName(
-          request?.device?.name ?? ''
-        );
         const payload = JSON.stringify(request?.device);
 
         const options = {
@@ -1430,7 +1427,7 @@ export class DeviceManagerClient {
             '/api/v/4/webhook/execute/' +
             token_response.systemKey +
             '/cloudiot_devices?name=' +
-            deviceName +
+            request.device?.name +
             '&updateMask=' +
             request?.updateMask?.paths?.join(','),
           method: 'PATCH',
