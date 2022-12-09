@@ -103,7 +103,37 @@ function isGetRegistryCredentialsResponse(
   );
 }
 
+interface ServerError {
+  error: {
+    code: number;
+    message: string;
+    status: string;
+  };
+}
+
+function isServerError(value: unknown): value is ServerError {
+  if (
+    value &&
+    typeof value === 'object' &&
+    'error' in value &&
+    (value as ServerError).error &&
+    typeof (value as ServerError).error === 'object' &&
+    'code' in (value as ServerError).error
+  ) {
+    return true;
+  }
+  return false;
+}
+
 function IoTCoreError(msg: string) {
+  try {
+    const parsedError: unknown = JSON.parse(msg);
+    if (isServerError(parsedError)) {
+      return parsedError;
+    }
+  } catch (e) {
+    // ignore error
+  }
   return {
     details: msg,
   };
@@ -1389,9 +1419,6 @@ export class DeviceManagerClient {
 
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
-        const deviceName = this.matchDeviceFromDeviceName(
-          request?.device?.name ?? ''
-        );
         const payload = JSON.stringify(request?.device);
 
         const options = {
@@ -1400,7 +1427,7 @@ export class DeviceManagerClient {
             '/api/v/4/webhook/execute/' +
             token_response.systemKey +
             '/cloudiot_devices?name=' +
-            deviceName +
+            request.device?.name +
             '&updateMask=' +
             request?.updateMask?.paths?.join(','),
           method: 'PATCH',
@@ -3299,13 +3326,78 @@ export class DeviceManagerClient {
           parent: request?.parent,
         });
 
+        const searchParams = new URLSearchParams();
+
+        if (request.parent) {
+          searchParams.set('parent', request.parent);
+        }
+
+        if (request.deviceIds) {
+          searchParams.set('deviceIds', request.deviceIds.join(','));
+        }
+
+        if (request.deviceNumIds) {
+          searchParams.set('deviceNumIds', request.deviceNumIds.join(','));
+        }
+
+        if (request.fieldMask && request.fieldMask.paths) {
+          searchParams.set('fieldMask', request.fieldMask.paths?.join(','));
+        }
+
+        if (request.gatewayListOptions?.associationsDeviceId) {
+          searchParams.set(
+            'gatewayListOptions.associationsDeviceId',
+            request.gatewayListOptions.associationsDeviceId
+          );
+        }
+
+        if (request.gatewayListOptions?.associationsGatewayId) {
+          searchParams.set(
+            'gatewayListOptions.associationsGatewayId',
+            request.gatewayListOptions.associationsGatewayId
+          );
+        }
+
+        if (request.gatewayListOptions?.gatewayType) {
+          searchParams.set(
+            'gatewayListOptions.gatewayType',
+            getGatewayType(request.gatewayListOptions.gatewayType)
+          );
+        }
+
+        if (request.pageSize) {
+          searchParams.set('pageSize', request.pageSize + '');
+        }
+
+        if (request.pageToken) {
+          searchParams.set('pageToken', request.pageToken);
+        }
+
+        function getGatewayType(
+          requestGatewayType:
+            | protos.google.cloud.iot.v1.GatewayType
+            | keyof typeof protos.google.cloud.iot.v1.GatewayType
+        ): keyof typeof protos.google.cloud.iot.v1.GatewayType {
+          if (typeof requestGatewayType === 'string') {
+            return requestGatewayType;
+          }
+
+          switch (requestGatewayType) {
+            case 1:
+              return 'GATEWAY';
+            case 2:
+              return 'NON_GATEWAY';
+            case 0:
+            default:
+              return 'GATEWAY_TYPE_UNSPECIFIED';
+          }
+        }
+
         const options = {
           host: token_response.host,
-          path:
-            '/api/v/4/webhook/execute/' +
-            token_response.systemKey +
-            '/cloudiot_devices?parent=' +
-            request?.parent,
+          path: `/api/v/4/webhook/execute/${
+            token_response.systemKey
+          }/cloudiot_devices?${searchParams.toString()}`,
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
