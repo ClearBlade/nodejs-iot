@@ -3333,11 +3333,20 @@ export class DeviceManagerClient {
         }
 
         if (request.deviceIds) {
-          searchParams.set('deviceIds', request.deviceIds.join(','));
+          request.deviceIds.forEach(deviceId => {
+            searchParams.append('deviceIds', deviceId);
+          });
         }
 
         if (request.deviceNumIds) {
-          searchParams.set('deviceNumIds', request.deviceNumIds.join(','));
+          request.deviceNumIds.forEach(deviceNumId => {
+            searchParams.append(
+              'deviceNumIds',
+              typeof deviceNumId === 'string'
+                ? deviceNumId
+                : deviceNumId.toString()
+            );
+          });
         }
 
         if (request.fieldMask && request.fieldMask.paths) {
