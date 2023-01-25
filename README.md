@@ -45,6 +45,18 @@ npm install @clearblade/iot
 export CLEARBLADE_CONFIGURATION=/path/to/file.json
 ```
 
+Alternatively, you can supply the credentials to the constructor of DeviceManagerClient. Example:
+```javascript
+const client = new DeviceManagerClient({
+  credentials: {
+    project: '<project>',
+    systemKey: '<systemKey>',
+    token: '<token>',
+    url: '<url>'
+  }
+});
+```
+
 ### Using the client library
 
 ```javascript
