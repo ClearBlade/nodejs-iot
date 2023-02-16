@@ -254,8 +254,6 @@ const mqttDeviceDemo = (
       messageStr = 'Config message received: ';
     } else if (topic.startsWith(`/devices/${deviceId}/commands`)) {
       messageStr = 'Command message received: ';
-    } else if (topic.startsWith(`/devices/${deviceId}/events`)) {
-      messageStr = 'Event message received: ';
     }
 
     messageStr += Buffer.from(message, 'base64').toString('ascii');
@@ -742,7 +740,7 @@ const {argv} = require('yargs')
         type: 'string',
       },
       numMessages: {
-        default: 50,
+        default: 10,
         description: 'Number of messages to publish.',
         demandOption: true,
         type: 'number',
