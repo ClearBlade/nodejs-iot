@@ -1750,7 +1750,7 @@ export class DeviceManagerClient {
                 timeStamp.seconds = timeSeconds.toString();
                 timeStamp.nanos = timeSeconds * 1000000000;
                 deviceConfig.cloudUpdateTime = timeStamp;
-                var uint8array = new TextEncoder().encode(
+                const uint8array = new TextEncoder().encode(
                   deviceConfig.binaryData?.toString()
                 );
                 deviceConfig.binaryData = uint8array;
