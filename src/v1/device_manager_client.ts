@@ -1743,17 +1743,19 @@ export class DeviceManagerClient {
               res.on('end', () => {
                 const deviceConfig: protos.google.cloud.iot.v1.IDeviceConfig =
                   JSON.parse(data);
-                const timeStamp: protos.google.protobuf.ITimestamp = {};
-                const timeSeconds = new Date(
-                  JSON.parse(data).cloudUpdateTime
-                ).valueOf();
-                timeStamp.seconds = timeSeconds.toString();
-                timeStamp.nanos = timeSeconds * 1000000000;
-                deviceConfig.cloudUpdateTime = timeStamp;
-                const uint8array = new TextEncoder().encode(
-                  deviceConfig.binaryData?.toString()
-                );
-                deviceConfig.binaryData = uint8array;
+                if (request.base64Encode) {
+                  const timeStamp: protos.google.protobuf.ITimestamp = {};
+                  const timeSeconds = new Date(
+                    JSON.parse(data).cloudUpdateTime
+                  ).valueOf();
+                  timeStamp.seconds = timeSeconds.toString();
+                  timeStamp.nanos = timeSeconds * 1000000000;
+                  deviceConfig.cloudUpdateTime = timeStamp;
+                  const uint8array = new TextEncoder().encode(
+                    deviceConfig.binaryData?.toString()
+                  );
+                  deviceConfig.binaryData = uint8array;
+                }
                 resolve(deviceConfig);
               });
             }

@@ -1826,6 +1826,9 @@ export namespace google {
 
                     /** ModifyCloudToDeviceConfigRequest binaryData */
                     binaryData?: (Uint8Array|string|null);
+
+                    /** ModifyCloudToDeviceConfigRequest base64Encode Data */
+                    base64Encode?: (boolean|null);
                 }
 
                 /** Represents a ModifyCloudToDeviceConfigRequest. */

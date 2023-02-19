@@ -304,6 +304,7 @@ async function main() {
     //   versionToUpdate : '5',
     //   name: devicePath,
     //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
+    //   base64Encode: true,//Optional parameter
     // };
 
     // const [response] = await client.modifyCloudToDeviceConfig(request);
