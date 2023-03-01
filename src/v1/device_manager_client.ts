@@ -103,6 +103,15 @@ function isGetRegistryCredentialsResponse(
   );
 }
 
+function isBinaryDataFormat(): boolean {
+  const binaryDataFormat = process.env.BINARYDATA_AND_TIME_GOOGLE_FORMAT;
+  if (typeof binaryDataFormat !== 'undefined' && binaryDataFormat === 'true') {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 function IoTCoreError(msg: string) {
   return {
     details: msg,
@@ -1743,7 +1752,7 @@ export class DeviceManagerClient {
               res.on('end', () => {
                 const deviceConfig: protos.google.cloud.iot.v1.IDeviceConfig =
                   JSON.parse(data);
-                if (request.base64Encode) {
+                if (isBinaryDataFormat()) {
                   const timeStamp: protos.google.protobuf.ITimestamp = {};
                   const timeSeconds = new Date(
                     JSON.parse(data).cloudUpdateTime
@@ -1925,6 +1934,21 @@ export class DeviceManagerClient {
               res.on('end', () => {
                 const response: protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse =
                   JSON.parse(data);
+                if (isBinaryDataFormat()) {
+                  response.deviceConfigs!!.forEach(element => {
+                    const timeStamp: protos.google.protobuf.ITimestamp = {};
+                    const timeSeconds = new Date(
+                      JSON.parse(data).cloudUpdateTime
+                    ).valueOf();
+                    timeStamp.seconds = timeSeconds.toString();
+                    timeStamp.nanos = timeSeconds * 1000000000;
+                    element.cloudUpdateTime = timeStamp;
+                    const uint8array = new TextEncoder().encode(
+                      element.binaryData?.toString()
+                    );
+                    element.binaryData = uint8array;
+                  });
+                }
                 resolve(response);
               });
             }
@@ -2073,6 +2097,21 @@ export class DeviceManagerClient {
               res.on('end', () => {
                 const deviceStatesRes: protos.google.cloud.iot.v1.IListDeviceStatesResponse =
                   JSON.parse(data);
+                if (isBinaryDataFormat()) {
+                  deviceStatesRes.deviceStates!!.forEach(element => {
+                    const timeStamp: protos.google.protobuf.ITimestamp = {};
+                    const timeSeconds = new Date(
+                      JSON.parse(data).cloudUpdateTime
+                    ).valueOf();
+                    timeStamp.seconds = timeSeconds.toString();
+                    timeStamp.nanos = timeSeconds * 1000000000;
+                    element.updateTime = timeStamp;
+                    const uint8array = new TextEncoder().encode(
+                      element.binaryData?.toString()
+                    );
+                    element.binaryData = uint8array;
+                  });
+                }
                 resolve(deviceStatesRes);
               });
             }
