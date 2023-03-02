@@ -45,6 +45,19 @@ npm install @clearblade/iot
 export CLEARBLADE_CONFIGURATION=/path/to/file.json
 ```
 
+As an alternative to using a filepath for your service account credentials, you can take the values of `project`, `systemKey`, `token`, and `url` from your service account .json file and supply them directly to the constructor:
+```javascript
+const client = new DeviceManagerClient({
+  credentials: {
+    project: '<project>',
+    systemKey: '<systemKey>',
+    token: '<token>',
+    url: '<url>'
+  }
+});
+```
+Note: be sure to use your service account credentials rather than the credentials from the Registry API keys page. By using the service account credentials, you will be able to use one set of credentials to target all of the registries in your project.
+
 ### Using the client library
 
 ```javascript
