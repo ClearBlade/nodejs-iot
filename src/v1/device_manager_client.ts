@@ -45,7 +45,7 @@ import {PathTemplate} from 'google-gax';
 import * as protos from '../../protos/protos';
 import * as https from 'https';
 import {URL} from 'url';
-var Timestamp = require('timestamp-nano');
+const Timestamp = require('timestamp-nano');
 
 function requestFactory<
   RequestObject,
@@ -1992,7 +1992,7 @@ export class DeviceManagerClient {
                 const response: protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse =
                   JSON.parse(data);
                 if (isBinaryDataFormat()) {
-                  response.deviceConfigs!!.forEach((element, index) => {
+                  response.deviceConfigs?.forEach((element, index) => {
                     element.cloudUpdateTime = timeSecondsNanos(
                       JSON.parse(data).deviceConfigs[index].cloudUpdateTime
                     );
@@ -2154,7 +2154,7 @@ export class DeviceManagerClient {
                 const deviceStatesRes: protos.google.cloud.iot.v1.IListDeviceStatesResponse =
                   JSON.parse(data);
                 if (isBinaryDataFormat()) {
-                  deviceStatesRes.deviceStates!!.forEach((element, index) => {
+                  deviceStatesRes.deviceStates?.forEach((element, index) => {
                     element.updateTime = timeSecondsNanos(
                       JSON.parse(data).deviceStates[index].updateTime
                     );
