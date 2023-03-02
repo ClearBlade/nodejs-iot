@@ -1993,7 +1993,6 @@ export class DeviceManagerClient {
                   JSON.parse(data);
                 if (isBinaryDataFormat()) {
                   response.deviceConfigs!!.forEach((element, index) => {
-                    const timeStamp: protos.google.protobuf.ITimestamp = {};
                     element.cloudUpdateTime = timeSecondsNanos(
                       JSON.parse(data).deviceConfigs[index].cloudUpdateTime
                     );
