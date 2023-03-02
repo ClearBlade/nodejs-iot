@@ -317,7 +317,7 @@ async function main() {
     // const request = {
     //   versionToUpdate : '5',
     //   name: devicePath,
-    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl'
+    //   binaryData: 'c2VuZEZ1bm55TWVzc2FnZVRvRGV2aWNl',
     // };
 
     // const [response] = await client.modifyCloudToDeviceConfig(request);
