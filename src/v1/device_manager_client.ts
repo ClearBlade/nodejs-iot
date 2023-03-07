@@ -1992,18 +1992,25 @@ export class DeviceManagerClient {
                 const response: protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse =
                   JSON.parse(data);
                 if (isBinaryDataFormat()) {
-                  response.deviceConfigs?.forEach((element, index) => {
-                    element.cloudUpdateTime = timeSecondsNanos(
-                      JSON.parse(data).deviceConfigs[index].cloudUpdateTime
-                    );
-                    element.deviceAckTime = timeSecondsNanos(
-                      JSON.parse(data).deviceConfigs[index].deviceAckTime
-                    );
-                    const uint8array = new TextEncoder().encode(
-                      element.binaryData?.toString()
-                    );
-                    element.binaryData = uint8array;
+                  resolve({
+                    ...response,
+                    deviceConfigs:
+                      response.deviceConfigs?.map(element => {
+                        return {
+                          ...element,
+                          cloudUpdateTime: timeSecondsNanos(
+                            element.cloudUpdateTime as string
+                          ),
+                          deviceAckTime: timeSecondsNanos(
+                            element.deviceAckTime as string
+                          ),
+                          binaryData: new TextEncoder().encode(
+                            element.binaryData?.toString()
+                          ),
+                        };
+                      }) ?? [],
                   });
+                  return;
                 }
                 resolve(response);
               });
@@ -2154,15 +2161,22 @@ export class DeviceManagerClient {
                 const deviceStatesRes: protos.google.cloud.iot.v1.IListDeviceStatesResponse =
                   JSON.parse(data);
                 if (isBinaryDataFormat()) {
-                  deviceStatesRes.deviceStates?.forEach((element, index) => {
-                    element.updateTime = timeSecondsNanos(
-                      JSON.parse(data).deviceStates[index].updateTime
-                    );
-                    const uint8array = new TextEncoder().encode(
-                      element.binaryData?.toString()
-                    );
-                    element.binaryData = uint8array;
+                  resolve({
+                    ...deviceStatesRes,
+                    deviceStates:
+                      deviceStatesRes.deviceStates?.map(element => {
+                        return {
+                          ...element,
+                          updateTime: timeSecondsNanos(
+                            element.updateTime as string
+                          ),
+                          binaryData: new TextEncoder().encode(
+                            element.binaryData?.toString()
+                          ),
+                        };
+                      }) ?? [],
                   });
+                  return;
                 }
                 resolve(deviceStatesRes);
               });
