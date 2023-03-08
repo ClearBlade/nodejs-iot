@@ -1812,10 +1812,10 @@ export class DeviceManagerClient {
                   JSON.parse(data);
                 if (isBinaryDataFormat()) {
                   deviceConfig.cloudUpdateTime = timeSecondsNanos(
-                    JSON.parse(data).cloudUpdateTime
+                    deviceConfig.cloudUpdateTime as string
                   );
                   deviceConfig.deviceAckTime = timeSecondsNanos(
-                    JSON.parse(data).deviceAckTime
+                    deviceConfig.deviceAckTime as string
                   );
                   const uint8array = new TextEncoder().encode(
                     deviceConfig.binaryData?.toString()
