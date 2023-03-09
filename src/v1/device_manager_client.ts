@@ -122,9 +122,10 @@ function isBinaryDataFormat(): boolean {
 
 function timeSecondsNanos(data: string): protos.google.protobuf.ITimestamp {
   const timeStamp: protos.google.protobuf.ITimestamp = {};
+  const time = Timestamp.fromString(data);
   if (data) {
-    timeStamp.seconds = Timestamp.fromString(data).toString('%S');
-    timeStamp.nanos = Timestamp.fromString(data).getNano();
+    timeStamp.seconds = time.toString('%S');
+    timeStamp.nanos = time.getNano();
   }
   return timeStamp;
 }
