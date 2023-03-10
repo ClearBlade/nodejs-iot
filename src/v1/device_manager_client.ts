@@ -45,6 +45,7 @@ import {PathTemplate} from 'google-gax';
 import * as protos from '../../protos/protos';
 import * as https from 'https';
 import {URL} from 'url';
+const Timestamp = require('timestamp-nano');
 
 function requestFactory<
   RequestObject,
@@ -105,6 +106,28 @@ interface GetRegistryCredentialsResponse {
   systemKey: string;
   serviceAccountToken: string;
   url: string;
+}
+
+function isBinaryDataFormat(): boolean {
+  const binaryDataFormat = process.env.BINARYDATA_AND_TIME_GOOGLE_FORMAT;
+  if (
+    typeof binaryDataFormat !== 'undefined' &&
+    binaryDataFormat.toLowerCase() === 'true'
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function timeSecondsNanos(data: string): protos.google.protobuf.ITimestamp {
+  const timeStamp: protos.google.protobuf.ITimestamp = {};
+  if (data) {
+    const time = Timestamp.fromString(data);
+    timeStamp.seconds = time.toString('%S');
+    timeStamp.nanos = time.getNano();
+  }
+  return timeStamp;
 }
 
 function isGetRegistryCredentialsResponse(
@@ -1788,6 +1811,18 @@ export class DeviceManagerClient {
               res.on('end', () => {
                 const deviceConfig: protos.google.cloud.iot.v1.IDeviceConfig =
                   JSON.parse(data);
+                if (isBinaryDataFormat()) {
+                  deviceConfig.cloudUpdateTime = timeSecondsNanos(
+                    deviceConfig.cloudUpdateTime as string
+                  );
+                  deviceConfig.deviceAckTime = timeSecondsNanos(
+                    deviceConfig.deviceAckTime as string
+                  );
+                  const uint8array = new TextEncoder().encode(
+                    deviceConfig.binaryData?.toString()
+                  );
+                  deviceConfig.binaryData = uint8array;
+                }
                 resolve(deviceConfig);
               });
             }
@@ -1957,6 +1992,27 @@ export class DeviceManagerClient {
               res.on('end', () => {
                 const response: protos.google.cloud.iot.v1.IListDeviceConfigVersionsResponse =
                   JSON.parse(data);
+                if (isBinaryDataFormat()) {
+                  resolve({
+                    ...response,
+                    deviceConfigs:
+                      response.deviceConfigs?.map(element => {
+                        return {
+                          ...element,
+                          cloudUpdateTime: timeSecondsNanos(
+                            element.cloudUpdateTime as string
+                          ),
+                          deviceAckTime: timeSecondsNanos(
+                            element.deviceAckTime as string
+                          ),
+                          binaryData: new TextEncoder().encode(
+                            element.binaryData?.toString()
+                          ),
+                        };
+                      }) ?? [],
+                  });
+                  return;
+                }
                 resolve(response);
               });
             }
@@ -2105,6 +2161,24 @@ export class DeviceManagerClient {
               res.on('end', () => {
                 const deviceStatesRes: protos.google.cloud.iot.v1.IListDeviceStatesResponse =
                   JSON.parse(data);
+                if (isBinaryDataFormat()) {
+                  resolve({
+                    ...deviceStatesRes,
+                    deviceStates:
+                      deviceStatesRes.deviceStates?.map(element => {
+                        return {
+                          ...element,
+                          updateTime: timeSecondsNanos(
+                            element.updateTime as string
+                          ),
+                          binaryData: new TextEncoder().encode(
+                            element.binaryData?.toString()
+                          ),
+                        };
+                      }) ?? [],
+                  });
+                  return;
+                }
                 resolve(deviceStatesRes);
               });
             }
