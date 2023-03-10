@@ -45,6 +45,12 @@ npm install @clearblade/iot
 export CLEARBLADE_CONFIGURATION=/path/to/file.json
 ```
 
+Define an environment variable named `BINARYDATA_AND_TIME_GOOGLE_FORMAT` which represents support of byte array data for binaryData matching it with Google. If the env variable BINARYDATA_AND_TIME_GOOGLE_FORMAT is set as `true` then it will give binaryData object's response in byte array form and time in Timestamp format which will have seconds and nanos in it which is following google's structure. Basically it's applicable on get device state list, modify config, device config versions methods. To get the data in proper format it should be cast in proper format. By default this will be as false.
+
+```
+export BINARYDATA_AND_TIME_GOOGLE_FORMAT=true
+```
+
 As an alternative to using a filepath for your service account credentials, you can take the values of `project`, `systemKey`, `token`, and `url` from your service account .json file and supply them directly to the constructor:
 ```javascript
 const client = new DeviceManagerClient({
