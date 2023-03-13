@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.7](https://github.com/clearblade/nodejs-iot/compare/v1.0.4..v1.0.7) (2023-03-13)
+
+- Add support for `BINARYDATA_AND_TIME_GOOGLE_FORMAT` flag
+
 ## [1.0.4](https://github.com/clearblade/nodejs-iot/compare/v1.0.3..v1.0.4) (2022-11-10)
 
 - fix binaryData Buffer not encoded for sendCommandToDevice and modifyCloudToDeviceConfig
