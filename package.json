@@ -1,7 +1,7 @@
 {
   "name": "@clearblade/iot",
   "description": "Cloud IoT API client for Node.js",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "license": "Apache-2.0",
   "author": "ClearBlade Inc.",
   "engines": {
