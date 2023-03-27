@@ -29,14 +29,17 @@
 import * as protos from '../protos/protos';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {SinonStub} from 'sinon';
+import {SinonStub, fake} from 'sinon';
 import {describe, it} from 'mocha';
 import * as devicemanagerModule from '../src';
 
 // import {PassThrough} from 'stream';
 
 import {protobuf} from 'google-gax';
-import {ServiceAccountCredentials} from '../src/v1/device_manager_client';
+import {
+  requestFactory,
+  ServiceAccountCredentials,
+} from '../src/v1/device_manager_client';
 import path = require('path');
 
 function generateSampleMessage<T extends object>(instance: T) {
@@ -3071,6 +3074,37 @@ describe('v1.DeviceManagerClient', () => {
           assert.strictEqual(result, expectedParameters.registry);
         });
       });
+    });
+  });
+
+  describe.only('retry logic', () => {
+    it('does the thing', () => {
+      console.log('one');
+      const stub = fake.rejects('foo error');
+      console.log('two');
+      const requester = requestFactory(stub, {
+        getResponseObject: r => r,
+        getNextRequestObject: r => r,
+      });
+      console.log('three');
+
+      requester(
+        {},
+        {
+          retry: {
+            backoffSettings: {
+              maxRetries: 3,
+              initialRetryDelayMillis: 10,
+              retryDelayMultiplier: 2,
+              maxRetryDelayMillis: 10000,
+            },
+          },
+        }
+      );
+
+      console.log('four', stub.callCount, stub.threw());
+
+      assert(stub.calledOnce);
     });
   });
 });

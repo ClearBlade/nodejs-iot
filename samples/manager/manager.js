@@ -665,14 +665,30 @@ const getDevice = async (deviceId, registryId, projectId, cloudRegion) => {
     //   ],
     // };
 
-    const [response] = await iotClient.getDevice({
-      name: devicePath,
-      // todo: bring this back once it's fixed in system
-      // fieldMask,
-    });
-    const data = response;
+    try {
+      const [response] = await iotClient.getDevice(
+        {
+          name: devicePath,
+          // todo: bring this back once it's fixed in system
+          // fieldMask,
+        },
+        {
+          timeout: 5000,
+          retry: {
+            backoffSettings: {
+              // totalTimeoutMillis: 40000,
+              // maxRpcTimeoutMillis: 60000,
+              // initialRpcTimeoutMillis: 60000,
+            },
+          },
+        }
+      );
+      const data = response;
 
-    console.log('Found device:', deviceId, data);
+      console.log('Found device:', deviceId, data);
+    } catch (e) {
+      console.error('error getting device', e);
+    }
   }
 
   getDevice();
