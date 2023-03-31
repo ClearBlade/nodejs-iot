@@ -120,11 +120,13 @@ function isBinaryDataFormat(): boolean {
   }
 }
 
-function timeSecondsNanos(data: string): protos.google.protobuf.ITimestamp {
+export function timeSecondsNanos(
+  data: string
+): protos.google.protobuf.ITimestamp {
   const timeStamp: protos.google.protobuf.ITimestamp = {};
   if (data) {
     const time = Timestamp.fromString(data);
-    timeStamp.seconds = time.toString('%S');
+    timeStamp.seconds = time.getTimeT() + '';
     timeStamp.nanos = time.getNano();
   }
   return timeStamp;

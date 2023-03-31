@@ -36,7 +36,10 @@ import * as devicemanagerModule from '../src';
 // import {PassThrough} from 'stream';
 
 import {protobuf} from 'google-gax';
-import {ServiceAccountCredentials} from '../src/v1/device_manager_client';
+import {
+  ServiceAccountCredentials,
+  timeSecondsNanos,
+} from '../src/v1/device_manager_client';
 import path = require('path');
 
 function generateSampleMessage<T extends object>(instance: T) {
@@ -3070,6 +3073,21 @@ describe('v1.DeviceManagerClient', () => {
           const result = client.matchRegistryFromRegistryName(fakePath);
           assert.strictEqual(result, expectedParameters.registry);
         });
+      });
+    });
+  });
+
+  describe('util functions', () => {
+    describe('timeSecondsNanos', () => {
+      it('formats date into nanos and seconds properly', () => {
+        const val = timeSecondsNanos('2023-03-28T19:55:00.927Z');
+        assert.equal(val.nanos, 927000000);
+        assert.equal(val.seconds, '1680033300');
+      });
+
+      it('returns an empty object if no value for time is passed', () => {
+        const val = timeSecondsNanos('');
+        assert.equal(Object.keys(val).length, 0);
       });
     });
   });
