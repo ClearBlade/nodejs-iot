@@ -865,7 +865,14 @@ const sendCommand = async (
       binaryData: binaryData,
     };
 
-    const [response] = await iotClient.sendCommandToDevice(request);
+    const [response] = await iotClient.sendCommandToDevice(request, {
+      retry: {
+        retryCodes: [9],
+        backoffSettings: {
+          maxRetries: 3,
+        },
+      },
+    });
     console.log('Sent command: ', response);
   }
 

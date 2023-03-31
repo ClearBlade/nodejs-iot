@@ -38,7 +38,6 @@ import {
   Callback,
   CallOptions,
   CallSettings,
-  GoogleError,
   PaginationCallback,
   PathTemplate as IPathTemplate,
 } from 'google-gax';
@@ -47,7 +46,7 @@ import {PathTemplate, createApiCall} from 'google-gax';
 import * as protos from '../../protos/protos';
 import * as https from 'https';
 import {URL} from 'url';
-import {backOff} from 'exponential-backoff';
+import {IoTCoreError, NetworkingError, UnknownError} from './iotCoreError';
 const Timestamp = require('timestamp-nano');
 
 export function requestFactory<
@@ -96,7 +95,7 @@ export function requestFactory<
             })
             .catch(err => {
               console.log('got an error here', err);
-              callback(new GoogleError('sup goog'));
+              callback(IoTCoreError.toGoogleError(err));
             });
           return {
             cancel: () => {},
@@ -214,93 +213,6 @@ function isGetRegistryCredentialsResponse(
     typeof (data as GetRegistryCredentialsResponse).url === 'string'
   );
 }
-
-interface ServerError {
-  error: {
-    code: number;
-    message: string;
-    status: string;
-  };
-}
-
-function isServerError(value: unknown): value is ServerError {
-  if (
-    value &&
-    typeof value === 'object' &&
-    'error' in value &&
-    (value as ServerError).error &&
-    typeof (value as ServerError).error === 'object' &&
-    'code' in (value as ServerError).error
-  ) {
-    return true;
-  }
-  return false;
-}
-
-class IoTCoreError extends Error {
-  constructor(info: {
-    code: number;
-    message: string;
-    status: string;
-    details?: unknown;
-  }) {
-    super(JSON.stringify({error: info}));
-  }
-
-  static fromServerError = (
-    error: unknown,
-    {fallbackMessage}: {fallbackMessage: string}
-  ): IoTCoreError => {
-    if (error instanceof IoTCoreError) {
-      return error;
-    } else if (typeof error === 'string') {
-      try {
-        const parsedError = JSON.parse(error);
-        if (isServerError(parsedError)) {
-          return new IoTCoreError(parsedError.error);
-        }
-        // eslint-disable-next-line no-empty
-      } catch (e) {}
-    }
-    return new UnknownError(fallbackMessage, error);
-  };
-}
-
-class UnknownError extends IoTCoreError {
-  constructor(message: string, error: unknown) {
-    super({code: -1, message, status: 'UNKNOWN_ERROR', details: error});
-  }
-}
-
-class NetworkingError extends IoTCoreError {
-  constructor() {
-    super({
-      code: -2,
-      message: 'Networking error. No status code was returned',
-      status: 'NETWORKING_ERROR',
-    });
-  }
-}
-
-// function IoTCoreError(msg: string) {
-//   try {
-//     const parsedError: unknown = JSON.parse(msg);
-//     if (isServerError(parsedError)) {
-//       return parsedError;
-//     }
-//   } catch (e) {
-//     // ignore error
-//   }
-//   return {
-//     details: msg,
-//   };
-// }
-// IoTCoreError.fromError = (e: unknown, {fallbackMessage}: {fallbackMessage: string}) => {
-
-// }
-// IoTCoreError.KNOWN_ERRORS = {
-//   NO_STATUS_CODE: 'Networking error. No status code was returned',
-// };
 
 function isErrorStatusCode(statusCode: number): boolean {
   if (statusCode < 200 || statusCode > 299) {
@@ -696,11 +608,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to create device registry',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -840,11 +748,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to get device registry',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -1008,11 +912,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to update device registry',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -1163,11 +1063,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to delete device registry',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               res.on('data', () => {});
@@ -1314,11 +1210,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to create device',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -1471,11 +1363,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to get device',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -1633,11 +1521,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to update device',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -1781,11 +1665,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to delete device',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -1954,11 +1834,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to modify device config',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -2139,11 +2015,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to list device config versions',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -2312,11 +2184,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to list device states',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -2784,11 +2652,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to send command to device',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -2942,11 +2806,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to bind device to gateway',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -3113,11 +2973,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to unbind device from gateway',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -3276,11 +3132,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to list device registries',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -3344,8 +3196,7 @@ export class DeviceManagerClient {
                 if (!isGetRegistryCredentialsResponse(parsed)) {
                   reject(
                     new UnknownError(
-                      'Invalid response from getRegistryCredentials:' + data,
-                      undefined
+                      'Invalid response from getRegistryCredentials:' + data
                     )
                   );
                 } else {
@@ -3358,12 +3209,7 @@ export class DeviceManagerClient {
                   resolve(cacheData);
                 }
               } catch (e) {
-                reject(
-                  new UnknownError(
-                    'Caught error while parsing response from getRegistryCredentials',
-                    e
-                  )
-                );
+                reject(new UnknownError(e));
               }
             });
           });
@@ -3698,11 +3544,7 @@ export class DeviceManagerClient {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(
-                  IoTCoreError.fromServerError(errorData, {
-                    fallbackMessage: 'Failed to list devices',
-                  })
-                );
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
