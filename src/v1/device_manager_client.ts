@@ -117,11 +117,13 @@ function isBinaryDataFormat(): boolean {
   }
 }
 
-function timeSecondsNanos(data: string): protos.google.protobuf.ITimestamp {
+export function timeSecondsNanos(
+  data: string
+): protos.google.protobuf.ITimestamp {
   const timeStamp: protos.google.protobuf.ITimestamp = {};
   if (data) {
     const time = Timestamp.fromString(data);
-    timeStamp.seconds = time.toString('%S');
+    timeStamp.seconds = time.getTimeT() + '';
     timeStamp.nanos = time.getNano();
   }
   return timeStamp;
@@ -319,9 +321,11 @@ export class DeviceManagerClient {
           if (callback) {
             doRetry(argument)
               .then(data => {
+                // @ts-ignore
                 callback(null, data);
               })
               .catch(err => {
+                // @ts-ignore
                 callback(err);
               });
             return;
@@ -1850,10 +1854,12 @@ export class DeviceManagerClient {
                   deviceConfig.deviceAckTime = timeSecondsNanos(
                     deviceConfig.deviceAckTime as string
                   );
-                  const uint8array = new TextEncoder().encode(
-                    deviceConfig.binaryData?.toString()
-                  );
-                  deviceConfig.binaryData = uint8array;
+                  if (deviceConfig.binaryData) {
+                    deviceConfig.binaryData = Buffer.from(
+                      deviceConfig.binaryData as string,
+                      'base64'
+                    );
+                  }
                 }
                 resolve(deviceConfig);
               });
@@ -2037,9 +2043,12 @@ export class DeviceManagerClient {
                           deviceAckTime: timeSecondsNanos(
                             element.deviceAckTime as string
                           ),
-                          binaryData: new TextEncoder().encode(
-                            element.binaryData?.toString()
-                          ),
+                          binaryData: element.binaryData
+                            ? Buffer.from(
+                                element.binaryData as string,
+                                'base64'
+                              )
+                            : undefined,
                         };
                       }) ?? [],
                   });
@@ -2203,9 +2212,12 @@ export class DeviceManagerClient {
                           updateTime: timeSecondsNanos(
                             element.updateTime as string
                           ),
-                          binaryData: new TextEncoder().encode(
-                            element.binaryData?.toString()
-                          ),
+                          binaryData: element.binaryData
+                            ? Buffer.from(
+                                element.binaryData as string,
+                                'base64'
+                              )
+                            : undefined,
                         };
                       }) ?? [],
                   });

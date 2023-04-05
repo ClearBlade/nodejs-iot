@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.8](https://github.com/clearblade/nodejs-iot/compare/v1.0.7..v1.0.8) (2023-04-04)
+
+- Fix incorrect timestamp format when using `BINARYDATA_AND_TIME_GOOGLE_FORMAT` flag
+- Fix issue with binaryData when using `BINARYDATA_AND_TIME_GOOGLE_FORMAT` flag
+
 ## [1.0.7](https://github.com/clearblade/nodejs-iot/compare/v1.0.4..v1.0.7) (2023-03-13)
 
 - Add support for `BINARYDATA_AND_TIME_GOOGLE_FORMAT` flag

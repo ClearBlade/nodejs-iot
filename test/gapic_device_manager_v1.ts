@@ -39,6 +39,7 @@ import {protobuf} from 'google-gax';
 import {
   requestFactory,
   ServiceAccountCredentials,
+  timeSecondsNanos,
 } from '../src/v1/device_manager_client';
 import path = require('path');
 import {IoTCoreError} from '../src/v1/iotCoreError';
@@ -3159,6 +3160,21 @@ describe('v1.DeviceManagerClient', () => {
           return true;
         }
       );
+    });
+  });
+
+  describe('util functions', () => {
+    describe('timeSecondsNanos', () => {
+      it('formats date into nanos and seconds properly', () => {
+        const val = timeSecondsNanos('2023-03-28T19:55:00.927Z');
+        assert.equal(val.nanos, 927000000);
+        assert.equal(val.seconds, '1680033300');
+      });
+
+      it('returns an empty object if no value for time is passed', () => {
+        const val = timeSecondsNanos('');
+        assert.equal(Object.keys(val).length, 0);
+      });
     });
   });
 });
