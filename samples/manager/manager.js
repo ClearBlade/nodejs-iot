@@ -665,30 +665,14 @@ const getDevice = async (deviceId, registryId, projectId, cloudRegion) => {
     //   ],
     // };
 
-    try {
-      const [response] = await iotClient.getDevice(
-        {
-          name: devicePath,
-          // todo: bring this back once it's fixed in system
-          // fieldMask,
-        },
-        {
-          timeout: 5000,
-          retry: {
-            backoffSettings: {
-              // totalTimeoutMillis: 40000,
-              // maxRpcTimeoutMillis: 60000,
-              // initialRpcTimeoutMillis: 60000,
-            },
-          },
-        }
-      );
-      const data = response;
+    const [response] = await iotClient.getDevice({
+      name: devicePath,
+      // todo: bring this back once it's fixed in system
+      // fieldMask,
+    });
+    const data = response;
 
-      console.log('Found device:', deviceId, data);
-    } catch (e) {
-      console.error('error getting device', e);
-    }
+    console.log('Found device:', deviceId, data);
   }
 
   getDevice();
@@ -865,14 +849,7 @@ const sendCommand = async (
       binaryData: binaryData,
     };
 
-    const [response] = await iotClient.sendCommandToDevice(request, {
-      retry: {
-        retryCodes: [9],
-        backoffSettings: {
-          maxRetries: 3,
-        },
-      },
-    });
+    const [response] = await iotClient.sendCommandToDevice(request);
     console.log('Sent command: ', response);
   }
 
