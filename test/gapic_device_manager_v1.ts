@@ -29,7 +29,7 @@
 import * as protos from '../protos/protos';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {SinonStub, fake} from 'sinon';
+import {SinonStub} from 'sinon';
 import {describe, it} from 'mocha';
 import * as devicemanagerModule from '../src';
 
@@ -41,6 +41,7 @@ import {
   ServiceAccountCredentials,
 } from '../src/v1/device_manager_client';
 import path = require('path');
+import {IoTCoreError} from '../src/v1/iotCoreError';
 
 function generateSampleMessage<T extends object>(instance: T) {
   const filledObject = (
@@ -3077,34 +3078,108 @@ describe('v1.DeviceManagerClient', () => {
     });
   });
 
-  describe.only('retry logic', () => {
-    it('does the thing', () => {
-      console.log('one');
-      const stub = fake.rejects('foo error');
-      console.log('two');
-      const requester = requestFactory(stub, {
-        getResponseObject: r => r,
-        getNextRequestObject: r => r,
-      });
-      console.log('three');
+  describe('retry logic', () => {
+    it('rejects with error', async () => {
+      const client = getClientWithRegistryCredentialsStub();
 
-      requester(
-        {},
+      client.apiCallers.sendCommandToDevice.do = requestFactory(
+        () =>
+          Promise.reject(
+            new IoTCoreError({
+              code: 400,
+              message: 'Device d is not connected',
+              status: 'FAILED_PRECONDITION',
+            })
+          ),
         {
-          retry: {
-            backoffSettings: {
-              maxRetries: 3,
-              initialRetryDelayMillis: 10,
-              retryDelayMultiplier: 2,
-              maxRetryDelayMillis: 10000,
-            },
+          getNextRequestObject: () => {
+            return;
           },
+          getResponseObject: d => d,
         }
       );
+      await assert.rejects(
+        () =>
+          client.sendCommandToDevice({
+            name: client.devicePath('p', 'l', 'r', 'd'),
+            binaryData: 'foo',
+          }),
+        err => {
+          assert.strictEqual(
+            (err as Error).message,
+            'Device d is not connected'
+          );
+          return true;
+        }
+      );
+    });
 
-      console.log('four', stub.callCount, stub.threw());
+    it('rejects with deadline exceeded', async () => {
+      const client = getClientWithRegistryCredentialsStub();
 
-      assert(stub.calledOnce);
+      client.apiCallers.sendCommandToDevice.do = requestFactory(
+        () =>
+          Promise.reject(
+            new IoTCoreError({
+              code: 400,
+              message: 'Device d is not connected',
+              status: 'FAILED_PRECONDITION',
+            })
+          ),
+        {
+          getNextRequestObject: () => {
+            return;
+          },
+          getResponseObject: d => d,
+        }
+      );
+      await assert.rejects(
+        () =>
+          // @ts-ignore
+          client.sendCommandToDevice(
+            {
+              name: client.devicePath('p', 'l', 'r', 'd'),
+              binaryData: 'foo',
+            },
+            {
+              maxRetries: 3,
+              retry: {
+                retryCodes: [9],
+                backoffSettings: {
+                  maxRetries: 3,
+                },
+              },
+            }
+          ),
+        err => {
+          assert.strictEqual(
+            (err as Error).message,
+            'Exceeded maximum number of retries before any response was received'
+          );
+          return true;
+        }
+      );
     });
   });
 });
+
+function getClientWithRegistryCredentialsStub() {
+  const client = new devicemanagerModule.v1.DeviceManagerClient({
+    credentials: {
+      systemKey: 'bogus',
+      project: 'bogus',
+      token: 'bogus',
+      url: 'https://bogus.com',
+    },
+  });
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  client.getRegistryToken = () =>
+    Promise.resolve({
+      systemKey: 'systemKey',
+      serviceAccountToken: 'serviceAccountToken',
+      url: 'https://bogus.com',
+      host: 'bogus.com',
+    });
+  return client;
+}

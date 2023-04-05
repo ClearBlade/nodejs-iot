@@ -38,15 +38,20 @@ import {
   Callback,
   CallOptions,
   CallSettings,
+  ClientConfig,
   PaginationCallback,
   PathTemplate as IPathTemplate,
+  constructSettings,
 } from 'google-gax';
-import {PathTemplate, createApiCall} from 'google-gax';
+import {PathTemplate} from 'google-gax';
+import * as gapicConfig from './device_manager_client_config.json';
 //import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import * as https from 'https';
 import {URL} from 'url';
 import {IoTCoreError, NetworkingError, UnknownError} from './iotCoreError';
+import {retryable} from './retries';
+import {GRPCCallOtherArgs} from 'google-gax/build/src/apitypes';
 const Timestamp = require('timestamp-nano');
 
 export function requestFactory<
@@ -68,100 +73,22 @@ export function requestFactory<
   }
 ) {
   return function makeRequest(
-    request: RequestObject,
-    options?: CallOptions,
-    callback?: Callback<ResponseObject, NextRequestObject, RawResponseObject>
+    request: RequestObject
+    // options?: CallOptions,
+    // callback?: Callback<ResponseObject, NextRequestObject, RawResponseObject>
   ): Promise<[ResponseObject, NextRequestObject, RawResponseObject]> | void {
-    return new Promise(res => {
-      createApiCall(
-        (arg, metadata, options, callback) => {
-          console.log('calling the func...', arg, metadata, options, callback);
-          fetcher(request)
-            .then(data => {
-              console.log('got some data here', data);
-
-              callback(
-                null,
-                getResponseObject(data),
-                // @ts-ignore
-                getNextRequestObject(request, data),
-                data
-              );
-              res([
-                getResponseObject(data),
-                getNextRequestObject(request, data),
-                data,
-              ]);
-            })
-            .catch(err => {
-              console.log('got an error here', err);
-              callback(IoTCoreError.toGoogleError(err));
-            });
-          return {
-            cancel: () => {},
-          };
-        },
-        new CallSettings()
-        // {...options}
-      )({}, options);
-    });
-    // return (
-    //   createApiCall(fetcher, {...options, otherArgs: request})
-    //     .then(data => {
-    //       console.log('received data from createApiCall', data);
-    //       return {blark: 'hi'};
-    //     })
-    //     .catch(e => {
-    //       console.error('caught error from createApiCall', e);
-    //       throw e;
-    //     })
-    // );
-    // const numOfRetryAttempts = options?.retry?.backoffSettings?.maxRetries;
-    // const maxDelay = options?.retry?.backoffSettings?.maxRetryDelayMillis;
-    // const startingDelay =
-    //   options?.retry?.backoffSettings?.initialRetryDelayMillis;
-    // const timeMultiple = options?.retry?.backoffSettings?.retryDelayMultiplier;
-    // const foo = options?.retry?.backoffSettings?.initialRpcTimeoutMillis;
-    // const foo2 = options?.retry?.backoffSettings?.maxRpcTimeoutMillis;
-    // const foo3 = options?.retry?.backoffSettings?.rpcTimeoutMultiplier;
-    // const foo4 = options?.retry?.backoffSettings?.totalTimeoutMillis;
-    // if (callback) {
-    //   fetcher(request)
-    //     .then(data => {
-    //       callback(
-    //         null,
-    //         getResponseObject(data),
-    //         getNextRequestObject(request, data),
-    //         data
-    //       );
-    //     })
-    //     .catch(e => {
-    //       callback(new Error(e));
-    //     });
-    // } else {
-    //   return backOff(
-    //     async () => {
-    //       console.log('calling fetcher...', typeof request, request);
-    //       const data = await fetcher(request);
-    //       return [
-    //         getResponseObject(data),
-    //         getNextRequestObject(request, data),
-    //         data,
-    //       ];
-    //     },
-    //     {
-    //       numOfAttempts: numOfRetryAttempts,
-    //       maxDelay,
-    //       startingDelay,
-    //       timeMultiple,
-    //       retry: e => {
-    //         // if ()
-    //         console.log('e', typeof e, e);
-    //         return false;
-    //       },
-    //     }
-    //   );
-    // }
+    // @ts-ignore
+    return fetcher(request)
+      .then(data => {
+        return [
+          getResponseObject(data),
+          getNextRequestObject(request, data),
+          data,
+        ];
+      })
+      .catch(e => {
+        throw IoTCoreError.toGoogleError(e);
+      });
   };
 }
 
@@ -279,6 +206,11 @@ function isServiceAccountCredentials(
 
 interface DeviceManagerClientOptions {
   credentials?: ServiceAccountCredentials;
+  clientConfig?: ClientConfig;
+}
+
+interface ApiCaller {
+  do: Function;
 }
 
 /**
@@ -295,6 +227,7 @@ export class DeviceManagerClient {
     string,
     GetRegistryCredentialsResponse & {host: string}
   >;
+  private _defaults: {[method: string]: CallSettings};
   // descriptors: Descriptors = {
   //   page: {},
   //   stream: {},
@@ -302,7 +235,12 @@ export class DeviceManagerClient {
   //   batching: {},
   // };
   // warn: (code: string, message: string, warnType?: string) => void;
-  innerApiCalls: {[name: string]: Function};
+  innerApiCalls: Record<string, Function>;
+  /**
+   * apiCallers is a Record of functions that make API requests
+   *
+   */
+  apiCallers: Record<string, ApiCaller>;
   pathTemplates: {
     devicePathTemplate: IPathTemplate;
     locationPathTemplate: IPathTemplate;
@@ -333,24 +271,80 @@ export class DeviceManagerClient {
       ),
     };
 
-    this.innerApiCalls = {
-      createDeviceRegistry: this._createDeviceRegistry,
-      getDeviceRegistry: this._getDeviceRegistry,
-      updateDeviceRegistry: this._updateDeviceRegistry,
-      deleteDeviceRegistry: this._deleteDeviceRegistry,
-      createDevice: this._createDevice,
-      getDevice: this._getDevice,
-      updateDevice: this._updateDevice,
-      deleteDevice: this._deleteDevice,
-      modifyCloudToDeviceConfig: this._modifyCloudToDeviceConfig,
-      listDeviceConfigVersions: this._listDeviceConfigVersions,
-      listDeviceStates: this._listDeviceStates,
-      sendCommandToDevice: this._sendCommandToDevice,
-      bindDeviceToGateway: this._bindDeviceToGateway,
-      unbindDeviceFromGateway: this._unbindDeviceFromGateway,
-      listDeviceRegistries: this._listDeviceRegistries,
-      listDevices: this._listDevices,
-    };
+    const methods = [
+      'createDeviceRegistry',
+      'getDeviceRegistry',
+      'updateDeviceRegistry',
+      'deleteDeviceRegistry',
+      'createDevice',
+      'getDevice',
+      'updateDevice',
+      'deleteDevice',
+      'modifyCloudToDeviceConfig',
+      'listDeviceConfigVersions',
+      'listDeviceStates',
+      'sendCommandToDevice',
+      'bindDeviceToGateway',
+      'unbindDeviceFromGateway',
+      'listDeviceRegistries',
+      'listDevices',
+    ];
+
+    this.apiCallers = methods.reduce((agg, val) => {
+      // @ts-ignore
+      agg[val] = {do: this[`_${val}`]};
+      return agg;
+    }, {} as typeof this.apiCallers);
+
+    function createApiCall(caller: ApiCaller, settings: CallSettings) {
+      return function apiCall(
+        argument: {},
+        callOptions?: CallOptions,
+        callback?: () => void
+      ) {
+        const thisSettings = settings.merge(callOptions);
+        const retry = thisSettings.retry;
+        if (retry && retry.retryCodes && retry.retryCodes.length > 0) {
+          retry.backoffSettings.initialRpcTimeoutMillis =
+            retry.backoffSettings.initialRpcTimeoutMillis ||
+            thisSettings.timeout;
+          const doRetry = retryable(
+            // () => caller.do(argument, thisSettings),
+            // @ts-ignores
+            caller.do,
+            thisSettings.retry!,
+            thisSettings.otherArgs as GRPCCallOtherArgs,
+            thisSettings.apiName
+          );
+
+          if (callback) {
+            // doRetry(argument, (err, resp) => {
+            //   // @ts-ignore
+            //   callback(err, resp);
+            // });
+            // return ;
+          }
+          // @ts-ignore
+          return doRetry(argument);
+        }
+        return caller.do(argument, thisSettings);
+      };
+    }
+
+    this._defaults = constructSettings(
+      'google.cloud.iot.v1.DeviceManager',
+      gapicConfig as ClientConfig,
+      opts?.clientConfig || {},
+      {}
+    );
+
+    this.innerApiCalls = methods.reduce<{[method: string]: Function}>(
+      (agg, val) => {
+        agg[val] = createApiCall(this.apiCallers[val], this._defaults[val]);
+        return agg;
+      },
+      {}
+    );
   }
 
   /**

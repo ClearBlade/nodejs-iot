@@ -39,7 +39,7 @@ export class IoTCoreError extends Error {
   };
 }
 
-function getGoogleErrorCodeFromStatus(status: string): Status {
+export function getGoogleErrorCodeFromStatus(status: string): Status {
   switch (status) {
     case 'CANCELLED':
       return Status.CANCELLED;
