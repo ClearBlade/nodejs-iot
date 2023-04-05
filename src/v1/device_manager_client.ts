@@ -309,8 +309,7 @@ export class DeviceManagerClient {
             retry.backoffSettings.initialRpcTimeoutMillis ||
             thisSettings.timeout;
           const doRetry = retryable(
-            // () => caller.do(argument, thisSettings),
-            // @ts-ignores
+            // @ts-ignore
             caller.do,
             thisSettings.retry!,
             thisSettings.otherArgs as GRPCCallOtherArgs,
@@ -318,6 +317,14 @@ export class DeviceManagerClient {
           );
 
           if (callback) {
+            doRetry(argument)
+              .then(data => {
+                callback(null, data);
+              })
+              .catch(err => {
+                callback(err);
+              });
+            return;
             // doRetry(argument, (err, resp) => {
             //   // @ts-ignore
             //   callback(err, resp);
