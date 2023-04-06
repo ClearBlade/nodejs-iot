@@ -44,7 +44,7 @@ import {PathTemplate} from 'google-gax';
 //import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import * as https from 'https';
-import {URL} from 'url';
+import {URL, URLSearchParams} from 'url';
 const Timestamp = require('timestamp-nano');
 
 function requestFactory<
@@ -2138,10 +2138,27 @@ export class DeviceManagerClient {
       return new Promise((resolve, reject) => {
         const deviceName = this.matchDeviceFromDeviceName(request?.name ?? '');
 
+        const query = new URLSearchParams();
+        query.append(
+          'name',
+          typeof deviceName === 'string' ? deviceName : deviceName.toString()
+        );
+        query.append(
+          'numStates',
+          typeof request.numStates === 'number'
+            ? request.numStates?.toString()
+            : '10'
+        );
+        if (isBinaryDataFormat()) {
+          query.append('base64Encode', 'true');
+        }
+
         const options = {
           host: token_response.host,
           port: '443',
-          path: `/api/v/4/webhook/execute/${token_response.systemKey}/cloudiot_devices_states?name=${deviceName}&numStates=${request.numStates}`,
+          path: `/api/v/4/webhook/execute/${
+            token_response.systemKey
+          }/cloudiot_devices_states?${query.toString()}`,
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
