@@ -37,10 +37,12 @@ import * as devicemanagerModule from '../src';
 
 import {protobuf} from 'google-gax';
 import {
+  requestFactory,
   ServiceAccountCredentials,
   timeSecondsNanos,
 } from '../src/v1/device_manager_client';
 import path = require('path');
+import {IoTCoreError} from '../src/v1/iotCoreError';
 
 function generateSampleMessage<T extends object>(instance: T) {
   const filledObject = (
@@ -3077,6 +3079,90 @@ describe('v1.DeviceManagerClient', () => {
     });
   });
 
+  describe('retry logic', () => {
+    it('rejects with error', async () => {
+      const client = getClientStub();
+
+      client.apiCallers.sendCommandToDevice.do = requestFactory(
+        () =>
+          Promise.reject(
+            new IoTCoreError({
+              code: 400,
+              message: 'Device d is not connected',
+              status: 'FAILED_PRECONDITION',
+            })
+          ),
+        {
+          getNextRequestObject: () => {
+            return;
+          },
+          getResponseObject: d => d,
+        }
+      );
+      await assert.rejects(
+        () =>
+          client.sendCommandToDevice({
+            name: client.devicePath('p', 'l', 'r', 'd'),
+            binaryData: 'foo',
+          }),
+        err => {
+          assert.strictEqual(
+            (err as Error).message,
+            'Device d is not connected'
+          );
+          return true;
+        }
+      );
+    });
+
+    it('rejects with deadline exceeded', async () => {
+      const client = getClientStub();
+
+      const mock = sinon.stub().rejects(
+        new IoTCoreError({
+          code: 400,
+          message: 'Device d is not connected',
+          status: 'FAILED_PRECONDITION',
+        })
+      );
+
+      client.apiCallers.sendCommandToDevice.do = requestFactory(mock, {
+        getNextRequestObject: () => {
+          return;
+        },
+        getResponseObject: d => d,
+      });
+      await assert.rejects(
+        () =>
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          client.sendCommandToDevice(
+            {
+              name: client.devicePath('p', 'l', 'r', 'd'),
+              binaryData: 'foo',
+            },
+            {
+              maxRetries: 5,
+              retry: {
+                retryCodes: [9],
+                backoffSettings: {
+                  maxRetries: 3,
+                },
+              },
+            }
+          ),
+        err => {
+          assert.strictEqual(
+            (err as Error).message,
+            'Exceeded maximum number of retries before any response was received'
+          );
+          assert.strictEqual(mock.callCount, 5);
+          return true;
+        }
+      );
+    });
+  });
+
   describe('util functions', () => {
     describe('timeSecondsNanos', () => {
       it('formats date into nanos and seconds properly', () => {
@@ -3092,3 +3178,24 @@ describe('v1.DeviceManagerClient', () => {
     });
   });
 });
+
+function getClientStub() {
+  const client = new devicemanagerModule.v1.DeviceManagerClient({
+    credentials: {
+      systemKey: 'bogus',
+      project: 'bogus',
+      token: 'bogus',
+      url: 'https://bogus.com',
+    },
+  });
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  client.getRegistryToken = () =>
+    Promise.resolve({
+      systemKey: 'systemKey',
+      serviceAccountToken: 'serviceAccountToken',
+      url: 'https://bogus.com',
+      host: 'bogus.com',
+    });
+  return client;
+}

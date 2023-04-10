@@ -34,20 +34,27 @@
 // ** https://github.com/googleapis/gapic-generator-typescript **
 // ** All changes to this file may be overwritten. **
 
-import type {
+import {
   Callback,
   CallOptions,
+  CallSettings,
+  ClientConfig,
   PaginationCallback,
   PathTemplate as IPathTemplate,
+  constructSettings,
 } from 'google-gax';
 import {PathTemplate} from 'google-gax';
+import * as gapicConfig from './device_manager_client_config.json';
 //import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import * as https from 'https';
 import {URL, URLSearchParams} from 'url';
+import {IoTCoreError, NetworkingError, UnknownError} from './iotCoreError';
+import {retryable} from './retries';
+import {GRPCCallOtherArgs} from 'google-gax/build/src/apitypes';
 const Timestamp = require('timestamp-nano');
 
-function requestFactory<
+export function requestFactory<
   RequestObject,
   ResponseObject,
   NextRequestObject,
@@ -66,32 +73,19 @@ function requestFactory<
   }
 ) {
   return function makeRequest(
-    request: RequestObject,
-    options: CallOptions,
-    callback?: Callback<ResponseObject, NextRequestObject, RawResponseObject>
-  ): Promise<[ResponseObject, NextRequestObject, RawResponseObject]> | void {
-    if (callback) {
-      fetcher(request)
-        .then(data => {
-          callback(
-            null,
-            getResponseObject(data),
-            getNextRequestObject(request, data),
-            data
-          );
-        })
-        .catch(e => {
-          callback(new Error(e));
-        });
-    } else {
-      return fetcher(request).then(data => {
+    request: RequestObject
+  ): Promise<[ResponseObject, NextRequestObject, RawResponseObject]> {
+    return fetcher(request)
+      .then(data => {
         return [
           getResponseObject(data),
           getNextRequestObject(request, data),
           data,
-        ];
+        ] as [ResponseObject, NextRequestObject, RawResponseObject];
+      })
+      .catch(e => {
+        throw IoTCoreError.toGoogleError(e);
       });
-    }
   };
 }
 
@@ -145,45 +139,6 @@ function isGetRegistryCredentialsResponse(
     typeof (data as GetRegistryCredentialsResponse).url === 'string'
   );
 }
-
-interface ServerError {
-  error: {
-    code: number;
-    message: string;
-    status: string;
-  };
-}
-
-function isServerError(value: unknown): value is ServerError {
-  if (
-    value &&
-    typeof value === 'object' &&
-    'error' in value &&
-    (value as ServerError).error &&
-    typeof (value as ServerError).error === 'object' &&
-    'code' in (value as ServerError).error
-  ) {
-    return true;
-  }
-  return false;
-}
-
-function IoTCoreError(msg: string) {
-  try {
-    const parsedError: unknown = JSON.parse(msg);
-    if (isServerError(parsedError)) {
-      return parsedError;
-    }
-  } catch (e) {
-    // ignore error
-  }
-  return {
-    details: msg,
-  };
-}
-IoTCoreError.KNOWN_ERRORS = {
-  NO_STATUS_CODE: 'Networking error. No status code was returned',
-};
 
 function isErrorStatusCode(statusCode: number): boolean {
   if (statusCode < 200 || statusCode > 299) {
@@ -250,6 +205,11 @@ function isServiceAccountCredentials(
 
 interface DeviceManagerClientOptions {
   credentials?: ServiceAccountCredentials;
+  clientConfig?: ClientConfig;
+}
+
+interface ApiCaller {
+  do: (request: unknown) => Promise<unknown>;
 }
 
 /**
@@ -266,6 +226,7 @@ export class DeviceManagerClient {
     string,
     GetRegistryCredentialsResponse & {host: string}
   >;
+  private _defaults: {[method: string]: CallSettings};
   // descriptors: Descriptors = {
   //   page: {},
   //   stream: {},
@@ -273,7 +234,12 @@ export class DeviceManagerClient {
   //   batching: {},
   // };
   // warn: (code: string, message: string, warnType?: string) => void;
-  innerApiCalls: {[name: string]: Function};
+  innerApiCalls: Record<string, Function>;
+  /**
+   * apiCallers is a Record of functions that make API requests
+   *
+   */
+  apiCallers: Record<string, ApiCaller>;
   pathTemplates: {
     devicePathTemplate: IPathTemplate;
     locationPathTemplate: IPathTemplate;
@@ -304,24 +270,83 @@ export class DeviceManagerClient {
       ),
     };
 
-    this.innerApiCalls = {
-      createDeviceRegistry: this._createDeviceRegistry,
-      getDeviceRegistry: this._getDeviceRegistry,
-      updateDeviceRegistry: this._updateDeviceRegistry,
-      deleteDeviceRegistry: this._deleteDeviceRegistry,
-      createDevice: this._createDevice,
-      getDevice: this._getDevice,
-      updateDevice: this._updateDevice,
-      deleteDevice: this._deleteDevice,
-      modifyCloudToDeviceConfig: this._modifyCloudToDeviceConfig,
-      listDeviceConfigVersions: this._listDeviceConfigVersions,
-      listDeviceStates: this._listDeviceStates,
-      sendCommandToDevice: this._sendCommandToDevice,
-      bindDeviceToGateway: this._bindDeviceToGateway,
-      unbindDeviceFromGateway: this._unbindDeviceFromGateway,
-      listDeviceRegistries: this._listDeviceRegistries,
-      listDevices: this._listDevices,
-    };
+    const methods = [
+      'createDeviceRegistry',
+      'getDeviceRegistry',
+      'updateDeviceRegistry',
+      'deleteDeviceRegistry',
+      'createDevice',
+      'getDevice',
+      'updateDevice',
+      'deleteDevice',
+      'modifyCloudToDeviceConfig',
+      'listDeviceConfigVersions',
+      'listDeviceStates',
+      'sendCommandToDevice',
+      'bindDeviceToGateway',
+      'unbindDeviceFromGateway',
+      'listDeviceRegistries',
+      'listDevices',
+    ];
+
+    this.apiCallers = methods.reduce((agg, val) => {
+      agg[val] = {
+        do: this[`_${val}` as keyof this] as unknown as (
+          request: unknown
+        ) => Promise<unknown>,
+      };
+      return agg;
+    }, {} as typeof this.apiCallers);
+
+    function createApiCall(caller: ApiCaller, settings: CallSettings) {
+      return function apiCall(
+        argument: {},
+        callOptions?: CallOptions,
+        callback?: (error: Error | null, data?: unknown) => void
+      ) {
+        const thisSettings = settings.merge(callOptions);
+        const retry = thisSettings.retry;
+        if (retry && retry.retryCodes && retry.retryCodes.length > 0) {
+          retry.backoffSettings.initialRpcTimeoutMillis =
+            retry.backoffSettings.initialRpcTimeoutMillis ||
+            thisSettings.timeout;
+          const doRetry = retryable(
+            caller.do,
+            thisSettings.retry!,
+            thisSettings.otherArgs as GRPCCallOtherArgs,
+            thisSettings.apiName
+          );
+
+          if (callback) {
+            doRetry(argument)
+              .then(data => {
+                callback(null, data);
+              })
+              .catch(err => {
+                callback(err);
+              });
+            return;
+          }
+          return doRetry(argument);
+        }
+        return caller.do(argument);
+      };
+    }
+
+    this._defaults = constructSettings(
+      'google.cloud.iot.v1.DeviceManager',
+      gapicConfig as ClientConfig,
+      opts?.clientConfig || {},
+      {}
+    );
+
+    this.innerApiCalls = methods.reduce<{[method: string]: Function}>(
+      (agg, val) => {
+        agg[val] = createApiCall(this.apiCallers[val], this._defaults[val]);
+        return agg;
+      },
+      {}
+    );
   }
 
   /**
@@ -574,12 +599,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -714,12 +739,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -878,12 +903,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -1029,12 +1054,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               res.on('data', () => {});
@@ -1176,12 +1201,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -1329,12 +1354,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -1487,12 +1512,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -1631,12 +1656,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -1800,12 +1825,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -1983,12 +2008,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -2172,12 +2197,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -2643,12 +2668,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -2797,12 +2822,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -2964,12 +2989,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -3123,12 +3148,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
@@ -3191,7 +3216,7 @@ export class DeviceManagerClient {
                 const parsed = JSON.parse(data);
                 if (!isGetRegistryCredentialsResponse(parsed)) {
                   reject(
-                    IoTCoreError(
+                    new UnknownError(
                       'Invalid response from getRegistryCredentials:' + data
                     )
                   );
@@ -3205,12 +3230,7 @@ export class DeviceManagerClient {
                   resolve(cacheData);
                 }
               } catch (e) {
-                reject(
-                  IoTCoreError(
-                    'Caught error while parsing response from getRegistryCredentials: ' +
-                      e
-                  )
-                );
+                reject(new UnknownError(e));
               }
             });
           });
@@ -3540,12 +3560,12 @@ export class DeviceManagerClient {
           },
           res => {
             if (typeof res.statusCode === 'undefined') {
-              reject(IoTCoreError(IoTCoreError.KNOWN_ERRORS.NO_STATUS_CODE));
+              reject(new NetworkingError());
             } else if (isErrorStatusCode(res.statusCode)) {
               let errorData = '';
               res.on('data', chunk => (errorData += chunk));
               res.on('end', () => {
-                reject(IoTCoreError(errorData));
+                reject(IoTCoreError.parseHttpError(errorData));
               });
             } else {
               let data = '';
