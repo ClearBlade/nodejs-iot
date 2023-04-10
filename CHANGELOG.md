@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.0](https://github.com/clearblade/nodejs-iot/compare/v1.0.9..v1.1.0) (2023-04-10)
+
+- Add support for retrying requests on error
+
 ## [1.0.9](https://github.com/clearblade/nodejs-iot/compare/v1.0.8..v1.0.9) (2023-04-06)
 
 - Fix incorrect decoding of state binaryData when using `BINARYDATA_AND_TIME_GOOGLE_FORMAT` flag
