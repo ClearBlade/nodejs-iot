@@ -13,14 +13,7 @@
 // limitations under the License.
 
 import {GoogleError, RetryOptions, Status} from 'google-gax';
-import {
-  GRPCCall,
-  GRPCCallOtherArgs,
-  GRPCCallResult,
-  RequestType,
-  SimpleCallbackFunction,
-  UnaryCall,
-} from 'google-gax/build/src/apitypes';
+import {GRPCCallOtherArgs, RequestType} from 'google-gax/build/src/apitypes';
 
 /**
  * Copyright 2020 Google LLC
@@ -73,8 +66,8 @@ export function retryable(
    * @param {RequestType} argument The request object.
    */
   return async (argument: RequestType) => {
-    let canceller: GRPCCallResult | null;
-    let timeoutId: ReturnType<typeof setTimeout> | null;
+    // let canceller: GRPCCallResult | null;
+    // let timeoutId: ReturnType<typeof setTimeout> | null;
     let now = new Date();
     let deadline: number;
     if (retry.backoffSettings.totalTimeoutMillis) {
@@ -86,7 +79,7 @@ export function retryable(
 
     /** Repeat the API call as long as necessary. */
     function repeat(): Promise<unknown> {
-      timeoutId = null;
+      // timeoutId = null;
       if (deadline && now.getTime() >= deadline) {
         const error = new GoogleError(
           `Total timeout of API ${apiName} exceeded ${retry.backoffSettings.totalTimeoutMillis} milliseconds before any response was received.`
@@ -106,7 +99,7 @@ export function retryable(
 
       retries++;
       return func(argument).catch(async err => {
-        canceller = null;
+        // canceller = null;
         if (retry.retryCodes.indexOf(err!.code!) < 0) {
           err.note =
             'Exception occurred in retry method that was ' +
@@ -114,7 +107,8 @@ export function retryable(
           throw err;
         } else {
           const toSleep = Math.random() * delay;
-          timeoutId = await sleep(toSleep);
+          // timeoutId = await sleep(toSleep);
+          await sleep(toSleep);
           now = new Date();
           delay = Math.min(delay * delayMult, maxDelay);
           const timeoutCal = timeout && timeoutMult ? timeout * timeoutMult : 0;
