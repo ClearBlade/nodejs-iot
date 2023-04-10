@@ -74,17 +74,14 @@ export function requestFactory<
 ) {
   return function makeRequest(
     request: RequestObject
-    // options?: CallOptions,
-    // callback?: Callback<ResponseObject, NextRequestObject, RawResponseObject>
-  ): Promise<[ResponseObject, NextRequestObject, RawResponseObject]> | void {
-    // @ts-ignore
+  ): Promise<[ResponseObject, NextRequestObject, RawResponseObject]> {
     return fetcher(request)
       .then(data => {
         return [
           getResponseObject(data),
           getNextRequestObject(request, data),
           data,
-        ];
+        ] as [ResponseObject, NextRequestObject, RawResponseObject];
       })
       .catch(e => {
         throw IoTCoreError.toGoogleError(e);
@@ -212,7 +209,7 @@ interface DeviceManagerClientOptions {
 }
 
 interface ApiCaller {
-  do: Function;
+  do: (request: unknown) => Promise<unknown>;
 }
 
 /**
@@ -293,8 +290,11 @@ export class DeviceManagerClient {
     ];
 
     this.apiCallers = methods.reduce((agg, val) => {
-      // @ts-ignore
-      agg[val] = {do: this[`_${val}`]};
+      agg[val] = {
+        do: this[`_${val}` as keyof this] as unknown as (
+          request: unknown
+        ) => Promise<unknown>,
+      };
       return agg;
     }, {} as typeof this.apiCallers);
 
@@ -302,7 +302,7 @@ export class DeviceManagerClient {
       return function apiCall(
         argument: {},
         callOptions?: CallOptions,
-        callback?: () => void
+        callback?: (error: Error | null, data?: unknown) => void
       ) {
         const thisSettings = settings.merge(callOptions);
         const retry = thisSettings.retry;
@@ -311,7 +311,6 @@ export class DeviceManagerClient {
             retry.backoffSettings.initialRpcTimeoutMillis ||
             thisSettings.timeout;
           const doRetry = retryable(
-            // @ts-ignore
             caller.do,
             thisSettings.retry!,
             thisSettings.otherArgs as GRPCCallOtherArgs,
@@ -321,24 +320,16 @@ export class DeviceManagerClient {
           if (callback) {
             doRetry(argument)
               .then(data => {
-                // @ts-ignore
                 callback(null, data);
               })
               .catch(err => {
-                // @ts-ignore
                 callback(err);
               });
             return;
-            // doRetry(argument, (err, resp) => {
-            //   // @ts-ignore
-            //   callback(err, resp);
-            // });
-            // return ;
           }
-          // @ts-ignore
           return doRetry(argument);
         }
-        return caller.do(argument, thisSettings);
+        return caller.do(argument);
       };
     }
 

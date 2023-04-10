@@ -3081,7 +3081,7 @@ describe('v1.DeviceManagerClient', () => {
 
   describe('retry logic', () => {
     it('rejects with error', async () => {
-      const client = getClientWithRegistryCredentialsStub();
+      const client = getClientStub();
 
       client.apiCallers.sendCommandToDevice.do = requestFactory(
         () =>
@@ -3116,24 +3116,22 @@ describe('v1.DeviceManagerClient', () => {
     });
 
     it('rejects with deadline exceeded', async () => {
-      const client = getClientWithRegistryCredentialsStub();
+      const client = getClientStub();
 
-      client.apiCallers.sendCommandToDevice.do = requestFactory(
-        () =>
-          Promise.reject(
-            new IoTCoreError({
-              code: 400,
-              message: 'Device d is not connected',
-              status: 'FAILED_PRECONDITION',
-            })
-          ),
-        {
-          getNextRequestObject: () => {
-            return;
-          },
-          getResponseObject: d => d,
-        }
+      const mock = sinon.stub().rejects(
+        new IoTCoreError({
+          code: 400,
+          message: 'Device d is not connected',
+          status: 'FAILED_PRECONDITION',
+        })
       );
+
+      client.apiCallers.sendCommandToDevice.do = requestFactory(mock, {
+        getNextRequestObject: () => {
+          return;
+        },
+        getResponseObject: d => d,
+      });
       await assert.rejects(
         () =>
           // @ts-ignore
@@ -3143,7 +3141,7 @@ describe('v1.DeviceManagerClient', () => {
               binaryData: 'foo',
             },
             {
-              maxRetries: 3,
+              maxRetries: 5,
               retry: {
                 retryCodes: [9],
                 backoffSettings: {
@@ -3157,6 +3155,7 @@ describe('v1.DeviceManagerClient', () => {
             (err as Error).message,
             'Exceeded maximum number of retries before any response was received'
           );
+          assert.strictEqual(mock.callCount, 5);
           return true;
         }
       );
@@ -3179,7 +3178,7 @@ describe('v1.DeviceManagerClient', () => {
   });
 });
 
-function getClientWithRegistryCredentialsStub() {
+function getClientStub() {
   const client = new devicemanagerModule.v1.DeviceManagerClient({
     credentials: {
       systemKey: 'bogus',
