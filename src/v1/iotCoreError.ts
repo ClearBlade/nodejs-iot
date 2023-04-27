@@ -35,6 +35,11 @@ export class IoTCoreError extends Error {
     const iotError = IoTCoreError.parseHttpError(error);
     const googleError = new GoogleError(iotError.message);
     googleError.code = getGoogleErrorCodeFromStatus(iotError.status);
+
+    if (iotError.details) {
+      (googleError as GoogleError & {details: unknown}).details =
+        iotError.details;
+    }
     return googleError;
   };
 }

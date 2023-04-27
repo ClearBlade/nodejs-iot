@@ -3209,30 +3209,40 @@ export class DeviceManagerClient {
             },
           };
           const req = https.request(options, res => {
-            let data = '';
-            res.on('data', chunk => (data += chunk));
-            res.on('end', () => {
-              try {
-                const parsed = JSON.parse(data);
-                if (!isGetRegistryCredentialsResponse(parsed)) {
-                  reject(
-                    new UnknownError(
-                      'Invalid response from getRegistryCredentials:' + data
-                    )
-                  );
-                } else {
-                  const regionalURL = new URL(parsed.url);
-                  const cacheData = {
-                    ...parsed,
-                    host: regionalURL.host,
-                  };
-                  this.CACHED_CLIENT_INFO[cacheKey] = cacheData;
-                  resolve(cacheData);
+            if (typeof res.statusCode === 'undefined') {
+              reject(new NetworkingError());
+            } else if (isErrorStatusCode(res.statusCode)) {
+              let errorData = '';
+              res.on('data', chunk => (errorData += chunk));
+              res.on('end', () => {
+                reject(IoTCoreError.parseHttpError(errorData));
+              });
+            } else {
+              let data = '';
+              res.on('data', chunk => (data += chunk));
+              res.on('end', () => {
+                try {
+                  const parsed = JSON.parse(data);
+                  if (!isGetRegistryCredentialsResponse(parsed)) {
+                    reject(
+                      new UnknownError(
+                        'Invalid response from getRegistryCredentials:' + data
+                      )
+                    );
+                  } else {
+                    const regionalURL = new URL(parsed.url);
+                    const cacheData = {
+                      ...parsed,
+                      host: regionalURL.host,
+                    };
+                    this.CACHED_CLIENT_INFO[cacheKey] = cacheData;
+                    resolve(cacheData);
+                  }
+                } catch (e) {
+                  reject(new UnknownError(e));
                 }
-              } catch (e) {
-                reject(new UnknownError(e));
-              }
-            });
+              });
+            }
           });
           req.on('error', e => {
             reject(e);
