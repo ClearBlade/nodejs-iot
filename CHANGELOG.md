@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.1](https://github.com/clearblade/nodejs-iot/compare/v1.1.0..v1.1.1) (2023-05-16)
+
+- Add error handling to internal method
+
 ## [1.1.0](https://github.com/clearblade/nodejs-iot/compare/v1.0.9..v1.1.0) (2023-04-10)
 
 - Add support for retrying requests on error
