@@ -1,13 +1,13 @@
-# [ClearBlade Internet of Things (IoT) Core: Node.js Client](https://github.com/clearblade/nodejs-iot)
+# [ClearBlade IoT Core: Node.js Client](https://github.com/clearblade/nodejs-iot)
 
 [![npm version](https://img.shields.io/npm/v/@clearblade/iot.svg)](https://www.npmjs.org/package/@clearblade/iot)
 
 > Node.js idiomatic client for [ClearBlade IoT Core][product-docs].
 
-[ClearBlade Internet of Things (IoT) Core](https://clearblade.atlassian.net/wiki/spaces/IC/overview?homepageId=2170716228) is a fully managed service for securely connecting and managing IoT devices, from a few to millions. Ingest data from connected devices and build rich applications that integrate with the other big data services of Google Cloud Platform.
+[ClearBlade IoT Core](https://clearblade.atlassian.net/wiki/spaces/IC/overview?homepageId=2170716228) is a fully managed service for securely connecting and managing IoT devices, from a few to millions. Ingest data from connected devices and build rich applications that integrate with the other big data services of the ClearBlade Platform or the Google Cloud Platform.
 
-- [ClearBlade Internet of Things (IoT) Core Node.js Client API Reference][client-docs]
-- [Clearblade Internet of Things (IoT) Core Documentation][product-docs]
+- [ClearBlade IoT Core Node.js client API reference][client-docs]
+- [Clearblade IoT Core documentation][product-docs]
 - [github.com/clearblade/nodejs-iot](https://github.com/clearblade/nodejs-iot)
 
 **Table of contents:**
@@ -26,10 +26,9 @@
 ### Before you begin
 
 1.  [Select or create a Cloud Platform project][projects].
-1.  [Enable billing for your project][billing].
-1.  [Enable the ClearBlade Internet of Things (IoT) Core API][enable_api].
-1.  [Set up authentication with a service account][auth] so you can access the
-    API from your local workstation.
+2.  [Enable billing for your project][billing].
+3.  [Enable the ClearBlade IoT Core API][enable_api].
+4.  [Set up authentication with a service account][auth] so you can access the API from your local workstation.
 
 ### Installing the client library
 
@@ -39,13 +38,13 @@ npm install @clearblade/iot
 
 ### Setting up service account credentials
 
-[Create a service account](https://clearblade.atlassian.net/wiki/spaces/IC/pages/2240675843/Add+service+accounts+to+a+project) in your project and download the credentials .json file. Define an environment variable named `CLEARBLADE_CONFIGURATION` which represents the path to the credentials .json file. Example:
+[Create a service account](https://clearblade.atlassian.net/wiki/spaces/IC/pages/2240675843/Add+service+accounts+to+a+project) in your project and download the credentials .json file. Define an environment variable named `CLEARBLADE_CONFIGURATION`, which represents the credentials .json file's path. Example:
 
 ```
 export CLEARBLADE_CONFIGURATION=/path/to/file.json
 ```
 
-As an alternative to using a filepath for your service account credentials, you can take the values of `project`, `systemKey`, `token`, and `url` from your service account .json file and supply them directly to the constructor:
+As an alternative to using a filepath for your service account credentials, you can take the `project`, `systemKey`, `token`, and `url` values from your service account's .json file and supply them directly to the constructor:
 
 ```javascript
 const client = new DeviceManagerClient({
@@ -58,11 +57,11 @@ const client = new DeviceManagerClient({
 });
 ```
 
-Note: be sure to use your service account credentials rather than the credentials from the Registry API keys page. By using the service account credentials, you will be able to use one set of credentials to target all of the registries in your project.
+Use your service account credentials rather than those from the Registry API keys page. You can use one set of service account credentials to target all your project's registries.
 
 ### BINARYDATA_AND_TIME_GOOGLE_FORMAT env variable (optional)
 
-If you'd like to receive binaryData and timestamps in the same format that the Google IoT Node SDK supplies them, you can define an environment variable named `BINARYDATA_AND_TIME_GOOGLE_FORMAT`. If the env variable `BINARYDATA_AND_TIME_GOOGLE_FORMAT` is set as `true` then it will give binaryData object's response in byte array form and time in Timestamp format which will have seconds and nanos in it which is following Google's structure. It's applicable on get device state list, modify config, device config versions methods. By default the value for this flag will be false.
+If you'd like to receive binaryData and timestamps in the same format that the Google IoT Node SDK supplies, you can define an environment variable named `BINARYDATA_AND_TIME_GOOGLE_FORMAT`. If this env variable is set as `true`, then it will give the binaryData object's response in byte array form and time in timestamp format, which will have seconds and nanos in it, following Google's structure. It's applicable on the get device state list, modify config, and device config versions methods. By default, this flag's value will be false.
 
 ```
 export BINARYDATA_AND_TIME_GOOGLE_FORMAT=true
@@ -90,46 +89,35 @@ quickstart();
 
 Samples are in the [`samples/`](https://github.com/clearblade/nodejs-iot/tree/main/samples) directory. Each sample's `README.md` has instructions for running its sample.
 
-| Sample     | Source Code                                                                             | Try it                                                                                                                                                                                                     |
+| Sample     | Source code                                                                             | Try it                                                                                                                                                                                                     |
 | ---------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Quickstart | [source code](https://github.com/clearblade/nodejs-iot/blob/main/samples/quickstart.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/clearblade/nodejs-iot&page=editor&open_in_editor=samples/quickstart.js,samples/README.md) |
 
-The [ClearBlade Internet of Things (IoT) Core Node.js Client API Reference][client-docs] documentation
-also contains samples.
+The [ClearBlade IoT Core Node.js client API reference][client-docs] documentation also contains samples.
 
-## Supported Node.js Versions
+## Supported Node.js versions
 
-Our client libraries follow the [Node.js release schedule](https://nodejs.org/en/about/releases/).
-Libraries are compatible with all current _active_ and _maintenance_ versions of
-Node.js.
-If you are using an end-of-life version of Node.js, we recommend that you update
-as soon as possible to an actively supported LTS version.
+Our client libraries follow the [Node.js release schedule](https://nodejs.org/en/about/releases/). Libraries are compatible with all current _active_ and _maintenance_ versions of Node.js. If you are using an end-of-life version of Node.js, we recommend that you update it as soon as possible to an actively supported LTS version.
 
-ClearBlade's client libraries support legacy versions of Node.js runtimes on a
-best-efforts basis with the following warnings:
+ClearBlade's client libraries support legacy versions of Node.js runtimes on a best-efforts basis with the following warnings:
 
 - Legacy versions are not tested in continuous integration.
 - Some security patches and features cannot be backported.
 - Dependencies cannot be kept up-to-date.
 
-Client libraries targeting some end-of-life versions of Node.js are available, and
-can be installed through npm [dist-tags](https://docs.npmjs.com/cli/dist-tag).
-The dist-tags follow the naming convention `legacy-(version)`.
-For example, `npm install @google-cloud/iot@legacy-8` installs client libraries
-for versions compatible with Node.js 8.
+Client libraries targeting some end-of-life versions of Node.js are available and can be installed through npm [dist-tags](https://docs.npmjs.com/cli/dist-tag).
+The dist-tags follow the naming convention `legacy-(version)`. For example, `npm install @google-cloud/iot@legacy-8` installs client libraries for versions compatible with Node.js 8.
 
 ## Versioning
 
-This library follows [Semantic Versioning](http://semver.org/).
+This library follows [semantic versioning](http://semver.org/).
 
-This library is considered to be **stable**. The code surface will not change in backwards-incompatible ways
-unless absolutely necessary (e.g. because of critical security issues) or with
-an extensive deprecation period. Issues and requests against **stable** libraries
-are addressed with the highest priority.
+This library is considered to be **stable**. The code surface will not change in backward-incompatible ways unless necessary (e.g., because of critical security issues) or with
+an extensive deprecation period. Issues and requests against **stable** libraries are addressed with the highest priority.
 
 ## Contributing
 
-Contributions welcome! See the [Contributing Guide](https://github.com/clearblade/nodejs-iot/blob/main/CONTRIBUTING.md).
+Contributions welcome! See the [Contributing guide](https://github.com/clearblade/nodejs-iot/blob/main/CONTRIBUTING.md).
 
 ## License
 
