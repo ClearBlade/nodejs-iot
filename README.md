@@ -4,7 +4,7 @@
 
 > Node.js idiomatic client for [ClearBlade IoT Core][product-docs].
 
-[ClearBlade IoT Core](https://clearblade.atlassian.net/wiki/spaces/IC/overview?homepageId=2170716228) is a fully managed service for securely connecting and managing IoT devices, from a few to millions. Ingest data from connected devices and build rich applications that integrate with the other big data services of the ClearBlade Platform.
+[ClearBlade IoT Core](https://clearblade.atlassian.net/wiki/spaces/IC/overview?homepageId=2170716228) is a fully managed service for securely connecting and managing IoT devices, from a few to millions. Ingest data from connected devices and build rich applications that integrate with the other big data services of the ClearBlade Platform or the Google Cloud Platform.
 
 - [ClearBlade IoT Core Node.js client API reference][client-docs]
 - [Clearblade IoT Core documentation][product-docs]
@@ -61,7 +61,7 @@ Use your service account credentials rather than those from the Registry API key
 
 ### BINARYDATA_AND_TIME_GOOGLE_FORMAT env variable (optional)
 
-If you'd like to receive binaryData and timestamps in the same format that the Google IoT node SDK supplies, you can define an environment variable named `BINARYDATA_AND_TIME_GOOGLE_FORMAT`. If this env variable is set as `true`, then it will give the binaryData object's response in byte array form and time in timestamp format, which will have seconds and nanos in it, following Google's structure. It's applicable on the get device state list, modify config, and device config versions methods. By default, this flag's value will be false.
+If you'd like to receive binaryData and timestamps in the same format that the Google IoT Node SDK supplies, you can define an environment variable named `BINARYDATA_AND_TIME_GOOGLE_FORMAT`. If this env variable is set as `true`, then it will give the binaryData object's response in byte array form and time in timestamp format, which will have seconds and nanos in it, following Google's structure. It's applicable on the get device state list, modify config, and device config versions methods. By default, this flag's value will be false.
 
 ```
 export BINARYDATA_AND_TIME_GOOGLE_FORMAT=true
