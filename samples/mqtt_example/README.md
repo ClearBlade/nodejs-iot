@@ -5,17 +5,17 @@
 This sample app publishes data to Cloud Pub/Sub using the MQTT bridge provided
 as part of ClearBlade IoT Core.
 
-Note that before you can run this sample, you must register a device as
+Before you can run this sample, you must register a device as
 described in the parent README. For the gateway samples, you must register and bind
 a device as described in the [ClearBlade IoT gateway docs](https://clearblade.atlassian.net/wiki/spaces/IC/pages/2202664978/Creating+gateways).
 
 # Setup
 
-Run the following command to install the library dependencies for NodeJS:
+Run the following command to install the NodeJS library dependencies:
 
     npm install
 
-Download server certificate as described in the [ClearBlade docs](https://clearblade.atlassian.net/wiki/spaces/IC/pages/2210299905/Re-targetting+Devices).
+Download the server certificate as described in the [ClearBlade docs](https://clearblade.atlassian.net/wiki/spaces/IC/pages/2210299905/Re-targetting+Devices).
 
 # Running the sample
 
@@ -35,8 +35,8 @@ The following command summarizes the sample usage:
         --cloudRegion         GCP cloud region.
         --registryId          Cloud IoT registry ID.
         --deviceId            Cloud IoT device ID.
-        --privateKeyFile      Path to private key file.
-        --serverCertFile      Path to server certificate file.
+        --privateKeyFile      Path to the private key file.
+        --serverCertFile      Path to the server certificate file.
         --algorithm           Encryption algorithm to generate the JWT.
         --numMessages         Number of messages to publish.
         --tokenExpMins        Minutes to JWT token expiration.
@@ -82,7 +82,7 @@ Examples:
 
 # Sending a configuration update
 
-For `listenForConfigMessages` example, try sending a config update to the device while the client is running. This can be done via the ClearBlade IoT Core UI.
+For the `listenForConfigMessages` example, try sending a config update to the device while the client is running. This can be done via the ClearBlade IoT Core UI.
 
 # Reading the messages written by the sample client
 
@@ -92,7 +92,7 @@ For `listenForConfigMessages` example, try sending a config update to the device
             projects/your-project-id/subscriptions/my-subscription \
             --topic device-events
 
-2.  Read messages published to the topic
+2.  Read messages published to the topic.
 
         gcloud pubsub subscriptions pull --auto-ack \
             projects/my-iot-project/subscriptions/my-subscription
