@@ -2,11 +2,9 @@
 
 # ClearBlade IoT Core NodeJS HTTP example
 
-This sample app publishes messages to [Google Cloud Pub/Sub](pubsub) or updates
-device states using the HTTP bridge provided as part of ClearBlade IoT Core.
+This sample app publishes messages to [Google Cloud Pub/Sub](pubsub) or updates device states using the HTTP bridge provided as part of ClearBlade IoT Core.
 
-Note that before you can run this sample, you must register a device as
-described in the parent README.
+Before you can run this sample, you must register a device as described in the parent README.
 
 [pubsub]: https://cloud.google.com/pubsub/docs
 
@@ -22,19 +20,19 @@ The following command summarizes the sample usage:
 
 Usage: cloudiot_http_example.js [options]
 
-Example ClearBlade IoT Core HTTP device connection code.
+Example ClearBlade IoT Core HTTP device connection code
 
 Options:
 
-    -h, --help                       output usage information
-    --iotCredentials <iotCredentials>Service Account Credentials JSON file.
-    --registryId <registryId>        ClearBlade IoT Core registry id.
-    --deviceId <deviceId>            ClearBlade IoT Core device id.
-    --cloudRegion [region]           GCP cloud region (e.g. us-central1, europe-west1). Defaults to us-central1.
-    --numMessages [num]              Number of messages to publish.
-    --messageType [events|state]     The message type to publish.
+    -h, --help                        Output usage information
+    --iotCredentials <iotCredentials> Service account credentials JSON file
+    --registryId <registryId>         ClearBlade IoT Core registry id
+    --deviceId <deviceId>             ClearBlade IoT Core device id
+    --cloudRegion [region]            GCP cloud region (e.g. us-central1, europe-west1). Defaults to us-central1
+    --numMessages [num]               Number of messages to publish
+    --messageType [events|state]      The message type to publish
 
-For example, if your region is asia-east1, and you have generated downloaded your credentials JSON file when you created a project Service Account, you can run the sample as:
+For example, if your region is asia-east1, and you generated and downloaded your credentials JSON file when you created a project service account, you can run the sample as:
 
     node cloudiot_http_example.js \
         --iotCredentials=../creds.json
@@ -50,7 +48,7 @@ For example, if your region is asia-east1, and you have generated downloaded you
     projects/your-project-id/subscriptions/my-subscription \
     --topic device-events
 
-2.  Read messages published to the topic
+2.  Read messages published to the topic.
 
     gcloud beta pubsub subscriptions pull --auto-ack \
     projects/my-iot-project/subscriptions/my-subscription
