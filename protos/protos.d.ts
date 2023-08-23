@@ -1185,6 +1185,9 @@ export namespace google {
 
                     /** GetDeviceRequest fieldMask */
                     fieldMask?: (google.protobuf.IFieldMask|null);
+
+                    /** GetDeviceRequest base64Encode */
+                    base64Encode?: (string|null);
                 }
 
                 /** Represents a GetDeviceRequest. */
@@ -1503,6 +1506,9 @@ export namespace google {
 
                     /** ListDevicesRequest pageToken */
                     pageToken?: (string|null);
+
+                    /** Boolean base64Encode */
+                    base64Encode?: (string|null);
                 }
 
                 /** Represents a ListDevicesRequest. */

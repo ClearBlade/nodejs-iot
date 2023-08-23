@@ -1325,6 +1325,7 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IDevice
   >(
     async request => {
+      console.log('ANS here!!!!');
       const registry = this.matchRegistryFromDeviceName(request?.name ?? '');
       const region = this.matchLocationFromDeviceName(request?.name ?? '');
       const token_response = await this.getRegistryToken(registry, region);
@@ -1333,7 +1334,9 @@ export class DeviceManagerClient {
           host: token_response.host,
           path: `/api/v/4/webhook/execute/${
             token_response.systemKey
-          }/cloudiot_devices?name=${request.name}${
+          }/cloudiot_devices?name=${request.name}&base64Encode=${
+            request.base64Encode
+          }${
             typeof request.fieldMask !== 'undefined' &&
             request.fieldMask !== null &&
             typeof request.fieldMask.paths !== 'undefined' &&
@@ -3529,6 +3532,10 @@ export class DeviceManagerClient {
 
         if (request.pageToken) {
           searchParams.set('pageToken', request.pageToken);
+        }
+
+        if (request.base64Encode) {
+          searchParams.set('base64Encode', request.base64Encode);
         }
 
         function getGatewayType(
