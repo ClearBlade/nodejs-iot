@@ -35,3 +35,4 @@
 // ** All changes to this file may be overwritten. **
 
 export {DeviceManagerClient} from './device_manager_client';
+export {ClearBladeIoTCoreGoogleError} from './iotCoreError';

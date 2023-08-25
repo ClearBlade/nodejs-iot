@@ -39,7 +39,10 @@ import * as v1 from './v1';
 const DeviceManagerClient = v1.DeviceManagerClient;
 type DeviceManagerClient = v1.DeviceManagerClient;
 
-export {v1, DeviceManagerClient};
-export default {v1, DeviceManagerClient};
+const ClearBladeIoTCoreGoogleError = v1.ClearBladeIoTCoreGoogleError;
+type ClearBladeIoTCoreGoogleError = v1.ClearBladeIoTCoreGoogleError;
+
+export {v1, DeviceManagerClient, ClearBladeIoTCoreGoogleError};
+export default {v1, DeviceManagerClient, ClearBladeIoTCoreGoogleError};
 import * as protos from '../protos/protos';
 export {protos};

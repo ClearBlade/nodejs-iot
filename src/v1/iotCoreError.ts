@@ -1,19 +1,30 @@
 import {GoogleError, Status} from 'google-gax';
 
+export class ClearBladeIoTCoreGoogleError extends GoogleError {
+  ClearBladeIoTCoreError: IoTCoreError;
+  details?: IoTCoreError['details'];
+  constructor(iotError: IoTCoreError) {
+    super(iotError.message);
+    this.code = getGoogleErrorCodeFromStatus(iotError.status);
+
+    this.ClearBladeIoTCoreError = iotError;
+    if (iotError.details) {
+      this.details = iotError.details;
+    }
+  }
+}
+
 export class IoTCoreError extends Error {
   code: number;
   status: string;
   details?: unknown;
-  constructor(info: {
-    code: number;
-    message: string;
-    status: string;
-    details?: unknown;
-  }) {
-    super(info.message);
-    this.code = info.code;
-    this.status = info.status;
-    this.details = info.details;
+  serverError: ServerError;
+  constructor(serverError: ServerError) {
+    super(serverError.error.message);
+    this.code = serverError.error.code;
+    this.status = serverError.error.status;
+    this.details = serverError.error.details;
+    this.serverError = serverError;
   }
 
   static parseHttpError = (error: unknown): IoTCoreError => {
@@ -23,7 +34,7 @@ export class IoTCoreError extends Error {
       try {
         const parsedError = JSON.parse(error);
         if (isServerError(parsedError)) {
-          return new IoTCoreError(parsedError.error);
+          return new IoTCoreError(parsedError);
         }
         // eslint-disable-next-line no-empty
       } catch (e) {}
@@ -31,16 +42,9 @@ export class IoTCoreError extends Error {
     return new UnknownError(error);
   };
 
-  static toGoogleError = (error: unknown): GoogleError => {
+  static toGoogleError = (error: unknown): ClearBladeIoTCoreGoogleError => {
     const iotError = IoTCoreError.parseHttpError(error);
-    const googleError = new GoogleError(iotError.message);
-    googleError.code = getGoogleErrorCodeFromStatus(iotError.status);
-
-    if (iotError.details) {
-      (googleError as GoogleError & {details: unknown}).details =
-        iotError.details;
-    }
-    return googleError;
+    return new ClearBladeIoTCoreGoogleError(iotError);
   };
 }
 
@@ -85,10 +89,12 @@ export function getGoogleErrorCodeFromStatus(status: string): Status {
 export class UnknownError extends IoTCoreError {
   constructor(error: unknown) {
     super({
-      code: 2,
-      message: 'An unknown error occurred',
-      status: 'UNKNOWN_ERROR',
-      details: error,
+      error: {
+        code: 2,
+        message: 'An unknown error occurred',
+        status: 'UNKNOWN_ERROR',
+        details: error,
+      },
     });
   }
 }
@@ -96,9 +102,11 @@ export class UnknownError extends IoTCoreError {
 export class NetworkingError extends IoTCoreError {
   constructor() {
     super({
-      code: -2,
-      message: 'Networking error. No status code was returned',
-      status: 'NETWORKING_ERROR',
+      error: {
+        code: -2,
+        message: 'Networking error. No status code was returned',
+        status: 'NETWORKING_ERROR',
+      },
     });
   }
 }
@@ -122,5 +130,6 @@ interface ServerError {
     code: number;
     message: string;
     status: string;
+    details?: unknown;
   };
 }
