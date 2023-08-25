@@ -3087,9 +3087,11 @@ describe('v1.DeviceManagerClient', () => {
         () =>
           Promise.reject(
             new IoTCoreError({
-              code: 400,
-              message: 'Device d is not connected',
-              status: 'FAILED_PRECONDITION',
+              error: {
+                code: 400,
+                message: 'Device d is not connected',
+                status: 'FAILED_PRECONDITION',
+              },
             })
           ),
         {
@@ -3120,9 +3122,11 @@ describe('v1.DeviceManagerClient', () => {
 
       const mock = sinon.stub().rejects(
         new IoTCoreError({
-          code: 400,
-          message: 'Device d is not connected',
-          status: 'FAILED_PRECONDITION',
+          error: {
+            code: 400,
+            message: 'Device d is not connected',
+            status: 'FAILED_PRECONDITION',
+          },
         })
       );
 
