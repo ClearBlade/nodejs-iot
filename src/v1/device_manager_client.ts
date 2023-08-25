@@ -1325,7 +1325,6 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IDevice
   >(
     async request => {
-      console.log('ANS here!!!!');
       const registry = this.matchRegistryFromDeviceName(request?.name ?? '');
       const region = this.matchLocationFromDeviceName(request?.name ?? '');
       const token_response = await this.getRegistryToken(registry, region);
