@@ -1328,21 +1328,30 @@ export class DeviceManagerClient {
       const registry = this.matchRegistryFromDeviceName(request?.name ?? '');
       const region = this.matchLocationFromDeviceName(request?.name ?? '');
       const token_response = await this.getRegistryToken(registry, region);
+      const searchParams = new URLSearchParams();
+      if (typeof request.name === 'string') {
+        searchParams.set('name', request.name);
+      }
+      if (
+        typeof request.fieldMask !== 'undefined' &&
+        request.fieldMask !== null &&
+        typeof request.fieldMask.paths !== 'undefined' &&
+        request.fieldMask.paths !== null
+      ) {
+        searchParams.set('fieldMask', request.fieldMask.paths.join(','));
+      }
+      if (typeof request.base64Encode !== 'undefined') {
+        searchParams.set(
+          'base64Encode',
+          request.base64Encode ? 'true' : 'false'
+        );
+      }
       return new Promise((resolve, reject) => {
         const options = {
           host: token_response.host,
           path: `/api/v/4/webhook/execute/${
             token_response.systemKey
-          }/cloudiot_devices?name=${request.name}&base64Encode=${
-            request.base64Encode
-          }${
-            typeof request.fieldMask !== 'undefined' &&
-            request.fieldMask !== null &&
-            typeof request.fieldMask.paths !== 'undefined' &&
-            request.fieldMask.paths !== null
-              ? `&fieldMask=${request.fieldMask.paths.join(',')}`
-              : ''
-          }`,
+          }/cloudiot_devices?${searchParams.toString()}`,
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -3533,8 +3542,11 @@ export class DeviceManagerClient {
           searchParams.set('pageToken', request.pageToken);
         }
 
-        if (request.base64Encode) {
-          searchParams.set('base64Encode', request.base64Encode);
+        if (typeof request.base64Encode !== 'undefined') {
+          searchParams.set(
+            'base64Encode',
+            request.base64Encode === true ? 'true' : 'false'
+          );
         }
 
         function getGatewayType(
