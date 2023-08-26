@@ -1186,7 +1186,7 @@ export namespace google {
                     /** GetDeviceRequest fieldMask */
                     fieldMask?: (google.protobuf.IFieldMask|null);
 
-                    /** GetDeviceRequest base64Encode - if supplied, the state data in the state field will be base64 encoded */
+                    /** boolean base64Encode - if supplied, the state data in the state field will be base64 encoded */
                     base64Encode?: boolean;
                 }
 
@@ -1507,7 +1507,7 @@ export namespace google {
                     /** ListDevicesRequest pageToken */
                     pageToken?: (string|null);
 
-                    /** Boolean base64Encode - if supplied, the state data in the state field will be base64 encoded */
+                    /** boolean base64Encode - if supplied, the state data in the state field will be base64 encoded */
                     base64Encode?: boolean;
                 }
 
