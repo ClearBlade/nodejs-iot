@@ -1182,6 +1182,7 @@ export class DeviceManagerClient {
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
         const payload = JSON.stringify(request?.device);
+        const data = Buffer.from(payload, 'utf-8');
         const options = {
           host: token_response.host,
           path:
@@ -1192,7 +1193,7 @@ export class DeviceManagerClient {
           headers: {
             'Content-Type': 'application/json',
             'ClearBlade-UserToken': token_response.serviceAccountToken,
-            'Content-Length': payload.length,
+            'Content-Length': data.length,
           },
         };
         const req = https.request(
@@ -1223,7 +1224,7 @@ export class DeviceManagerClient {
           reject(e);
         });
         if (payload) {
-          req.write(payload);
+          req.write(data);
         }
         req.end();
       });
@@ -1488,6 +1489,7 @@ export class DeviceManagerClient {
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
         const payload = JSON.stringify(request?.device);
+        const data = Buffer.from(payload, 'utf-8');
 
         const options = {
           host: token_response.host,
@@ -1502,7 +1504,7 @@ export class DeviceManagerClient {
           headers: {
             'Content-Type': 'application/json',
             'ClearBlade-UserToken': token_response.serviceAccountToken,
-            'Content-Length': payload.length,
+            'Content-Length': data.length,
           },
         };
 
@@ -1534,7 +1536,7 @@ export class DeviceManagerClient {
           reject(e);
         });
         if (payload) {
-          req.write(payload);
+          req.write(data);
         }
         req.end();
       });
