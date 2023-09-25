@@ -108,7 +108,7 @@ async function main() {
     // };
     // const requestUpdateDevice = {
     //   device,
-    //   updateMask: 'logLevel,metadata',
+    //   updateMask: { paths: [ 'logLevel,metadata' ] }
     // };
     // const [responseUpdateDevice] = await client.updateDevice(
     //   requestUpdateDevice
