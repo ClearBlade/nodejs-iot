@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.0](https://github.com/clearblade/nodejs-iot/compare/v1.2.1..v1.3.0) (2023-09-28)
+
+- Add support for base64 encoding of state when calling getDevice and listDevices
+
 ## [1.2.1](https://github.com/clearblade/nodejs-iot/compare/v1.2.0..v1.2.1) (2023-09-12)
 
 - Fix content length header on device create and device patch
