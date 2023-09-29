@@ -2151,6 +2151,9 @@ export namespace google {
 
                     /** ListDeviceStatesRequest numStates */
                     numStates?: (number|null);
+
+                    /** boolean base64Encode - if supplied, the state data in the state field will be base64 encoded */
+                    base64Encode?: boolean;
                 }
 
                 /** Represents a ListDeviceStatesRequest. */
