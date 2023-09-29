@@ -2189,6 +2189,13 @@ export class DeviceManagerClient {
         );
         if (isBinaryDataFormat()) {
           query.append('base64Encode', 'true');
+        } else {
+          query.append(
+            'base64Encode',
+            typeof request.base64Encode === 'boolean'
+            ? request.base64Encode?.toString()
+            : 'false'
+          )
         }
 
         const options = {
