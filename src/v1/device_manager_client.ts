@@ -2193,9 +2193,9 @@ export class DeviceManagerClient {
           query.append(
             'base64Encode',
             typeof request.base64Encode === 'boolean'
-            ? request.base64Encode?.toString()
-            : 'false'
-          )
+              ? request.base64Encode?.toString()
+              : 'false'
+          );
         }
 
         const options = {
