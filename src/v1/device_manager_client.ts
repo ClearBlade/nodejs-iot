@@ -3148,13 +3148,20 @@ export class DeviceManagerClient {
   >(
     request => {
       return new Promise((resolve, reject) => {
+        const searchParams = new URLSearchParams();
+        searchParams.set('parent', request.parent ?? '');
+
+        if (request.fieldMask && request.fieldMask.paths) {
+          searchParams.set('fieldMask', request.fieldMask.paths?.join(','));
+        }
+
         const options = {
           host: this.BASE_URL,
           path:
             '/api/v/4/webhook/execute/' +
             this.ADMIN_SYSTEM_KEY +
-            '/cloudiot?parent=' +
-            request?.parent,
+            '/cloudiot?' +
+            searchParams.toString(),
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

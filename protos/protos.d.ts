@@ -873,6 +873,9 @@ export namespace google {
 
                     /** ListDeviceRegistriesRequest pageToken */
                     pageToken?: (string|null);
+
+                    /** ListDeviceRegistriesRequest fieldMask */
+                    fieldMask?: (google.protobuf.IFieldMask|null);
                 }
 
                 /** Represents a ListDeviceRegistriesRequest. */
