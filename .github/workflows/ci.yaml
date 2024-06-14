@@ -20,11 +20,9 @@ jobs:
       # dependencies work on the given Node.js version, this helps us find
       # dependencies that don't match our engines field:
       - run: npm install --production --engine-strict --ignore-scripts --no-package-lock
-      - run: npm ls
       # Clean up the production install, before installing dev/production:
       - run: rm -rf node_modules
       - run: npm install
-      - run: npm ls
       - run: npm test
         env:
           MOCHA_THROW_DEPRECATION: false
