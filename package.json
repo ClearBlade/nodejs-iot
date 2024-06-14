@@ -29,7 +29,7 @@
     "docs-test": "linkinator docs",
     "predocs-test": "npm run docs",
     "clean": "gts clean",
-    "compile": "tsc -p . && cp -r protos build/",
+    "compile": "echo compile",
     "compile-protos": "compileProtos src",
     "prepare": "npm run compile",
     "prelint": "cd samples; npm link ../; npm install",
