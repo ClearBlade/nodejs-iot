@@ -3392,11 +3392,10 @@ export class DeviceManagerClient {
    *   Required. The device registry path. Required. For example,
    *   `projects/my-project/locations/us-central1/registries/my-registry`.
    * @param {number[]} request.deviceNumIds
-   *   A list of device numeric IDs. If empty, this field is ignored. Maximum
-   *   IDs: 10,000.
+   *   A list of device numeric IDs. If empty, this field is ignored.
    * @param {string[]} request.deviceIds
    *   A list of device string IDs. For example, `['device0', 'device12']`.
-   *   If empty, this field is ignored. Maximum IDs: 10,000
+   *   If empty, this field is ignored.
    * @param {google.protobuf.FieldMask} request.fieldMask
    *   The fields of the `Device` resource to be returned in the response. The
    *   fields `id` and `num_id` are always returned, along with any
@@ -3648,11 +3647,10 @@ export class DeviceManagerClient {
    *   Required. The device registry path. Required. For example,
    *   `projects/my-project/locations/us-central1/registries/my-registry`.
    * @param {number[]} request.deviceNumIds
-   *   A list of device numeric IDs. If empty, this field is ignored. Maximum
-   *   IDs: 10,000.
+   *   A list of device numeric IDs. If empty, this field is ignored.
    * @param {string[]} request.deviceIds
    *   A list of device string IDs. For example, `['device0', 'device12']`.
-   *   If empty, this field is ignored. Maximum IDs: 10,000
+   *   If empty, this field is ignored.
    * @param {google.protobuf.FieldMask} request.fieldMask
    *   The fields of the `Device` resource to be returned in the response. The
    *   fields `id` and `num_id` are always returned, along with any
@@ -3713,11 +3711,10 @@ export class DeviceManagerClient {
    *   Required. The device registry path. Required. For example,
    *   `projects/my-project/locations/us-central1/registries/my-registry`.
    * @param {number[]} request.deviceNumIds
-   *   A list of device numeric IDs. If empty, this field is ignored. Maximum
-   *   IDs: 10,000.
+   *   A list of device numeric IDs. If empty, this field is ignored.
    * @param {string[]} request.deviceIds
    *   A list of device string IDs. For example, `['device0', 'device12']`.
-   *   If empty, this field is ignored. Maximum IDs: 10,000
+   *   If empty, this field is ignored.
    * @param {google.protobuf.FieldMask} request.fieldMask
    *   The fields of the `Device` resource to be returned in the response. The
    *   fields `id` and `num_id` are always returned, along with any
