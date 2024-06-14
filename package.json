@@ -29,7 +29,7 @@
     "docs-test": "linkinator docs",
     "predocs-test": "npm run docs",
     "clean": "gts clean",
-    "compile": "echo compile",
+    "compile": "tsc -p . && cp -r protos build/",
     "compile-protos": "compileProtos src",
     "prepare": "npm run compile",
     "prelint": "cd samples; npm link ../; npm install",
@@ -38,6 +38,9 @@
   "dependencies": {
     "google-gax": "^4.3.2",
     "timestamp-nano": "^1.0.1"
+  },
+  "overrides": {
+    "@types/linkify-it": "3.0.2"
   },
   "devDependencies": {
     "@types/mocha": "^9.0.0",
