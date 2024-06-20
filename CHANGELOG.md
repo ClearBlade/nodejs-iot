@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.2](https://github.com/clearblade/nodejs-iot/compare/v1.4.0..v1.4.1) (2023-06-20)
+
+- Update comment about 10,000 deviceIds
+
+## [1.4.1](https://github.com/clearblade/nodejs-iot/compare/v1.4.0..v1.4.1) (2023-04-16)
+
+- Update google-gax dependency to latest to fix vulnerability
+
+## [1.4.0](https://github.com/clearblade/nodejs-iot/compare/v1.3.1..v1.4.0) (2023-01-31)
+
+- Add fieldMask support for listDeviceRegistries
+
 ## [1.3.1](https://github.com/clearblade/nodejs-iot/compare/v1.3.0..v1.3.1) (2023-09-29)
 
 - Add support for base64 encoding of state when calling listDeviceStates
