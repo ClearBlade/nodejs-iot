@@ -877,7 +877,7 @@ const {argv} = require('yargs')
   .wrap(120)
   .recommendCommands()
   .epilogue(
-    'For more information, see https://clearblade.atlassian.net/wiki/spaces/IC/pages/2210299905/Re-targetting+Devices'
+    'For more information, see https://docs.clearblade.com/iotcore/retargeting-devices'
   )
   .help()
   .strict();

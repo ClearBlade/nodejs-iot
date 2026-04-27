@@ -4,7 +4,7 @@
 
 > Node.js idiomatic client for [ClearBlade IoT Core][product-docs].
 
-[ClearBlade IoT Core](https://clearblade.atlassian.net/wiki/spaces/IC/overview?homepageId=2170716228) is a fully managed service for securely connecting and managing IoT devices, from a few to millions. Ingest data from connected devices and build rich applications that integrate with the other big data services of the ClearBlade Platform or the Google Cloud Platform.
+[ClearBlade IoT Core](https://docs.clearblade.com/iotcore/) is a fully managed service for securely connecting and managing IoT devices, from a few to millions. Ingest data from connected devices and build rich applications that integrate with the other big data services of the ClearBlade Platform or the Google Cloud Platform.
 
 - [ClearBlade IoT Core Node.js client API reference][client-docs]
 - [Clearblade IoT Core documentation][product-docs]
@@ -38,7 +38,11 @@ npm install @clearblade/iot
 
 ### Setting up service account credentials
 
-[Create a service account](https://clearblade.atlassian.net/wiki/spaces/IC/pages/2240675843/Add+service+accounts+to+a+project) in your project and download the credentials .json file. Define an environment variable named `CLEARBLADE_CONFIGURATION`, which represents the credentials .json file's path. Example:
+Use one of these docs for this section:
+IoT Core Standard: https://docs.clearblade.com/iotcore/manage-service-accounts-in-a-project-standard
+IoT Core Enterprise: https://docs.clearblade.com/iotcore/manage-service-accounts-in-a-project-enterprise
+
+Create a service account in your project and download the credentials .json file. Define an environment variable named `CLEARBLADE_CONFIGURATION`, which represents the credentials .json file's path. Example:
 
 ```
 export CLEARBLADE_CONFIGURATION=/path/to/file.json
@@ -126,9 +130,9 @@ Apache Version 2.0
 See [LICENSE](https://github.com/googleapis/nodejs-iot/blob/main/LICENSE)
 
 [client-docs]: https://cloud.google.com/nodejs/docs/reference/iot/latest
-[product-docs]: https://clearblade.atlassian.net/wiki/spaces/IC/pages/2200895497/All+concepts
+[product-docs]: https://docs.clearblade.com/iotcore/all-concepts
 [shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
 [projects]: https://console.cloud.google.com/project
 [billing]: https://support.google.com/cloud/answer/6293499#enable-billing
-[enable_api]: https://clearblade.atlassian.net/wiki/spaces/IC/pages/2230976570/Google+Cloud+Marketplace+Activation
+[enable_api]: https://docs.clearblade.com/iotcore/google-cloud-marketplace-activation
 [auth]: https://cloud.google.com/docs/authentication/getting-started
