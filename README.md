@@ -39,8 +39,8 @@ npm install @clearblade/iot
 ### Setting up service account credentials
 
 Use one of these docs for this section:
-IoT Core Standard: https://docs.clearblade.com/iotcore/manage-service-accounts-in-a-project-standard
-IoT Core Enterprise: https://docs.clearblade.com/iotcore/manage-service-accounts-in-a-project-enterprise
+- [IoT Core Standard](https://docs.clearblade.com/iotcore/manage-service-accounts-in-a-project-standard)
+- [IoT Core Enterprise](https://docs.clearblade.com/iotcore/manage-service-accounts-in-a-project-enterprise)
 
 Create a service account in your project and download the credentials .json file. Define an environment variable named `CLEARBLADE_CONFIGURATION`, which represents the credentials .json file's path. Example:
 
