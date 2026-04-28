@@ -7,7 +7,7 @@ as part of ClearBlade IoT Core.
 
 Before you can run this sample, you must register a device as
 described in the parent README. For the gateway samples, you must register and bind
-a device as described in the [ClearBlade IoT gateway docs](https://clearblade.atlassian.net/wiki/spaces/IC/pages/2202664978/Creating+gateways).
+a device as described in the [ClearBlade IoT gateway docs](https://docs.clearblade.com/iotcore/creating-configuring-and-managing-gateways).
 
 # Setup
 
@@ -15,7 +15,7 @@ Run the following command to install the NodeJS library dependencies:
 
     npm install
 
-Download the server certificate as described in the [ClearBlade docs](https://clearblade.atlassian.net/wiki/spaces/IC/pages/2210299905/Re-targetting+Devices).
+Download the server certificate as described in the [ClearBlade docs](https://docs.clearblade.com/iotcore/retargeting-devices).
 
 # Running the sample
 
