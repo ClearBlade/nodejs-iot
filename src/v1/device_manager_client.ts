@@ -599,7 +599,6 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IDeviceRegistry
   >(
     request => {
-      console.log('hello from private _createDeviceRegistry!!!!');
       return new Promise((resolve, reject) => {
         const payload = JSON.stringify(request?.deviceRegistry);
         const options = {
