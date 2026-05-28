@@ -147,6 +147,25 @@ function isErrorStatusCode(statusCode: number): boolean {
   return false;
 }
 
+function webhookPath(
+  systemKey: string,
+  endpoint: string,
+  query?: Record<string, string | null | undefined>
+): string {
+  const searchParams = new URLSearchParams();
+  Object.entries(query ?? {}).forEach(([key, value]) => {
+    if (typeof value !== 'undefined' && value !== null) {
+      searchParams.set(key, value);
+    }
+  });
+
+  const path = `/api/v/4/webhook/execute/${encodeURIComponent(
+    systemKey
+  )}/${endpoint}`;
+  const queryString = searchParams.toString();
+  return queryString ? `${path}?${queryString}` : path;
+}
+
 function loadServiceAccountCredentials(
   opts?: DeviceManagerClientOptions
 ): ServiceAccountCredentials {
@@ -580,16 +599,19 @@ export class DeviceManagerClient {
     protos.google.cloud.iot.v1.IDeviceRegistry
   >(
     request => {
+      console.log('hello from private _createDeviceRegistry!!!!');
       return new Promise((resolve, reject) => {
         const payload = JSON.stringify(request?.deviceRegistry);
         const options = {
           host: this.BASE_URL,
-          path: `/api/v/4/webhook/execute/${this.ADMIN_SYSTEM_KEY}/cloudiot?parent=${request?.parent}`,
+          path: webhookPath(this.ADMIN_SYSTEM_KEY, 'cloudiot', {
+            parent: request?.parent,
+          }),
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
-            'Content-Length': payload.length,
+            'Content-Length': Buffer.byteLength(payload),
           },
         };
 
@@ -725,7 +747,9 @@ export class DeviceManagerClient {
       return await new Promise((resolve, reject) => {
         const options = {
           host: token_response.host,
-          path: `/api/v/4/webhook/execute/${token_response.systemKey}/cloudiot?name=${request.name}`,
+          path: webhookPath(token_response.systemKey, 'cloudiot', {
+            name: request.name,
+          }),
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -882,18 +906,15 @@ export class DeviceManagerClient {
 
         const options = {
           host: token_response.host,
-          path:
-            '/api/v/4/webhook/execute/' +
-            token_response.systemKey +
-            '/cloudiot?name=' +
-            request?.deviceRegistry?.name +
-            '&updateMask=' +
-            request?.updateMask?.paths?.join(','),
+          path: webhookPath(token_response.systemKey, 'cloudiot', {
+            name: request?.deviceRegistry?.name,
+            updateMask: request?.updateMask?.paths?.join(','),
+          }),
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
             'ClearBlade-UserToken': token_response.serviceAccountToken,
-            'Content-Length': payload.length,
+            'Content-Length': Buffer.byteLength(payload),
           },
         };
 
@@ -1031,19 +1052,13 @@ export class DeviceManagerClient {
   >(
     request => {
       return new Promise((resolve, reject) => {
-        const payload = JSON.stringify({
-          name: request?.name,
-        });
         const options = {
           host: this.BASE_URL,
-          path:
-            '/api/v/4/webhook/execute/' +
-            this.ADMIN_SYSTEM_KEY +
-            '/cloudiot?name=' +
-            request?.name,
+          path: webhookPath(this.ADMIN_SYSTEM_KEY, 'cloudiot', {
+            name: request?.name,
+          }),
           method: 'DELETE',
           headers: {
-            'Content-Type': 'application/json',
             'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
           },
         };
@@ -1072,9 +1087,6 @@ export class DeviceManagerClient {
         req.on('error', e => {
           reject(e);
         });
-        if (payload) {
-          req.write(payload);
-        }
         req.end();
       });
     },
@@ -1828,7 +1840,7 @@ export class DeviceManagerClient {
           headers: {
             'Content-Type': 'application/json',
             'ClearBlade-UserToken': token_response.serviceAccountToken,
-            'Content-Length': payload.length,
+            'Content-Length': Buffer.byteLength(payload),
           },
         };
 
@@ -2678,7 +2690,7 @@ export class DeviceManagerClient {
           headers: {
             'Content-Type': 'application/json',
             'ClearBlade-UserToken': token_response.serviceAccountToken,
-            'Content-Length': payload.length,
+            'Content-Length': Buffer.byteLength(payload),
           },
         };
 
@@ -2832,7 +2844,7 @@ export class DeviceManagerClient {
           headers: {
             'Content-Type': 'application/json',
             'ClearBlade-UserToken': token_response.serviceAccountToken,
-            'Content-Length': payload.length,
+            'Content-Length': Buffer.byteLength(payload),
           },
         };
 
@@ -2999,7 +3011,7 @@ export class DeviceManagerClient {
           headers: {
             'Content-Type': 'application/json',
             'ClearBlade-UserToken': token_response.serviceAccountToken,
-            'Content-Length': payload.length,
+            'Content-Length': Buffer.byteLength(payload),
           },
         };
 
@@ -3232,7 +3244,7 @@ export class DeviceManagerClient {
             headers: {
               'Content-Type': 'application/json',
               'ClearBlade-UserToken': this.ADMIN_USER_TOKEN,
-              'Content-Length': payload.length,
+              'Content-Length': Buffer.byteLength(payload),
             },
           };
           const req = https.request(options, res => {
@@ -3497,10 +3509,6 @@ export class DeviceManagerClient {
       const region = this.matchLocationFromRegistryName(request.parent ?? '');
       const token_response = await this.getRegistryToken(registry, region);
       return new Promise((resolve, reject) => {
-        const payload = JSON.stringify({
-          parent: request?.parent,
-        });
-
         const searchParams = new URLSearchParams();
 
         if (request.parent) {
@@ -3593,7 +3601,6 @@ export class DeviceManagerClient {
           headers: {
             'Content-Type': 'application/json',
             'ClearBlade-UserToken': token_response.serviceAccountToken,
-            'Content-Length': payload.length,
           },
         };
 
@@ -3624,9 +3631,6 @@ export class DeviceManagerClient {
         req.on('error', e => {
           reject(e);
         });
-        if (payload) {
-          req.write(payload);
-        }
         req.end();
       });
     },
