@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.4](https://github.com/clearblade/nodejs-iot/compare/v1.4.3..v1.4.4) (2026-05-28)
+
+- Remove debug log
+
+## [1.4.3](https://github.com/clearblade/nodejs-iot/compare/v1.4.2..v1.4.3) (2026-05-28)
+
+- Fix issues with incorrect Content-Length header, URL encode query params,
+
 ## [1.4.2](https://github.com/clearblade/nodejs-iot/compare/v1.4.0..v1.4.1) (2023-06-20)
 
 - Update comment about 10,000 deviceIds
